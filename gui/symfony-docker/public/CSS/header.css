@@ -1,0 +1,74 @@
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  header {
+    background-color: #34aadc; /* The specific blue shade from your image */
+    color: white;
+    padding: 10px 0;
+  }
+  
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+  
+  .logo img {
+    height: 50px; /* Adjust as needed */
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px; /* Space between the links */
+  }
+  
+  .nav-links li {
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-links a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-links a i {
+    margin-right: 8px;
+  }
+  
+  /* Add classes for icons based on your image assets */
+  .icon {
+    width: 20px; /* Adjust as needed */
+    height: 20px; /* Adjust as needed */
+  }
+  
+  .home-icon {
+    background-image: url('icons/home.png');
+  }
+  
+  .search-icon {
+    background-image: url('icons/search.png');
+  }
+  
+  .alert-icon {
+    background-image: url('icons/alert.png');
+  }
+  
+  .admin-icon {
+    background-image: url('icons/admin.png');
+  }
+  
+  .contact-icon {
+    background-image: url('icons/contact.png');
+  }
+  
+  .login-icon {
+    background-image: url('icons/login.png');
+  }

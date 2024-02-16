@@ -1,0 +1,36 @@
+/* sidebar.css */
+
+#sidebar {
+    background-color: #2a9fd6; /* Adjust the color to match the image */
+    color: white;
+    width: 250px; /* Adjust the width as necessary */
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
+}
+
+.sidebar-logo {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 0;
+    display: block;
+    font-weight: bold;
+}
+
+.sidebar-nav li a:hover,
+.sidebar-nav li a:focus {
+    background-color: #1c7aa7;
+}
