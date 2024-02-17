@@ -9,9 +9,14 @@
     </style>
 
     <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
         <h2>REGISTER</h2>
 
 
     </div>
+    {{ form_start(form) }}
+    <div class ="row">
+        <div class = "col"> {{form_row(form.FirstName)}} </div>
+        <div class = "col"> {{form_row(form.LastName)}} </div>
+    </div>
+    {{ form_end(form) }}
 {% endblock %}
