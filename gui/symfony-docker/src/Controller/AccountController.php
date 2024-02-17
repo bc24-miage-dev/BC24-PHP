@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,23 +20,22 @@ class AccountController extends AbstractController
         ]);
     }
 
-    #[Route('/register', name: 'app_register')]
-    public function register(PersistenceManagerRegistry $doctrine, Request $request): Response
+    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
+    public function register(EntityManagerInterface $entityManager, Request $request): Response
     {
-
-        $entityManager = $doctrine->getManager();
         //User
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
 
         //Traitement de la requête
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($user);
             $entityManager->flush();
+
             return $this->redirectToRoute('app_login');
         }
-
+        
         return $this->render('account/register.html.twig', [
             'form' => $form->createView()
         ]);
