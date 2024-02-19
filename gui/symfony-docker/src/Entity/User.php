@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -27,6 +29,14 @@ class User
 
     #[ORM\Column(length: 255)]
     private ?string $UserCategory = null;
+
+    #[ORM\OneToMany(mappedBy: 'IdUser', targetEntity: Historic::class)]
+    private Collection $historics;
+
+    public function __construct()
+    {
+        $this->historics = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -89,6 +99,36 @@ class User
     public function setUserCategory(string $UserCategory): static
     {
         $this->UserCategory = $UserCategory;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Historic>
+     */
+    public function getHistorics(): Collection
+    {
+        return $this->historics;
+    }
+
+    public function addHistoric(Historic $historic): static
+    {
+        if (!$this->historics->contains($historic)) {
+            $this->historics->add($historic);
+            $historic->setIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHistoric(Historic $historic): static
+    {
+        if ($this->historics->removeElement($historic)) {
+            // set the owning side to null (unless already changed)
+            if ($historic->getIdUser() === $this) {
+                $historic->setIdUser(null);
+            }
+        }
 
         return $this;
     }
