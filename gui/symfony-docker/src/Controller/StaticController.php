@@ -39,4 +39,36 @@ class StaticController extends AbstractController
             'controller_name' => 'StaticController',
         ]);
     }
+
+    #[Route('/consommateur', name: 'app_consommateur')]
+    public function consommateur(): Response
+    {
+        return $this->render('static/consommateur.html.twig', [
+            'controller_name' => 'StaticController',
+        ]);
+    }
+
+    #[Route('/producteur', name: 'app_producteur')]
+    public function producteur(): Response
+    {
+        return $this->render('static/producteur.html.twig', [
+            'controller_name' => 'StaticController',
+        ]);
+    }
+
+    #[Route('/usine', name: 'app_usine')]
+    public function usine(): Response
+    {
+        return $this->render('static/usine.html.twig', [
+            'controller_name' => 'StaticController',
+        ]);
+    }
+
+    #[Route('/equarisseur', name: 'app_equarisseur')]
+    public function equarisseur(): Response
+    {
+        return $this->render('static/equarisseur.html.twig', [
+            'controller_name' => 'StaticController',
+        ]);
+    }
 }
