@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Comment fonctionne BC24 ?{% endblock %}
+
+{% block body %}
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        /*background: #f5f5f5;*/ 
+    }
+    .content-wrapper {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center; 
+    }
+    .steps {
+        display: flex;
+        justify-content: space-between; 
+        margin-bottom: 20px; 
+    }
+    .step {
+        text-align: center;
+        flex-basis: 30%; 
+    }
+    .step img {
+        max-width: 100%; 
+        height: 150px;
+        weight: 150px;
+    }
+    .step p {
+        color: #333;
+        font-size: 1rem;
+    }
+    h1, h2 {
+        color: #017BFE; 
+        text-align: center;
+    }
+</style>
+
+<div class="content-wrapper">
+    <h1>Comment fonctionne BC24 ?</h1>
+
+    <div class="steps">
+        <div class="step">
+            <img src="{{ asset('images/acheter.jpg') }}" alt="Achetez vos produits"><br><br>
+            <p>Achetez vos produits</p>
+        </div>
+        <div class="step">
+            <img src="{{ asset('images/scanner.jpg') }}" alt="Scannez le code"><br><br>
+            <p>Scannez le code</p>
+        </div>
+        <div class="step">
+            <img src="{{ asset('images/verify.jpg') }}" alt="Vérifiez la qualité de votre produit"><br><br>
+            <p>Vérifiez la qualité de votre produit</p>
+        </div>
+    </div>
+
+    <h2>Comment ça marche</h2>
+    <p>Ca fait bim bam boom ! Ca fait vroum et ça fait boom !</p>
+</div>
+{% endblock %}

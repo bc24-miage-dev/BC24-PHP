@@ -1,16 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello StaticController!{% endblock %}
+{% block title %}BC24 - Traçabilité{% endblock %}
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-size: cover;
+    }
+    .main-content {
+        margin-left: 250px;
+        margin-right: 250px;
+        padding: 20px;
+    }
+    .main-content h1 {
+        color: #017BFE;
+        font-size: 48px; 
+    }
+    .search-container {
+        position: relative;
+        margin: 20px 0;
+    }
+    .search-box {
+        width: 100%;
+        padding: 10px;
+        font-size: 18px; 
+        border: 2px solid #017BFE; 
+        border-radius: 5px;
+    }
+    .search-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #017BFE;
+    }
+
+    .logo {
+        width: 100%; 
+        margin-bottom: 20px;
+    }
 </style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-    <h2>INDEX</h2>
 
+<div class="main-content">
+    <h1>BC24 - Traçabilité</h1>
+    <a href="   ">Qu'est-ce que c'est ?</a>
+    <div class="search-container">
+        <span>Code NFT : </span>
+        <input type="text" class="search-box" placeholder="Recherche">
+        <i class="search-icon">🔍</i> 
+    </div>
 </div>
+
 {% endblock %}

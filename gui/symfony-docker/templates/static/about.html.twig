@@ -1,16 +1,52 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello StaticController!{% endblock %}
+{% block title %}À propos de nous{% endblock %}
 
 {% block body %}
-    <style>
-        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-        .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    </style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-size: cover;
+    }
+    .content {
+        padding: 20px;
+        text-align: left;
+    }
+    .content h1 {
+        color: #000066; 
+    }
+</style>
 
-    <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
-        <h2>ABOUT</h2>
-        
-    </div>
+<div class="content">
+    <h1>À propos de nous</h1><hr>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+        sed do eiusmod tempor incididunt ut labore et dolore magna 
+        aliqua. Le lorem ipsum (également appelé faux-texte, lipsum, 
+        ou bolo bolo1)est, en imprimerie, une suite de mots sans 
+        signification utilisée à titre provisoire pour calibrer une 
+        mise en page, le texte définitif venant remplacer le 
+        faux-texte dès qu'il est prêt ou que la mise en page est 
+        achevée.
+        Généralement, on utilise un texte en faux latin (le texte 
+        ne veut rien dire, il a été modifié), le Lorem ipsum ou 
+        Lipsum. L'avantage du latin est que l'opérateur sait au 
+        premier coup d'œil que la page contenant ces lignes n'est 
+        pas valide et que l'attention du lecteur n'est pas dérangée 
+        par le contenu, lui permettant de demeurer concentré sur 
+        le seul aspect graphique.
+
+        Il circule des centaines de versions différentes du lorem 
+        ipsum, mais ce texte aurait originellement été tiré de 
+        l'ouvrage écrit par Cicéron en 45 av. J.-C., De finibus 
+        bonorum et malorum (Liber Primus, 32), texte populaire 
+        à cette époque, dont l'une des premières phrases est : 
+        « Neque porro quisquam est qui dolorem ipsum quia dolor 
+        sit amet, consectetur, adipisci velit… » (« Il n'existe 
+        personne qui aime la souffrance pour elle-même, ni qui 
+        la recherche ni qui la veuille pour ce qu'elle est… »). 
+    </p>
+</div>
 {% endblock %}
