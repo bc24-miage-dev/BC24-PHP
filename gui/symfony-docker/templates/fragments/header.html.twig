@@ -42,13 +42,18 @@
                     </li>
                     {% if app.user %}
                     <li class="nav-item">
-                        <a class="btn-transparent" href="{{ path('app_logout') }}">Deconnexion</a>
+                        <a class="btn-transparent" href="{{ path('app_logout') }}">Déconnexion</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="btn-transparent" href="{{ path('app_login') }}">Connexion</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="btn-transparent" href="{{ path('app_register') }}">Créer un compte</a>
+                    </li>
                     {% endif %}
+                    
+
                 </ul>
             </div>
         </div>
