@@ -71,4 +71,12 @@ class StaticController extends AbstractController
             'controller_name' => 'StaticController',
         ]);
     }
+
+    #[Route('/static_logout', name: 'app_static_logout')]
+    public function contact(): Response
+    {
+        return $this->render('static/logout.html.twig', [
+            'controller_name' => 'StaticController',
+        ]);
+    }
 }

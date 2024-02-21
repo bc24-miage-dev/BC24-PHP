@@ -12,32 +12,32 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class AccountController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
-    public function login(): Response
-    {
-        return $this->render('account/login.html.twig', [
-            'controller_name' => 'AccountController',
-        ]);
-    }
+    // #[Route('/login', name: 'app_login')]
+    // public function login(): Response
+    // {
+    //     return $this->render('account/login.html.twig', [
+    //         'controller_name' => 'AccountController',
+    //     ]);
+    // }
 
-    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
-    public function register(EntityManagerInterface $entityManager, Request $request): Response
-    {
-        //User
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+    // #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
+    // public function register(EntityManagerInterface $entityManager, Request $request): Response
+    // {
+    //     //User
+    //     $user = new User();
+    //     $form = $this->createForm(UserType::class, $user);
 
-        //Traitement de la requête
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($user);
-            $entityManager->flush();
+    //     //Traitement de la requête
+    //     $form->handleRequest($request);
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $entityManager->persist($user);
+    //         $entityManager->flush();
 
-            return $this->redirectToRoute('app_login');
-        }
+    //         return $this->redirectToRoute('app_login');
+    //     }
         
-        return $this->render('account/register.html.twig', [
-            'form' => $form->createView()
-        ]);
-    }
+    //     return $this->render('account/register.html.twig', [
+    //         'form' => $form->createView()
+    //     ]);
+    // }
 }

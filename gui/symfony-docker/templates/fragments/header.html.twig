@@ -31,15 +31,24 @@
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <!-- Button-styled nav items aligned to the right -->
+                    
+                    {% if app.user and app.user.roles[0] == "ROLE_ADMIN" %}
                     <li class="nav-item">
                         <a class="btn-transparent" href="{{ path('app_admin') }}">Admin</a>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="btn-transparent" href="{{ path('app_contact') }}">Contacter</a>
                     </li>
+                    {% if app.user %}
+                    <li class="nav-item">
+                        <a class="btn-transparent" href="{{ path('app_logout') }}">Deconnexion</a>
+                    </li>
+                    {% else %}
                     <li class="nav-item">
                         <a class="btn-transparent" href="{{ path('app_login') }}">Connexion</a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
