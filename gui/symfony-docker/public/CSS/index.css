@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-size: cover;
+}
+.main-content {
+    margin-left: 250px;
+    margin-right: 250px;
+    padding: 20px;
+}
+.main-content h1 {
+    color: #017BFE;
+    font-size: 48px; 
+}
+.search-container {
+    position: relative;
+    margin: 20px 0;
+}
+.search-box {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px; 
+    border: 2px solid #017BFE; 
+    border-radius: 5px;
+}
+.search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #017BFE;
+}
+
+.logo {
+    width: 100%; 
+    margin-bottom: 20px;
+}
