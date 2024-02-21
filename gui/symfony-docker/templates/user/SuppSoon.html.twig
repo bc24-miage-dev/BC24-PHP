@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+{% block meta %} <meta http-equiv="refresh" content="10;{{ path('app_deleteMyAccount2') }}" charset="UTF-8"> {% endblock %}
+{% block title %}Register{% endblock %}
+
+{% block body %}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
+Votre compte sera supprimé d'ici 10 secondes.
+<a href="{{ path('app_deleteMyAccount2') }}">Supprimer mon compte maintenant </a>
+<h1> oubliez pas de faire un truc ici en mode toutes vos infos seront supprimés pour toujours TRUC BIDULE </h1>
+
+{% endblock %}
