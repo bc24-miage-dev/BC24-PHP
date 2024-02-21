@@ -5004,16 +5004,16 @@
         },
         {
             "name": "symfony/ux-twig-component",
-            "version": "v2.14.2",
+            "version": "v2.15.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-twig-component.git",
-                "reference": "8c5ebcbc63f02f2f8c20f2a1ae891db26dae043c"
+                "reference": "cd804db6e0ea65f26fc04bae5342a4deec7b2ba4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-twig-component/zipball/8c5ebcbc63f02f2f8c20f2a1ae891db26dae043c",
-                "reference": "8c5ebcbc63f02f2f8c20f2a1ae891db26dae043c",
+                "url": "https://api.github.com/repos/symfony/ux-twig-component/zipball/cd804db6e0ea65f26fc04bae5342a4deec7b2ba4",
+                "reference": "cd804db6e0ea65f26fc04bae5342a4deec7b2ba4",
                 "shasum": ""
             },
             "require": {
@@ -5022,7 +5022,7 @@
                 "symfony/deprecation-contracts": "^2.2|^3.0",
                 "symfony/event-dispatcher": "^5.4|^6.0|^7.0",
                 "symfony/property-access": "^5.4|^6.0|^7.0",
-                "twig/twig": "^2.14.7|^3.0.4"
+                "twig/twig": "^2.14.7|~3.8.0"
             },
             "conflict": {
                 "symfony/config": "<5.4.0"
@@ -5068,7 +5068,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-twig-component/tree/v2.14.2"
+                "source": "https://github.com/symfony/ux-twig-component/tree/v2.15.0"
             },
             "funding": [
                 {
@@ -5084,7 +5084,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-07T20:16:44+00:00"
+            "time": "2024-02-20T16:11:17+00:00"
         },
         {
             "name": "symfony/validator",
@@ -5713,16 +5713,16 @@
         },
         {
             "name": "symfony/maker-bundle",
-            "version": "v1.54.0",
+            "version": "v1.55.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/maker-bundle.git",
-                "reference": "a8523cf35d777bf2d8cf5703fa73f378fdc27125"
+                "reference": "d344744ee8b35879b25777cea18c0d440f139777"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/a8523cf35d777bf2d8cf5703fa73f378fdc27125",
-                "reference": "a8523cf35d777bf2d8cf5703fa73f378fdc27125",
+                "url": "https://api.github.com/repos/symfony/maker-bundle/zipball/d344744ee8b35879b25777cea18c0d440f139777",
+                "reference": "d344744ee8b35879b25777cea18c0d440f139777",
                 "shasum": ""
             },
             "require": {
@@ -5785,7 +5785,7 @@
             ],
             "support": {
                 "issues": "https://github.com/symfony/maker-bundle/issues",
-                "source": "https://github.com/symfony/maker-bundle/tree/v1.54.0"
+                "source": "https://github.com/symfony/maker-bundle/tree/v1.55.0"
             },
             "funding": [
                 {
@@ -5801,7 +5801,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-02-06T21:23:55+00:00"
+            "time": "2024-02-21T03:37:48+00:00"
         },
         {
             "name": "symfony/process",
