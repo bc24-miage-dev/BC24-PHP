@@ -8,7 +8,10 @@
     </style>
 
     <div class="example-wrapper">
-        <h2>RECENT</h2>
+        <h2 style='text-align:center'>RECENT</h2>
         
     </div>
+    {% for resource in resourcesC %}
+        <h1 style='text-align:center'>{{ resource.id }} {{resource.resourceName }}</h1>
+    {% endfor %}
 {% endblock %}

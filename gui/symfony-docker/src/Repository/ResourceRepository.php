@@ -35,6 +35,15 @@ class ResourceRepository extends ServiceEntityRepository
 //            ->getResult()
 //        ;
 //    }
+    public function findLastContaminatedResources(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.isContamined = true')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    public function findOneBySomeField($value): ?Resource
 //    {

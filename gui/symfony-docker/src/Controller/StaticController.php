@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Resource;
 
 class StaticController extends AbstractController
 {
@@ -33,11 +35,11 @@ class StaticController extends AbstractController
     }
 
     #[Route('/recent', name: 'app_recent')]
-    public function recentReport(): Response
+    public function recentReport(ManagerRegistry $doctrine): Response
     {
-        return $this->render('static/recent.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
+        $repository = $doctrine->getRepository(Resource::class);
+        $resourcesC = $repository->findLastContaminatedResources();
+        return $this->render('static/recent.html.twig', ['resourcesC' => $resourcesC]);
     }
 
     #[Route('/consommateur', name: 'app_consommateur')]
