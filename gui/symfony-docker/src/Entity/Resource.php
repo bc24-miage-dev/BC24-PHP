@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ResourceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -10,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Resource
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    //#[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
@@ -32,9 +34,32 @@ class Resource
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
+    #[ORM\ManyToOne(inversedBy: 'resources')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ProductionSite $origin = null;
+
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'resources')]
+    private Collection $components;
+
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'components')]
+    private Collection $resources;
+
+    public function __construct()
+    {
+        $this->components = new ArrayCollection();
+        $this->resources = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getResourceName(): ?string
@@ -105,6 +130,69 @@ class Resource
     public function setDescription(string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+    
+    public function getOrigin(): ?ProductionSite
+    {
+        return $this->origin;
+    }
+
+    public function setOrigin(?ProductionSite $origin): static
+    {
+        $this->origin = $origin;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getComponents(): Collection
+    {
+        return $this->components;
+    }
+
+    public function addComponent(self $component): static
+    {
+        if (!$this->components->contains($component)) {
+            $this->components->add($component);
+        }
+
+        return $this;
+    }
+
+    public function removeComponent(self $component): static
+    {
+        $this->components->removeElement($component);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getResources(): Collection
+    {
+        return $this->resources;
+    }
+
+    public function addResource(self $resource): static
+    {
+        if (!$this->resources->contains($resource)) {
+            $this->resources->add($resource);
+            $resource->addComponent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResource(self $resource): static
+    {
+        if ($this->resources->removeElement($resource)) {
+            $resource->removeComponent($this);
+        }
 
         return $this;
     }
