@@ -13,9 +13,11 @@ class ModifierUserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
             ->add('firstname')
-            ->add('lastname');
+            ->add('lastname')
+            ->add('Modifier', SubmitType::class, [
+                'attr' => ['class' => 'btn btn-primary'],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

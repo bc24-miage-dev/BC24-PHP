@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use App\Form\ModifierUserType;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends AbstractController
 {
@@ -18,15 +19,17 @@ class UserController extends AbstractController
     {
         $this->tokenStorage = $tokenStorage;
     }
-    #[Route('/MyAccount', name: 'app_myaccount')]
-    public function index(): Response
+    
+    
+    #[Route('/myAccount', name: 'app_myaccount')]
+    public function myAccount(): Response
     {
         return $this->render('user/MyAccount.html.twig', [
             'controller_name' => 'UserController',
         ]);
     }
 
-    #[Route('/MyAccount_suppSoon', name: 'app_deleteMyAccount')]
+    #[Route('/myAccount/Suppr', name: 'app_deleteMyAccount')]
     public function deleteUser(User $user = null, ManagerRegistry $doctrine): Response
     {   
         $user = $this->getUser();
@@ -38,7 +41,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/MyAccount_supp', name: 'app_deleteMyAccount2')]
+    #[Route('/accountDel', name: 'app_deleteMyAccount2')]
     public function deleteUser2(User $user = null, ManagerRegistry $doctrine): RedirectResponse
     {   
         $user = $this->getUser();
@@ -46,25 +49,25 @@ class UserController extends AbstractController
             $entityManager = $doctrine->getManager();
             $entityManager->remove($user);
             $entityManager->flush();
+            //Kill la session
             $this->tokenStorage->setToken(null);
-            return $this->redirectToRoute('app_logout');
+            return $this->redirectToRoute('app_index');
         }
         return $this->render('user/CompteSupprime.html.twig', [
             'information' => 'Compte inexsitant',
         ]);
     }
 
-    #[Route('/update', name: 'app_updateMyAccount')]
-    public function modifUser(User $user = null, ManagerRegistry $doctrine): Response
+    #[Route('/myAccount/update', name: 'app_updateMyAccount')]
+    public function modifUser(Request $request, ManagerRegistry $doctrine): Response
     {   
-        $user = $this->getUser()->get;
+        $user = $this->getUser();
         if ($user) {
             $form = $this->createForm(ModifierUserType::class, $user);
-            $form->handleRequest($form);
+            $form->handleRequest($request);
+
             if($form -> isSubmitted() && $form -> isValid()){
-                $user->setFirstname("sd");
-
-
+                
                 $entityManager = $doctrine->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
