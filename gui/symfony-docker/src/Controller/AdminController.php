@@ -11,6 +11,7 @@ use App\Form\ResourceType;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Report;
 
+
 class AdminController extends AbstractController
 {
     #[Route('/admin', name: 'app_admin')]
@@ -70,11 +71,31 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/admin/checkReport', name: 'app_check_report')]
-    public function checkReport(ManagerRegistry $doctrine): Response
+    #[Route('/admin/reportList', name: 'app_report_list')]
+    public function reportList(ManagerRegistry $doctrine): Response
     {
+        if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
+        {
+           return $this->redirectToRoute('app_index');
+        }
         $repository = $doctrine->getRepository(Report::class);
-        $reportC = $repository->findallReportedRessource();
-        return $this->render('admin/recentReport.html.twig', ['report' => $reportC]);
+        $report = $repository->findallReportedRessource();
+        return $this->render('admin/recentReport.html.twig', ['report' => $report]);
+    }
+
+
+
+#[Route('/admin/checkReport/{id}', name: 'app_admin_checkReport')]
+    public function checkReport(Request $request, ManagerRegistry $doctrine, $id): Response
+    {
+        if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
+        {
+           return $this->redirectToRoute('app_index');
+        }
+        
+        $report = $doctrine->getRepository(Report::class)->find($id);
+        $resource = $report->getResource();
+        return $this->render('admin/checkReport.html.twig', ['report' => $report, 'resource' => $resource]);
+
     }
 }

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+{{report.description}}
+{{report.date|date('Y-m-d')}}
+{{resource.id}}
+
+
+
+{% endblock %}

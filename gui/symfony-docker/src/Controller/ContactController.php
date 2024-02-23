@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Report;
 use App\Form\ReportType;
 
+
 class ContactController extends AbstractController
 {
     #[Route('/contact', name: 'app_contact')]
@@ -42,5 +43,7 @@ class ContactController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+
 
 }
