@@ -9,9 +9,11 @@
         <h1 style='text-align:center'>
         {{ reportElement.resource.ResourceName }}
 
+
         {{ reportElement.description }}
         <a href="{{ path('app_admin_checkReport', {'id': reportElement.id }) }}">check report</a>
         </h1>
+
 
     {% endfor %}
 
