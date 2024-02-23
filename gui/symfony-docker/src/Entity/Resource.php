@@ -47,6 +47,9 @@ class Resource
     #[ORM\OneToMany(mappedBy: 'NFC', targetEntity: Report::class)]
     private Collection $reports;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $date = null;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
@@ -227,6 +230,18 @@ class Resource
                 $report->setNFC(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeInterface $date): static
+    {
+        $this->date = $date;
 
         return $this;
     }
