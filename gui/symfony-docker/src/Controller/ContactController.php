@@ -29,6 +29,7 @@ class ContactController extends AbstractController
         $report = new Report();
         $report->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $report->setUser($this->getUser());
+        $report->setRead(false);
         $form = $this->createForm(ReportType::class, $report);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
