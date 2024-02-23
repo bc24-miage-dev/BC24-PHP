@@ -10,7 +10,7 @@
 
     {% for reportElement in report %}
         <h1 style='text-align:center'>
-        {# {{ reportElement.resource }} #}
+        {{ reportElement.resource.ResourceName }}
          {{reportElement.description }}</h1>
     {% endfor %}
 {% endblock %}
