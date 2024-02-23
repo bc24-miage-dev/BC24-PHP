@@ -44,10 +44,14 @@ class Resource
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'components')]
     private Collection $resources;
 
+    #[ORM\OneToMany(mappedBy: 'NFC', targetEntity: Report::class)]
+    private Collection $reports;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
         $this->resources = new ArrayCollection();
+        $this->reports = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -192,6 +196,36 @@ class Resource
     {
         if ($this->resources->removeElement($resource)) {
             $resource->removeComponent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Report>
+     */
+    public function getReports(): Collection
+    {
+        return $this->reports;
+    }
+
+    public function addReport(Report $report): static
+    {
+        if (!$this->reports->contains($report)) {
+            $this->reports->add($report);
+            $report->setNFC($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReport(Report $report): static
+    {
+        if ($this->reports->removeElement($report)) {
+            // set the owning side to null (unless already changed)
+            if ($report->getNFC() === $this) {
+                $report->setNFC(null);
+            }
         }
 
         return $this;
