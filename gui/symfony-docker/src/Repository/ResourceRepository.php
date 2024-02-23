@@ -40,6 +40,7 @@ class ResourceRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('r')
             ->where('r.isContamined = true')
             ->setMaxResults(10)
+            ->orderBy('r.date','DESC')
             ->getQuery()
             ->getResult()
         ;

@@ -28,6 +28,9 @@ class Report
     #[ORM\JoinColumn(nullable: false)]
     private ?User $User = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $read = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,6 +80,18 @@ class Report
     public function setUser(?User $User): static
     {
         $this->User = $User;
+
+        return $this;
+    }
+
+    public function isRead(): ?bool
+    {
+        return $this->read;
+    }
+
+    public function setRead(?bool $read): static
+    {
+        $this->read = $read;
 
         return $this;
     }

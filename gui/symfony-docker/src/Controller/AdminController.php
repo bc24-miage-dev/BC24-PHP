@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Resource;
 use App\Form\ResourceType;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Report;
 
 class AdminController extends AbstractController
 {
@@ -33,11 +34,13 @@ class AdminController extends AbstractController
            return $this->redirectToRoute('app_index');
         }
         $resource = new Resource();
+        $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
+            
             $entityManager->persist($resource);
             $entityManager->flush();
 
@@ -65,5 +68,13 @@ class AdminController extends AbstractController
         return $this->render('admin/modify.html.twig', [
             'controller_name' => 'AdminController',
         ]);
+    }
+
+    #[Route('/admin/checkReport', name: 'app_check_report')]
+    public function checkReport(ManagerRegistry $doctrine): Response
+    {
+        $repository = $doctrine->getRepository(Report::class);
+        $reportC = $repository->findallReportedRessource();
+        return $this->render('admin/recentReport.html.twig', ['report' => $reportC]);
     }
 }
