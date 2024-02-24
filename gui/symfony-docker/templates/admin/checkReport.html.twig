@@ -1,11 +1,21 @@
 {% extends 'base.html.twig' %}
 
-
 {% block body %}
+
+<a class="btn-transparent" href="{{ path('app_admin_reportList') }}">Retour</a>
+<br><br>
 {{report.description}}
 {{report.date|date('Y-m-d')}}
 {{resource.id}}
 
+
+<form action="{{ path('app_admin_checkReport', {'id': report.id}) }}" method="post">
+    <input type="submit" name="contaminate" value="Mark as Contaminated" />
+</form>
+
+<form action="{{ path('app_admin_checkReport', {'id': report.id}) }}" method="post">
+    <input type="submit" name="mark_safe" value="Mark as Safe" />
+</form>
 
 
 {% endblock %}
