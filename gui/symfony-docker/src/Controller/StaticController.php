@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Resource;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class StaticController extends AbstractController
 {
@@ -74,11 +76,10 @@ class StaticController extends AbstractController
         ]);
     }
 
-    #[Route('/static_logout', name: 'app_static_logout')]
-    public function contact(): Response
-    {
-        return $this->render('static/logout.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
+    #[Route('/logoutProcess', name: 'app_logoutProcess')]
+    public function logoutProcess(): RedirectResponse
+    {   
+        $this->addFlash('success', 'Vous êtes déconnecté(e) !');
+        return $this->redirectToRoute('app_index');
     }
 }

@@ -2,16 +2,19 @@
 
 
 {% block body %}
-    <style>
-        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-        .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    </style>
-
     <div class="example-wrapper">
-        <h2 style='text-align:center'>RECENT</h2>
-        
+        <h1 style='text-align:center'>Produits dangereux récemment détectés</h1>
+
     </div>
     {% for resource in resourcesC %}
-        <h1 style='text-align:center'>{{ resource.id }} {{resource.resourceName }}</h1>
+        <div class="card bg-danger mb-3" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">{{ resource.resourceName }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>
+            <p class="card-text">{{ resource.description }}</p>
+            <a href="{{ path('app_search') }}" class="card-link">Fiche du produit</a>
+        </div>
+    </div>
     {% endfor %}
 {% endblock %}
+

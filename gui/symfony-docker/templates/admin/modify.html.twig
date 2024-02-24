@@ -1,15 +1,22 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-   
+
 
     {% for resource in resources %}
-        <h1 style='text-align:center'>
-        {{ resource.id }} - {{ resource.ResourceName }}
-        <br>
-        <a href="{{ path('app_admin_modifySpecific', {'id': resource.id }) }}">Modifier cette ressource</a>
-        </h1>
-        <hr>
+        {%  if resource.isContamined %}
+        <div class="card bg-danger mb-3" style="max-width: 80%;">
+        {% else %}
+        <div class="card" style="width: 80%;">
+        {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ resource.resourceName }}</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>
+                <p class="card-text">{{ resource.description }}</p>
+                <a href="{{ path('app_admin_modifySpecific', {'id': resource.id}) }}" class="card-link">Modifier cette ressource</a>
+            </div>
+        </div>
 
     {% endfor %}
+
 {% endblock %}

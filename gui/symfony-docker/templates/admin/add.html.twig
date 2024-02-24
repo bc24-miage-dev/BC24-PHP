@@ -3,8 +3,10 @@
 {% block body %}
     {% if state == "success" %}
         <h1>Success ! </h1> <br>
-        
+        <a href="{{ path('app_admin') }}">Retour à la vue Admin</a>
+
     {% else %}
+        <h1>Création d'une nouvelle ressource</h1><br>
         {{ form_start(form) }}
         {{ form_row(form.id,  {
             label: 'Tag NFC'
@@ -20,24 +22,24 @@
         {{ form_row(form.isContamined, {
             label: 'Est dangereux'
         }) }}
-        
-        {{ form_row(form.weight, { 
+
+        {{ form_row(form.weight, {
             label: 'Poids en grammes'
         })
         }}
-       {{ form_row(form.price, { 
+       {{ form_row(form.price, {
             label: 'Prix en euros'
         })
         }}
-        {{ form_row(form.description, { 
+        {{ form_row(form.description, {
             label: 'Description'
         })
         }}
-        {{ form_row(form.components, { 
+        {{ form_row(form.components, {
             label: 'Composants'
         })
         }}
-        {{ form_row(form.origin, { 
+        {{ form_row(form.origin, {
             label: 'Lieu de production'
         })
         }}
