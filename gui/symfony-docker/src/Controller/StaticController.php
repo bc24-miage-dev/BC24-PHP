@@ -18,7 +18,7 @@ class StaticController extends AbstractController
         ]);
     }
 
-    #[Route('/about', name: 'app_about')]
+    #[Route('/about', name: 'app_static_about')]
     public function about(): Response
     {
         return $this->render('static/about.html.twig', [

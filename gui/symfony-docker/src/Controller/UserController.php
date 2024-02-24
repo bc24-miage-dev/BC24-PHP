@@ -21,7 +21,7 @@ class UserController extends AbstractController
     }
     
     
-    #[Route('/myAccount', name: 'app_myaccount')]
+    #[Route('/user', name: 'app_user_account')]
     public function myAccount(): Response
     {
         return $this->render('user/MyAccount.html.twig', [
@@ -29,7 +29,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/myAccount/Suppr', name: 'app_deleteMyAccount')]
+    #[Route('/user/postDelete', name: 'app_user_postDelete')]
     public function deleteUser(User $user = null, ManagerRegistry $doctrine): Response
     {   
         $user = $this->getUser();
@@ -41,7 +41,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/accountDel', name: 'app_deleteMyAccount2')]
+    #[Route('/user/delete', name: 'app_user_delete')]
     public function deleteUser2(User $user = null, ManagerRegistry $doctrine): RedirectResponse
     {   
         $user = $this->getUser();
@@ -58,7 +58,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/myAccount/update', name: 'app_updateMyAccount')]
+    #[Route('/user/update', name: 'app_user_update')]
     public function modifUser(Request $request, ManagerRegistry $doctrine): Response
     {   
         $user = $this->getUser();
@@ -71,7 +71,7 @@ class UserController extends AbstractController
                 $entityManager = $doctrine->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
-                return $this->redirectToRoute('app_myaccount');
+                return $this->redirectToRoute('app_user_account');
             }
             $form = $this->createForm(ModifierUserType::class, $user);
 

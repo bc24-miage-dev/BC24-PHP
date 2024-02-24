@@ -79,6 +79,7 @@ class AdminController extends AbstractController
            return $this->redirectToRoute('app_index');
         }
         $resource = $doctrine->getRepository(Resource::class)->find($id);
+        $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $form = $this->createForm(ResourceModifierType::class, $resource);
         $form -> handleRequest($request);
 

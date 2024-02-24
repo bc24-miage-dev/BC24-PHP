@@ -5,9 +5,9 @@
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
-<a href="{{ path('app_deleteMyAccount') }}">Supprimer mon compte</a>
+<a href="{{ path('app_user_postDelete') }}">Supprimer mon compte</a>
 <br>
-<a href="{{ path('app_updateMyAccount') }}">Changer les informations de mon compte</a>
+<a href="{{ path('app_user_update') }}">Changer les informations de mon compte</a>
 
 
 

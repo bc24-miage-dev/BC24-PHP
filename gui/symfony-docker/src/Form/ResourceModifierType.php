@@ -21,7 +21,6 @@ class ResourceModifierType extends AbstractType
             ->add('weight')
             ->add('price')
             ->add('description')
-            ->add('date')
             ->add('origin', EntityType::class, [
                 'class' => ProductionSite::class,
 'choice_label' => 'id',
