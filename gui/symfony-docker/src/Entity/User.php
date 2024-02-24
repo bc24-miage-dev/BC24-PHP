@@ -166,7 +166,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->reports->contains($report)) {
             $this->reports->add($report);
-            $report->setUserId($this);
+            $report->setUser($this);
         }
 
         return $this;
@@ -176,8 +176,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->reports->removeElement($report)) {
             // set the owning side to null (unless already changed)
-            if ($report->getUserId() === $this) {
-                $report->setUserId(null);
+            if ($report->getUser() === $this) {
+                $report->setUser(null);
             }
         }
 

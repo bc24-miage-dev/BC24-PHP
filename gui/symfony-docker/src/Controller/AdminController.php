@@ -66,12 +66,10 @@ class AdminController extends AbstractController
            return $this->redirectToRoute('app_index');
         }
 
-        return $this->render('admin/modify.html.twig', [
-            'controller_name' => 'AdminController',
-        ]);
+        return $this->render('admin/modify.html.twig');
     }
 
-    #[Route('/admin/reportList', name: 'app_report_list')]
+    #[Route('/admin/reportList', name: 'app_admin_report_list')]
     public function reportList(ManagerRegistry $doctrine): Response
     {
         if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
@@ -80,7 +78,7 @@ class AdminController extends AbstractController
         }
         $repository = $doctrine->getRepository(Report::class);
         $report = $repository->findallReportedRessource();
-        return $this->render('admin/recentReport.html.twig', ['report' => $report]);
+        return $this->render('admin/reportList.html.twig', ['report' => $report]);
     }
 
 

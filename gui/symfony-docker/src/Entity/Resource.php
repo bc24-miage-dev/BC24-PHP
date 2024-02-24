@@ -216,7 +216,7 @@ class Resource
     {
         if (!$this->reports->contains($report)) {
             $this->reports->add($report);
-            $report->setNFC($this);
+            $report->setResource($this);
         }
 
         return $this;
@@ -226,8 +226,8 @@ class Resource
     {
         if ($this->reports->removeElement($report)) {
             // set the owning side to null (unless already changed)
-            if ($report->getNFC() === $this) {
-                $report->setNFC(null);
+            if ($report->getResource() === $this) {
+                $report->setResource(null);
             }
         }
 
