@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+   
+    <h1>Modification de la ressource {{resource.id}}</h1>
+       
+
+        {{ form_start(form) }}
+        {{ form_row(form.ResourceName, {
+            label: 'Nom de la nouvelle ressource :'
+        }) }}
+
+        {{ form_row(form.isFinalProduct, {
+            label: 'Est un produit fini'
+        }) }}
+
+        {{ form_row(form.isContamined, {
+            label: 'Est dangereux'
+        }) }}
+        
+        {{ form_row(form.weight, { 
+            label: 'Poids en grammes'
+        })
+        }}
+       {{ form_row(form.price, { 
+            label: 'Prix en euros'
+        })
+        }}
+        {{ form_row(form.description, { 
+            label: 'Description'
+        })
+        }}
+        {{ form_row(form.components, { 
+            label: 'Composants'
+        })
+        }}
+        {{ form_row(form.origin, { 
+            label: 'Lieu de production'
+        })
+        }}
+    {{ form_end(form) }}
+        
+{% endblock %}
+
+ 

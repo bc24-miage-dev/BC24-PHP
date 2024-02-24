@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,7 +11,8 @@ use App\Entity\Resource;
 use App\Form\ResourceType;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Report;
-
+use App\Form\ResourceModifierType;
+use App\Entity\User;
 
 class AdminController extends AbstractController
 {
@@ -59,17 +61,37 @@ class AdminController extends AbstractController
     }
 
     #[Route('/admin/modify', name: 'app_admin_modify')]
-    public function modify(): Response
+    public function modify(ManagerRegistry $doctrine): Response
     {
         if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
         {
            return $this->redirectToRoute('app_index');
         }
-
-        return $this->render('admin/modify.html.twig');
+        $resources = $doctrine->getRepository(Resource::class)->findAll();
+        return $this->render('admin/modify.html.twig', ['resources' => $resources]);
     }
 
-    #[Route('/admin/reportList', name: 'app_admin_report_list')]
+    #[Route('/admin/modify/{id}', name: 'app_admin_modifySpecific')]
+    public function modifySpecific(ManagerRegistry $doctrine, Request $request, $id): Response
+    {
+        if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
+        {
+           return $this->redirectToRoute('app_index');
+        }
+        $resource = $doctrine->getRepository(Resource::class)->find($id);
+        $form = $this->createForm(ResourceModifierType::class, $resource);
+        $form -> handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($resource);
+            $entityManager->flush();
+            return $this->redirectToRoute('app_admin_modify');
+        }
+        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource]);
+    }
+
+    #[Route('/admin/reportList', name: 'app_admin_reportList')]
     public function reportList(ManagerRegistry $doctrine): Response
     {
         if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
@@ -95,5 +117,35 @@ class AdminController extends AbstractController
         $resource = $report->getResource();
         return $this->render('admin/checkReport.html.twig', ['report' => $report, 'resource' => $resource]);
 
+    }
+
+    #[Route('/admin/userList', name: 'app_admin_userList')]
+    public function userList(ManagerRegistry $doctrine): Response
+    {
+        if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
+        {
+           return $this->redirectToRoute('app_index');
+        }
+        $repository = $doctrine->getRepository(User::class);
+        $users = $repository->findAll();
+        return $this->render('admin/userList.html.twig', ['users' => $users]);
+    }
+
+    #[Route('/admin/userEdit/{id}', name: 'app_admin_userEdit')]
+    public function userEdit(ManagerRegistry $doctrine, $id) : Response
+    {
+        if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
+        {
+           return $this->redirectToRoute('app_index');
+        }
+        $user = $doctrine->getRepository(User::class)->find($id);
+        $roles = $user->getRoles();
+        array_push($roles, "ROLE_ADMIN");
+        $user->setRoles($roles);
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_admin_userList');
     }
 }

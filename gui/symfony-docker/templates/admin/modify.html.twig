@@ -1,2 +1,15 @@
-modify
-```
+{% extends 'base.html.twig' %}
+
+{% block body %}
+   
+
+    {% for resource in resources %}
+        <h1 style='text-align:center'>
+        {{ resource.id }} - {{ resource.ResourceName }}
+        <br>
+        <a href="{{ path('app_admin_modifySpecific', {'id': resource.id }) }}">Modifier cette ressource</a>
+        </h1>
+        <hr>
+
+    {% endfor %}
+{% endblock %}

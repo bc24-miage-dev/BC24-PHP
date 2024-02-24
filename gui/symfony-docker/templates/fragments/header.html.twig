@@ -44,7 +44,7 @@
 					class="navbar-nav ms-auto">
 					<!-- Button-styled nav items aligned to the right -->
 
-					{% if app.user and app.user.roles[0] == "ROLE_ADMIN" %}
+					{% if app.user and "ROLE_ADMIN" in app.user.roles %}
 						<li class="nav-item">
 							<a class="btn-transparent" href="{{ path('app_admin') }}">Admin</a>
 						</li>

@@ -75,11 +75,11 @@ class UserController extends AbstractController
             }
             $form = $this->createForm(ModifierUserType::class, $user);
 
-            return $this->render('user/ModifAccount.html.twig',['form' => $form->createView()
+            return $this->render('user/ModifAccount.html.twig', ['form' => $form->createView()
         ]);
         }
         return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexsitant',
+            'information' => 'Compte inexistant',
         ]);
     }
 
