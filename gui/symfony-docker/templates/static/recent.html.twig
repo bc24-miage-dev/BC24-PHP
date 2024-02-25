@@ -12,7 +12,7 @@
             <h5 class="card-title">{{ resource.resourceName }}</h5>
             <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>
             <p class="card-text">{{ resource.description }}</p>
-            <a href="{{ path('app_search') }}" class="card-link">Fiche du produit</a>
+            <a href="{{ path('app_search_result', {'id': resource.id}) }}" class="card-link">Fiche du produit</a>
         </div>
     </div>
     {% endfor %}
