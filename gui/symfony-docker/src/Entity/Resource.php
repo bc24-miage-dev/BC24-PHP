@@ -44,7 +44,7 @@ class Resource
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'components')]
     private Collection $resources;
 
-    #[ORM\OneToMany(mappedBy: 'NFC', targetEntity: Report::class)]
+    #[ORM\OneToMany(mappedBy: 'Resource', targetEntity: Report::class)]
     private Collection $reports;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]

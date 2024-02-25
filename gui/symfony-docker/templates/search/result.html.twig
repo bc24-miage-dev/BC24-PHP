@@ -1,0 +1,9 @@
+{% extends 'search/search.html.twig' %}
+
+{%  block title %}Search{% endblock %}
+
+{% block body %}
+{{ parent() }}
+    {# ICI ON A L'OBJET resource AVEC TOUS SES ATTRIBUTS; todo AFFICHER LES INFOS SUR LUI + SES PETITS + LIENS VERS PETITS #}
+{{ resource.id }}
+{% endblock %}
