@@ -1,16 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello StaticController!{% endblock %}
+{% block title %}Comment fonctionne BC24 ?{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/info.css') }}">
+{% endblock %}
 
 {% block body %}
-    <style>
-        .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-        .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-    </style>
+<div class="content-wrapper">
+    <h1>Comment fonctionne BC24 ?</h1>
 
-    <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
-        <h2>INFO</h2>
-        
+    <div class="steps">
+        <div class="step">
+            <img src="{{ asset('images/acheter.jpg') }}" alt="Achetez vos produits">
+            <p>Achetez vos produits</p>
+        </div>
+        <div class="step">
+            <img src="{{ asset('images/scanner.jpg') }}" alt="Scannez le code">
+            <p>Scannez le code</p>
+        </div>
+        <div class="step">
+            <img src="{{ asset('images/verify.jpg') }}" alt="Vérifiez la qualité de votre produit">
+            <p>Vérifiez la qualité de votre produit</p>
+        </div>
     </div>
+
+    <h2>Comment ça marche</h2>
+    <p>Insérez ici le texte explicatif sur le fonctionnement de BC24.</p>
+</div>
 {% endblock %}
