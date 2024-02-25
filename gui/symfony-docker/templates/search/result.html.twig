@@ -1,10 +1,10 @@
-{% extends 'base.html.twig' %}
+{% extends 'search/search.html.twig' %}
 
 {% block title %}Resource Details{% endblock %}
 
 {% block body %}
 
-<a class="btn-transparent" href="{{ path('app_search') }}">Retour</a>
+{# Le formulaire de recherche #}
 {{ parent() }}
 
 <div class="resource-details">
