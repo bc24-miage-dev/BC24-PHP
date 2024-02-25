@@ -16,44 +16,48 @@ use App\Form\SearchType;
 #[Route('/search')]
 class SearchController extends AbstractController
 {
-   
-    #[Route('/', name: 'app_search')]
-    public function search(Request $request, ManagerRegistry $doctrine): Response{
+#[Route('/', name: 'app_search')]
+    public function search(Request $request, ManagerRegistry $doctrine): Response
+    {
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             $id = $data->getId();
-            $resource = $doctrine
-                ->getRepository(Resource::class)
-                ->find($id);
-            if (!$resource) {
-                $this->addFlash('error', 'Resource not found');
-                return $this->redirectToRoute('app_search');
-            }
-            return $this->redirectToRoute('app_search', ['id' => $id]);
+
+            $resource = $doctrine->getRepository(Resource::class)->find($id);
+
+            return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
+            return $this->forward('App\Controller\SearchController::result', ['id' => $id]);
         }
         return $this->render('search/search.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form->createView()
         ]);
     }
 
     #[Route('/{id}', name: 'app_search_result')]
-    public function searchResult($id, ManagerRegistry $doctrine): Response{
-        $resource = $doctrine
-            ->getRepository(Resource::class)
-            ->find($id);
+    public function result(int $id, ManagerRegistry $doctrine, Request $request): Response
+    {
+        $form = $this->createForm(SearchType::class);
+        $form -> handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $id = $data->getId();
+            return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
+        }
+
+        $resource = $doctrine->getRepository(Resource::class)->find($id);
         if (!$resource) {
-            $this->addFlash('error', 'Resource not found');
+            $this->addFlash('error', 'No resource found');
             return $this->redirectToRoute('app_search');
         }
-        return $this->render('search/search_result.html.twig', [
-            'resource' => $resource,
+        return $this->render('search/result.html.twig', [
+            'form' => $form -> createView(),
+            'resource' => $resource
         ]);
     }
-
 }
-    
 
-    
+
+
 

@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
-    #[ORM\OneToMany(mappedBy: 'userId', targetEntity: Report::class)]
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: Report::class)]
     private Collection $reports;
 
     public function __construct()

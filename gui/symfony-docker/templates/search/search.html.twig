@@ -3,5 +3,12 @@
 {% block title %}Recherche{% endblock %}
 
 {% block body %}
-    {{form (form)}}
+    {{ form_start(form) }}
+    {{ form_row(form.id,  {
+        label: 'Tag NFC'
+    }) }}
+    {{ form_row(form.submit, {
+        label: 'Rechercher'
+    }) }}
+    {{ form_end(form) }}
 {% endblock %}
