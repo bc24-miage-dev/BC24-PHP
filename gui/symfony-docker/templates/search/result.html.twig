@@ -1,9 +1,52 @@
-{% extends 'search/search.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{%  block title %}Search{% endblock %}
+{% block title %}Resource Details{% endblock %}
 
 {% block body %}
+
+<a class="btn-transparent" href="{{ path('app_search') }}">Retour</a>
 {{ parent() }}
-    {# ICI ON A L'OBJET resource AVEC TOUS SES ATTRIBUTS; todo AFFICHER LES INFOS SUR LUI + SES PETITS + LIENS VERS PETITS #}
-{{ resource.id }}
+
+<div class="resource-details">
+    <h2>Resource Details: {{ resource.getResourceName }}</h2>
+    <p>ID: {{ resource.getId }}</p>
+    <p>Is Final Product: {{ resource.isIsFinalProduct ? 'Yes' : 'No' }}</p>
+    <p>Is Contaminated: {{ resource.isIsContamined ? 'Yes' : 'No' }}</p>
+    <p>Weight: {{ resource.getWeight }}</p>
+    <p>Price: ${{ resource.getPrice }}</p>
+    <p>Description: {{ resource.getDescription }}</p>
+    <p>Date: {{ resource.getDate ? resource.getDate|date('Y-m-d H:i:s') : 'Not available' }}</p>
+
+    <h3>Origin Production Site</h3>
+    <p>Name: {{ resource.getOrigin.getProductionSiteName }}</p>
+    <p>Address: {{ resource.getOrigin.getAddress }}</p>
+    <p>Telephone: {{ resource.getOrigin.getProductionSiteTel }}</p>
+
+    <h3>Components</h3>
+    {% if resource.getComponents|length > 0 %}
+        <ul>
+            {% for component in resource.getComponents %}
+            <li>
+                <a href="{{ path('app_search_result', {'id': component.getId}) }}">
+                    {{ component.getResourceName }} (ID: {{ component.getId }})
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>This resource has no components.</p>
+    {% endif %}
+
+    <h3>Reports</h3>
+    {% if resource.getReports|length > 0 %}
+        <ul>
+            {% for report in resource.getReports %}
+                <li>Report ID: {{ report.getId }}, Description: {{ report.getDescription }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>There are no reports for this resource.</p>
+    {% endif %}
+</div>
+
 {% endblock %}
