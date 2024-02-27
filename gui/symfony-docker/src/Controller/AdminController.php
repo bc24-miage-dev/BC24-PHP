@@ -13,6 +13,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Report;
 use App\Form\ResourceModifierType;
 use App\Entity\User;
+use App\Entity\ProductionSite;
+use App\Form\ProductionSiteType;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -168,4 +170,27 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_userList');
     }
+
+    #[Route('admin/productionSite', name: 'app_productionSite')]
+
+    public function createProductionSite(ManagerRegistry $doctrine, Request $request): Response
+    {
+        $productionSite = new ProductionSite();
+        $form = $this->createForm(ProductionSiteType::class, $productionSite);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($productionSite);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Production Site created successfully');
+            return $this->redirectToRoute('app_admin');
+        }
+
+        return $this->render('admin/productionSite.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
 }
