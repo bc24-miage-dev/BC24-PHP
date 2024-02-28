@@ -20,7 +20,7 @@ class StaticController extends AbstractController
         ]);
     }
 
-    #[Route('/about', name: 'app_static_about')]
+    #[Route('/about', name: 'app_about')]
     public function about(): Response
     {
         return $this->render('static/about.html.twig', [
@@ -74,12 +74,5 @@ class StaticController extends AbstractController
         return $this->render('static/equarisseur.html.twig', [
             'controller_name' => 'StaticController',
         ]);
-    }
-
-    #[Route('/logoutProcess', name: 'app_logoutProcess')]
-    public function logoutProcess(): RedirectResponse
-    {   
-        $this->addFlash('success', 'Vous êtes déconnecté(e) !');
-        return $this->redirectToRoute('app_index');
     }
 }

@@ -1,26 +1,28 @@
-{% extends 'base.html.twig' %}
+{% extends 'template.html.twig' %}
 
-{% block title %}Comment fonctionne BC24 ?{% endblock %}
+{% block title %}BC24-Fonctionnement{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/info.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/howItsWorks.css') }}">
 {% endblock %}
 
 {% block body %}
+    {# TODO : Réanimer cette page #}
 <div class="content-wrapper">
     <h1>Comment fonctionne BC24 ?</h1>
 
     <div class="steps">
         <div class="step">
-            <img src="{{ asset('images/acheter.jpg') }}" alt="Achetez vos produits">
+            <img src="{{ asset('images/acheter.jpg') }}" alt="Achetez vos produits"><br><br>
             <p>Achetez vos produits</p>
         </div>
         <div class="step">
-            <img src="{{ asset('images/scanner.jpg') }}" alt="Scannez le code">
+            <img src="{{ asset('images/scanner.jpg') }}" alt="Scannez le code"><br><br>
             <p>Scannez le code</p>
         </div>
         <div class="step">
-            <img src="{{ asset('images/verify.jpg') }}" alt="Vérifiez la qualité de votre produit">
+            <img src="{{ asset('images/verify.jpg') }}" alt="Vérifiez la qualité de votre produit"><br><br>
             <p>Vérifiez la qualité de votre produit</p>
         </div>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -29,5 +30,11 @@ class LoginSecurityController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    
+    #[\Symfony\Component\Routing\Annotation\Route('/logoutProcess', name: 'app_logoutProcess')]
+    public function logoutProcess(): RedirectResponse
+    {
+        $this->addFlash('success', 'Vous êtes déconnecté(e) !');
+        return $this->redirectToRoute('app_index');
+    }
+
 }

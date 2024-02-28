@@ -1,26 +1,42 @@
-{% extends 'base.html.twig' %}
+{% extends 'template.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}BC24-Création de compte{% endblock %}
 
 {% block body %}
+
+    {#
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
+    #}
 
-    <h1>Register</h1>
+    <h1>Création de compte :</h1>
+    <br>
 
     {{ form_errors(registrationForm) }}
 
     {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.firstname) }}
-        {{ form_row(registrationForm.lastname) }}
-        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.firstname, {
+            label: 'Prénom'
+            })
+        }}
+        {{ form_row(registrationForm.lastname, {
+            label: 'Nom'
+            })
+        }}
+        {{ form_row(registrationForm.email, {
+            label: 'Email'
+            })
+        }}
         {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
+            label: 'Mot de passe'
         }) }}
-        
-        {{ form_row(registrationForm.agreeTerms) }}
-
-        <button type="submit" class="btn">Register</button>
+        <br>
+        {{ form_row(registrationForm.agreeTerms, {
+            label: 'J\'accepte les conditions d\'utilisation'
+        })
+        }}
+    <br>
+        <button type="submit" class="button small-float-center">Créez votre compte</button>
     {{ form_end(registrationForm) }}
 {% endblock %}

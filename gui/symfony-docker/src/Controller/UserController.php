@@ -19,8 +19,8 @@ class UserController extends AbstractController
     {
         $this->tokenStorage = $tokenStorage;
     }
-    
-    
+
+
     #[Route('/user', name: 'app_user_account')]
     public function myAccount(): Response
     {
@@ -29,21 +29,19 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user/postDelete', name: 'app_user_postDelete')]
-    public function deleteUser(User $user = null, ManagerRegistry $doctrine): Response
-    {   
+    #[Route('/user/deleteAccount', name: 'app_user_delete')]
+    public function deleteUser(ManagerRegistry $doctrine): Response
+    {
         $user = $this->getUser();
         if ($user) {
-            return $this->render('user/SuppSoon.html.twig',[]);
+            return $this->render('user/SuppSoon.html.twig');
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexsitant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
-    #[Route('/user/delete', name: 'app_user_delete')]
-    public function deleteUser2(User $user = null, ManagerRegistry $doctrine): RedirectResponse
-    {   
+    #[Route('/user/delete', name: 'app_user_delete_process')]
+    public function deleteUserProcess(ManagerRegistry $doctrine): RedirectResponse
+    {
         $user = $this->getUser();
         if ($user) {
             $entityManager = $doctrine->getManager();
@@ -51,23 +49,22 @@ class UserController extends AbstractController
             $entityManager->flush();
             //Kill la session
             $this->tokenStorage->setToken(null);
+            $this->addFlash('success', 'Votre compte a bien été supprimé');
             return $this->redirectToRoute('app_index');
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexsitant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
     #[Route('/user/update', name: 'app_user_update')]
     public function modifUser(Request $request, ManagerRegistry $doctrine): Response
-    {   
+    {
         $user = $this->getUser();
         if ($user) {
             $form = $this->createForm(ModifierUserType::class, $user);
             $form->handleRequest($request);
 
             if($form -> isSubmitted() && $form -> isValid()){
-                
+
                 $entityManager = $doctrine->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();

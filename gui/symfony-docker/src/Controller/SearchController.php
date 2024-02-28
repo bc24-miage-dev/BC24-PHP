@@ -19,20 +19,19 @@ class SearchController extends AbstractController
 #[Route('/', name: 'app_search')]
     public function search(Request $request, ManagerRegistry $doctrine): Response
     {
-        $form = $this->createForm(SearchType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $id = $data->getId();
+            $form = $this->createForm(SearchType::class);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $data = $form->getData();
+                $id = $data->getId();
 
-            $resource = $doctrine->getRepository(Resource::class)->find($id);
+                $resource = $doctrine->getRepository(Resource::class)->find($id);
 
-            return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
-            return $this->forward('App\Controller\SearchController::result', ['id' => $id]);
-        }
-        return $this->render('search/search.html.twig', [
-            'form' => $form->createView()
-        ]);
+                return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
+            }
+            return $this->render('search/search.html.twig', [
+                'form' => $form->createView()
+            ]);
     }
 
     #[Route('/{id}', name: 'app_search_result')]

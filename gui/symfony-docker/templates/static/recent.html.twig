@@ -1,5 +1,8 @@
-{% extends 'base.html.twig' %}
+{% extends 'template.html.twig' %}
 
+{% block title %}
+    BC24-Produits dangereux
+{% endblock %}
 
 {% block body %}
     <div class="example-wrapper">
@@ -7,7 +10,7 @@
 
     </div>
     {% for resource in resourcesC %}
-        <div class="card bg-danger mb-3" style="width: 18rem;">
+    <div class="card" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">{{ resource.resourceName }}</h5>
             <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>

@@ -1,14 +1,10 @@
-{% extends 'base.html.twig' %}
-{% block title %}Register{% endblock %}
+{% extends 'template.html.twig' %}
+{% block title %}BC24-Mon Compte{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-<a href="{{ path('app_user_postDelete') }}">Supprimer mon compte</a>
+
+<a href="{{ path('app_user_delete') }}">Supprimer mon compte</a>
 <br>
 <a href="{{ path('app_user_update') }}">Changer les informations de mon compte</a>
-
-
 
 {% endblock %}
