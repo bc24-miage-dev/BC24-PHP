@@ -5,11 +5,15 @@
 {% endblock %}
 
 {% block body %}
-    <div class="example-wrapper">
-        <h1 style='text-align:center'>Produits dangereux récemment détectés</h1>
-
+    <div id="banner">
+            <h1 class="text-center">Produits dangereux récemment détectés</h1>
     </div>
+
+    <div id="main-wrapper">
+        <div class="container">
+            <div class="row gtr-200">
     {% for resource in resourcesC %}
+
     <div class="card" style="width: 18rem;">
         <div class="card-body">
             <h5 class="card-title">{{ resource.resourceName }}</h5>
@@ -19,5 +23,9 @@
         </div>
     </div>
     {% endfor %}
+
+            </div>
+        </div>
+    </div>
 {% endblock %}
 

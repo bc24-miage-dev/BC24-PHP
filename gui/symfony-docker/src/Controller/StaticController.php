@@ -40,7 +40,7 @@ class StaticController extends AbstractController
     public function recentReport(ManagerRegistry $doctrine): Response
     {
         $repository = $doctrine->getRepository(Resource::class);
-        $resourcesC = $repository->findLastContaminatedResources();
+        $resourcesC = $repository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
         return $this->render('static/recent.html.twig', ['resourcesC' => $resourcesC]);
     }
 
