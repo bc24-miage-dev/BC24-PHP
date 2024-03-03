@@ -19,7 +19,7 @@ use App\Form\ProductionSiteType;
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
-    #[Route('/', name: 'app_admin')]
+    #[Route('/', name: 'app_admin_index')]
     public function admin(): Response
     {
 
@@ -29,9 +29,7 @@ class AdminController extends AbstractController
 
         }
 
-        return $this->render('admin/admin.html.twig', [
-            'controller_name' => 'AdminController',
-        ]);
+        return $this->render('admin/admin.html.twig');
     }
 
     #[Route('/add', name: 'app_admin_add')]
