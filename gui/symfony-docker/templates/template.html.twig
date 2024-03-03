@@ -24,13 +24,12 @@
             <!-- Logo -->
             <div id="logo">
                 <h1><a href="{{ path('app_index') }}">BC24</a></h1>
-                <span>TRACABILITÉ</span>
             </div>
 
             <!-- Nav -->
             <nav id="nav">
                 <ul>
-                    <li class="current"><a href="{{ path('app_index') }}">Menu</a></li>
+                    <li><a href="{{ path('app_index') }}">Menu</a></li>
                     <li>
                         <a>Espace Client</a>
                         <ul>
@@ -46,9 +45,13 @@
                     </li>
                     <li><a href="{{ path('app_contact') }}">Nous Contacter</a></li>
                     <li><a href={{ path('app_report_reportAliment') }}>Signaler un produit</a></li>
-                    <li><a href="{{ path('app_recent') }}">Produits dangereux récemment ajoutés</a></li>
+                    <li><a href="{{ path('app_recent') }}">Produits dangereux récents</a></li>
                 </ul>
+
             </nav>
+
+
+
             {% for flash_message in app.flashes('success') %}
                 <div class="alert alert-success" role="alert">
                     {{ flash_message }}
@@ -71,7 +74,13 @@
     <!-- body -->
 
     {% block body %}
-        Body par défaut
+        {% if app.user %}
+            {% if "ROLE_ADMIN" in app.user.roles or "ROLE_ELEVEUR" in app.user.roles
+            or "ROLE_EQUARRISSEUR" in app.user.roles or "ROLE_TRANSPORTEUR" in app.user.roles or "ROLE_USINE" in app.user.roles
+            or "ROLE_COMMERCANT" in app.user.roles %}
+        <a href="{{ path('app_pro') }}">Passer à la vue Professionnelle</a>
+            {% endif %}
+        {% endif %}
     {% endblock %}
 
     <!-- Footer -->
