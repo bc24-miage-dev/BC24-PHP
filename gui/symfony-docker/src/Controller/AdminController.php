@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\UserRoleRequest;
+use App\Form\UserRoleRequestType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -188,6 +190,41 @@ class AdminController extends AbstractController
         return $this->render('admin/productionSite.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/user/request', name: 'app_admin_user_request')]
+    public function userRequestRole(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $UserRoleRequest = new UserRoleRequest();
+        $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $user = $this->getUser();
+            $UserRoleRequest->setIdUser($user);
+            $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+            $entityManager->persist($UserRoleRequest);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Production Site created successfully');
+            return $this->redirectToRoute('app_index');
+        }
+
+        return $this->render('admin/UserRequest.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/request/check', name: 'app_admin_request_check')]
+    public function userRequestCheck(Request $request, ManagerRegistry $doctrine): Response
+    {
+        if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_index');
+        }
+        $repository = $doctrine->getRepository(UserRoleRequest::class);
+        $UserRoleRequest = $repository->findAll();
+        return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
     }
 
 }
