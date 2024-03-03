@@ -35,7 +35,7 @@
                                         {% if "ROLE_ADMIN" in user.roles %}
                                             <p> Admin </p>
                                         {% else %}
-                                            <a href="{{ path('app_admin_userEdit', {'id': user.id}) }}" class="btn btn-primary">Appoint</a>
+                                            <a href="{{ path('app_admin_userEdit', {'id': user.id, 'role' : "ROLE_ADMIN"}) }}" class="btn btn-primary">Appoint</a>
                                         {% endif %}
                                     </tr>
                                 {% endfor %}

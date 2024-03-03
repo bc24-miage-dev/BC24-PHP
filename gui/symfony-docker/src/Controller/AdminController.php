@@ -153,19 +153,16 @@ class AdminController extends AbstractController
     }
 
 
-    #[Route('/userEdit/{id}', name: 'app_admin_userEdit')]
-    public function userEdit(ManagerRegistry $doctrine, $id) : Response
+    #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
+    public function userEdit(ManagerRegistry $doctrine, $id, $role) : Response
 
     {
         if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_index');
         }
         $user = $doctrine->getRepository(User::class)->find($id);
-        $roles = $user->getRoles();
-        array_push($roles, "ROLE_ADMIN");
-        $user->setRoles($roles);
         $entityManager = $doctrine->getManager();
-        $entityManager->persist($user);
+        $entityManager->persist($user->setSpecificRoles("$role"));
         $entityManager->flush();
 
         return $this->redirectToRoute('app_admin_userList');
