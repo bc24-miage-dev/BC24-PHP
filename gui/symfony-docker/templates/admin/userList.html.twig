@@ -34,9 +34,21 @@
                                         <td>
                                         {% if "ROLE_ADMIN" in user.roles %}
                                             <p> Admin </p>
-                                        {% else %}
-                                            <a href="{{ path('app_admin_userEdit', {'id': user.id, 'role' : "ROLE_ADMIN"}) }}" class="btn btn-primary">Appoint</a>
-                                        {% endif %}
+                                            {% else %}
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Assign Role
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ELEVEUR'}) }}">Éleveur</a></li>
+            <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_TRANSPORTEUR'}) }}">Transporteur</a></li>
+            <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_EQUARRISSEUR'}) }}">Équarrisseur</a></li>
+            <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USINE'}) }}">Usine</a></li>
+            <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_COMMERCANT'}) }}">Commerçant</a></li>
+            <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ADMIN'}) }}">Admin</a></li>
+        </ul>
+    </div>
+{% endif %}
+
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -47,9 +59,3 @@
         </div>
     </div>
 {% endblock %}
-
-
-
-
-
-
