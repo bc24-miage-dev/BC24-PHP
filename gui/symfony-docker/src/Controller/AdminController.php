@@ -162,7 +162,7 @@ class AdminController extends AbstractController
         }
         $user = $doctrine->getRepository(User::class)->find($id);
         $entityManager = $doctrine->getManager();
-        $entityManager->persist($user->setSpecificRoles("$role"));
+        $entityManager->persist($user->setSpecificRole("$role"));
         $entityManager->flush();
 
         return $this->redirectToRoute('app_admin_userList');
