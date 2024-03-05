@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/admin.html.twig' %}
 
 {% block title %}Liste des Utilisateurs{% endblock %}
 
@@ -16,27 +16,23 @@
                                     <th>Nom</th>
                                     <th>Prénom</th>
                                     <th>ID</th>
-                                    <th>Rôles</th>
-                                    <th>Action</th>
+                                    <th>Rôle souhaité</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for user in users %}
-                                    <tr>
-                                        <td>{{ user.lastname }}</td>
-                                        <td>{{ user.firstname }}</td>
-                                        <td>{{ user.id }}</td>
+                                {% for userRequest in UserRoleRequest %}
+                                    <tr>    
+                                        <td>{{ userRequest.iduser.lastname }}</td>
+                                        <td>{{ userRequest.iduser.firstname }}</td>
+                                        <td>{{ userRequest.iduser.id }}</td>
+                                        <td>{{ userRequest.roleRequest }}</td>
+                                        <td>{{ userRequest.description }}</td>
                                         <td>
-                                            {% for role in user.roles %}
-                                                {{ role }}
-                                            {% endfor %}
+                                            <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "true" , 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Accepter</a>
+                                            <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "false", 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Refuser</a>
                                         </td>
-                                        <td>
-                                        {% if "ROLE_ADMIN" in user.roles %}
-                                            <p> Admin </p>
-                                        {% else %}
-                                            <a href="{{ path('app_admin_userEdit', {'id': user.id, 'role' : "ROLE_ADMIN"}) }}" class="btn btn-primary">Appoint</a>
-                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>

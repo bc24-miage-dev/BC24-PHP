@@ -27,6 +27,7 @@ class UserRoleRequestType extends AbstractType
                     'commerçant' => 'ROLE_COMMERCANT',
                     'admin' => 'ROLE_ADMIN',
                 ],])
+                ->add('Description', null, ['label' => 'Description'])
                     ->add('Envoyer', SubmitType::class)
                 ;
     }

@@ -27,6 +27,9 @@ class UserRoleRequest
     #[ORM\Column]
     private ?bool $Read = null;
 
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $Description = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -79,4 +82,17 @@ class UserRoleRequest
 
         return $this;
     }
+
+    public function getDescription(): ?string
+    {
+        return $this->Description;
+    }
+
+    public function setDescription(string $Description): static
+    {
+        $this->Description = $Description;
+
+        return $this;
+    }
+    
 }
