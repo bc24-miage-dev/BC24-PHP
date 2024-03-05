@@ -2,21 +2,22 @@
 
 {% block body %}
 
+    <div class="container-fluid">
+        <h1>Modifier une ressource : </h1><br>
+        <div class="row">
+            {% for resource in resources %}
 
-    {% for resource in resources %}
-        {%  if resource.isContamined %}
-        <div class="card bg-danger mb-3" style="max-width: 80%;">
-        {% else %}
-        <div class="card" style="width: 80%;">
-        {% endif %}
-            <div class="card-body">
-                <h5 class="card-title">{{ resource.resourceName }}</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>
-                <p class="card-text">{{ resource.description }}</p>
-                <a href="{{ path('app_admin_modifySpecific', {'id': resource.id}) }}" class="card-link">Modifier cette ressource</a>
+            <div class="card mr-2 mb-2" style="width: 18rem;">
+                <div class="card-body ">
+                    <h5 class="card-title">{{ resource.resourceName }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>
+                    <p class="card-text">{{ resource.description }}</p>
+                    <a href="{{ path('app_admin_modifySpecific', {'id': resource.id}) }}" class="card-link">Modifier cette ressource</a>
+                </div>
             </div>
+
+            {% endfor %}
         </div>
 
-    {% endfor %}
-
+    </div>
 {% endblock %}
