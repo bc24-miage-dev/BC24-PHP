@@ -1,9 +1,10 @@
 {% extends 'admin/admin.html.twig' %}
 
 {% block body %}
+<div class="container-fluid">
     {% if state == "success" %}
         <h1>Success ! </h1> <br>
-        <a href="{{ path('app_admin') }}">Retour à la vue Admin</a>
+        <a href="{{ path('app_admin_index') }}">Retour à la vue Admin</a>
 
     {% else %}
         <h1>Création d'une nouvelle ressource</h1><br>
@@ -12,7 +13,7 @@
             label: 'Tag NFC'
         }) }}
         {{ form_row(form.ResourceName, {
-            label: 'Nom de la nouvelle ressource :'
+            label: 'Nom de la nouvelle ressource'
         }) }}
 
         {{ form_row(form.isFinalProduct, {
@@ -35,15 +36,26 @@
             label: 'Description'
         })
         }}
-        {{ form_row(form.components, {
-            label: 'Composants'
-        })
-        }}
-        {{ form_row(form.origin, {
-            label: 'Lieu de production'
-        })
-        }}
-    {{ form_end(form) }}
-    {% endif %}
+        <label> NFC des Composants :
+            {% for i in 0..5 %}
+            <input class="ml-3" type="number" name="{{ field_name(form.components) }}">
+            {% endfor %}
 
+        </label>
+
+        <br>
+
+        <label> Lieu d'origine :
+            <select name="{{ field_name(form.origin) }}" class="form-control">
+                {% for name, id in field_choices(form.origin) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <br><br>
+        {{ form_end(form) }}
+
+    {% endif %}
+</div>
 {% endblock %}

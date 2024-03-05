@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
+    {% block icon %}<link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">{% endblock %}
     <title>{% block title %}BC24-PRO{% endblock %}</title>
 
     <!-- Custom fonts for this template-->
@@ -34,9 +34,11 @@
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('app_index') }}">
-            <div class="sidebar-brand-text mx-3">BC24</div>
+            <div class="sidebar-brand-icon small"><img height="70"   alt="BC24" src="{{ asset('images/logo.png') }}"></div>
         </a>
-
+        <br>
+                             <!--<div class="sidebar-brand-text mx-3">-->
+        {% block sidebar %}
         <!-- Divider -->
         <!--
         <hr class="sidebar-divider my-0">
@@ -143,20 +145,57 @@
         </div>
 
     </ul>
-
     -->
+    {% endblock %}
+
     <!-- End of Sidebar -->
     </ul>
 
-    <div class="container-fluid">
+    <div id="content-wrapper" class="d-flex flex-column">
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <div class="text-center">
+                <h1 class="h3 mb-0 text-gray-800">{% block titrePro %}BC24 Pro{% endblock %}</h1>
+            </div>
 
-    {% block body %}
-        Body pro de base
-    {% endblock %}
+            <div class="topbar-divider d-none d-sm-block"></div>
+
+            <i class="fas fa-fw fa-user-tie mr-2"></i>
+            <span class="mr-3 d-none d-lg-inline text-gray-600 small">{{ app.user.firstName }} {{ app.user.lastName }}</span>
+            <a href="{{ path('app_logout') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-sign-out-alt fa-sm text-white-50"></i> Se déconnecter </a>
+
+
+            <span class="ml-sm-auto"><a href="{{ path('app_index') }}">Retourner à la vue utilisateur</a></span>
+
+
+        </nav>
+
+        {% for flash_message in app.flashes('success') %}
+            <div class="alert alert-success" role="alert">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+        {% for flash_message in app.flashes('error') %}
+            <div class="alert alert-danger" role="alert">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+        {% for flash_message in app.flashes('info') %}
+            <div class="alert alert-info" role="alert">
+                {{ flash_message }}
+            </div>
+        {% endfor %}
+
+        {% block body %}
+            Body de base PRO
+        {% endblock %}
 
     </div>
+</div>
+
+<div class="bg-dark">
         <!-- Footer -->
-        <footer class="sticky-footer bg-white">
+        <footer class="sticky-footer bg-dark">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
                     <span>Copyright &copy; BC24</span>
@@ -164,9 +203,8 @@
             </div>
         </footer>
         <!-- End of Footer -->
+</div>
 
-    </div>
-    <!-- End of Content Wrapper -->
 
 
 

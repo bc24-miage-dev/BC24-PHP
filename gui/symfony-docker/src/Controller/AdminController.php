@@ -24,8 +24,9 @@ class AdminController extends AbstractController
     public function admin(): Response
     {
 
-        if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
-            return $this->redirectToRoute('app_index');
+        if(!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles()))
+        {
+           return $this->redirectToRoute('app_index');
 
         }
 
@@ -114,25 +115,34 @@ class AdminController extends AbstractController
         $report = $doctrine->getRepository(Report::class)->find($id);
         $resource = $report->getResource();
 
-        if ($request->isMethod('POST')) {
-            if ($request->request->has('contaminate')) {
-                $resource->setIsContamined(true);
-                $report->setRead(true);
-            } elseif ($request->request->has('mark_safe')) {
-                $report->setRead(true);
-            }
-
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->persist($report);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_admin_reportList');
-        }
-
         return $this->render('admin/checkReport.html.twig', ['report' => $report, 'resource' => $resource]);
 
     }
+
+#[Route('/checkReportProcess/{idRep}/{action}', name:'app_admin_checkReportProcess')]
+    public function checkReportProcess(Request $request, ManagerRegistry $doctrine, $idRep, $action): RedirectResponse{
+        if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_index');
+        }
+
+        $report = $doctrine->getRepository(Report::class)->find($idRep);
+        $resource = $report->getResource();
+        if ($action =='delete'){
+            $resource->setIsContamined(true);
+        }
+        $report->setRead(true);
+
+
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($resource);
+        $entityManager->persist($report);
+        $entityManager->flush();
+
+
+        return $this->redirectToRoute('app_admin_reportList');
+    }
+
+
     #[Route('/userList', name: 'app_admin_userList')]
 
     public function userList(ManagerRegistry $doctrine): Response
@@ -145,21 +155,23 @@ class AdminController extends AbstractController
         return $this->render('admin/userList.html.twig', ['users' => $users]);
     }
 
+
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
-    public function userEdit(ManagerRegistry $doctrine, $id, $role): Response
+    public function userEdit(ManagerRegistry $doctrine, $id, $role) : Response
+
     {
         if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_index');
         }
         $user = $doctrine->getRepository(User::class)->find($id);
         $entityManager = $doctrine->getManager();
-        $entityManager->persist($user->setSpecificRoles("$role"));
+        $entityManager->persist($user->setSpecificRole("$role"));
         $entityManager->flush();
 
         return $this->redirectToRoute('app_admin_userList');
     }
 
-    #[Route('admin/productionSite', name: 'app_productionSite')]
+    #[Route('productionSite', name: 'app_productionSite')]
 
     public function createProductionSite(ManagerRegistry $doctrine, Request $request): Response
     {
@@ -172,8 +184,8 @@ class AdminController extends AbstractController
             $entityManager->persist($productionSite);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Production Site created successfully');
-            return $this->redirectToRoute('app_admin');
+            $this->addFlash('success', 'Site de production créé avec succès');
+            return $this->redirectToRoute('app_admin_index');
         }
 
         return $this->render('admin/productionSite.html.twig', [
@@ -241,5 +253,6 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_userList');
     }
+
 
 }

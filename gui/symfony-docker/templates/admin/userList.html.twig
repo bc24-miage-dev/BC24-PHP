@@ -27,16 +27,36 @@
                                         <td>{{ user.firstname }}</td>
                                         <td>{{ user.id }}</td>
                                         <td>
-                                            {% for role in user.roles %}
-                                                {{ role }}
-                                            {% endfor %}
+                                            {% if user.roles|length == 1 %}
+                                                 <p>User</p>
+                                            {% else %}
+                                                {% for role in user.roles %}
+                                                    {% if role != "ROLE_USER" and role != "ROLE_PRO" %}
+                                                        {{ role|replace({'ROLE_': ''})|capitalize}}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
                                         </td>
                                         <td>
                                         {% if "ROLE_ADMIN" in user.roles %}
-                                            <p> Admin </p>
+                                            <p> Aucune action possible </p>
                                         {% else %}
-                                            <a href="{{ path('app_admin_userEdit', {'id': user.id, 'role' : "ROLE_ADMIN"}) }}" class="btn btn-primary">Appoint</a>
+                                            <div class="dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Assigner Rôle
+                                            <span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ELEVEUR'}) }}">Éleveur</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_TRANSPORTEUR'}) }}">Transporteur</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_EQUARRISSEUR'}) }}">Équarrisseur</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USINE'}) }}">Usine</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_COMMERCANT'}) }}">Commerçant</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ADMIN'}) }}">Admin</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USER'})  }}">User Classique</a></li>
+                                            </ul>
+                                            </div>
                                         {% endif %}
+                                        </td>
+
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -47,9 +67,3 @@
         </div>
     </div>
 {% endblock %}
-
-
-
-
-
-

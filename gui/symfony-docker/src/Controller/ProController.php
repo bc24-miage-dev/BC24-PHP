@@ -13,10 +13,10 @@ class ProController extends AbstractController
     #[Route('/pro', name: 'app_pro')]
     public function proRoutage(): RedirectResponse
     {
-        if (!$this->isPro()){
+        if (! ($this->getUser() && in_array('ROLE_PRO', $this->getUser()->getRoles()))){
             return $this->redirectToRoute('app_index');
         }
-        return match ($this->getUser()->getRoles()[1]) {
+        return match ($this->getUser()->getRoles()[0]) {
             'ROLE_ELEVEUR' => $this->redirectToRoute('app_eleveur_index'),
             'ROLE_TRANSPORTEUR' => $this->redirectToRoute('app_transporteur_index'),
             'ROLE_EQUARRISSEUR' => $this->redirectToRoute('app_equarrisseur_index'),

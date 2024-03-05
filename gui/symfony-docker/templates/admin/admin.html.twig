@@ -2,13 +2,75 @@
 
 {% block title %}BC24 Admin{% endblock %}
 
-{% block body %}
-    <br><br><br><br><br><br><br>
-    <a href="{{ path('app_admin_add') }}">Ajouter une ressource</a> <br>
-    <a href="{{ path('app_admin_modify') }}">Modifier une ressource</a><br>
-    <a href="{{ path('app_admin_reportList') }}">Check le dernier report de ressource</a> <br>
-    <a href="{{ path('app_admin_userList') }}">Gestion des Utilisateurs</a><br>
-    <a href="{{ path('app_productionSite') }}">Gestion des sites de production</a>
-    <br><br><br><br><br><br><br>
+{%  block sidebar %}
+    <hr class="sidebar-divider my-0">
+    <li><div class="sidebar-heading"> Navigation </div></li>
+    <li class="nav-item active">
+        <a class="nav-link" href="{{ path('app_admin_index') }}">
+            <i class="fas fa-fw fa-user-tie"></i>
+            <span>Menu Pro</span></a>
+    </li>
+    <li class="nav-item active"><a class="nav-link" href="{{ path('app_index') }}">
+        <i class="fas fa-fw fa-home"></i>
+        <span>Menu consommateur</span></a>
+    </li>
+
+    <hr class="sidebar-divider my-0">
+
+<div class="sidebar-heading"> Opérations </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_admin_add') }}">
+            <i class="fas fa-fw fa-plus"></i>
+            <span>Ajouter une ressource</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_admin_modify') }}">
+            <i class="fas fa-fw fa-edit"></i>
+            <span>Modifier une ressource</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_admin_reportList') }}">
+            <i class="fas fa-fw fa-check"></i>
+            <span>Check le dernier report de ressource</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_admin_userList') }}">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Gestion des Utilisateurs</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_productionSite') }}">
+            <i class="fas fa-fw fa-industry"></i>
+            <span>Création de site de production</span></a>
+    </li>
+
+    <hr class="sidebar-divider my-0">
+
+    <div class="sidebar-heading"> Rétracter la barre </div>
+
+    <br>
+    <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+    </div>
 
 {% endblock %}
+
+
+{% block titrePro %}BC24 Admin{% endblock %}
+
+{% block body %}
+    <hr class="sidebar-divider my-0">
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Bienvenue sur la page d'administration de BC24</h1>
+        <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
+    </div>
+{% endblock %}
+
+
+
+

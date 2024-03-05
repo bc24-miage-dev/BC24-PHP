@@ -2,6 +2,7 @@
 
 {% block body %}
 
+    <div class="container-fluid">
     <h1>Modification de la ressource {{resource.id}}</h1>
 
 
@@ -30,16 +31,28 @@
             label: 'Description'
         })
         }}
-        {{ form_row(form.components, {
-            label: 'Composants'
-        })
-        }}
-        {{ form_row(form.origin, {
-            label: 'Lieu de production'
-        })
-        }}
-    {{ form_end(form) }}
 
+        <label> NFC des Composants :
+            {% for i in 0..5 %}
+                <input class="ml-3" type="number" name="{{ field_name(form.components) }}">
+            {% endfor %}
+
+        </label>
+
+        <br>
+
+        <label> Lieu d'origine :
+            <select name="{{ field_name(form.origin) }}" class="form-control">
+                {% for name, id in field_choices(form.origin) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <br><br>
+
+    {{ form_end(form) }}
+    </div>
 {% endblock %}
 
 
