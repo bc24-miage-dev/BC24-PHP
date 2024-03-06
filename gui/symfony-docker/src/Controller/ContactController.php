@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Report;
+use App\Form\ReportType;
+
 
 class ContactController extends AbstractController
 {
@@ -16,12 +21,7 @@ class ContactController extends AbstractController
         ]);
     }
 
-    #[Route('/report', name: 'app_report')]
-    public function report(): Response
-    {
-        return $this->render('contact/report.html.twig', [
-            'controller_name' => 'ContactController',
-        ]);
-    }
+
+
 
 }

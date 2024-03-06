@@ -1,0 +1,25 @@
+{% extends 'template.html.twig' %}
+
+{% block title %}BC24-Mon Compte{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('CSS/user.css') }}" />
+{% endblock %}
+
+{% block body %}
+<div class="centered-boxes">
+    <a href="{{ path('app_user_delete') }}" class="box">
+        <div class="icon-box">
+            <img src="{{ asset('images/DeleteAccount.png') }}" alt="Delete Account" />
+        </div>
+        <p>Delete Account</p>
+    </a>
+    <a href="{{ path('app_user_update') }}" class="box">
+        <div class="icon-box">
+            <img src="{{ asset('images/ModifyAccount.png') }}" alt="Modify Account" />
+        </div>
+        <p>Modify Account</p>
+    </a>
+</div>
+{% endblock %}

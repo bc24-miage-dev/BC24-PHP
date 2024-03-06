@@ -1,16 +1,123 @@
-{% extends 'base.html.twig' %}
+{% extends 'template.html.twig' %}
 
-{% block title %}Hello StaticController!{% endblock %}
+{% block title %}BC24 - Traçabilité{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    {{ parent()}}
+    <!-- Banner -->
+    <div id="banner-wrapper">
+        <div id="banner" class="box container">
+            <div class="row">
+                <div class="col-7 col-12-medium">
+                    <h2>Bienvenue sur le site de BC24</h2>
+                    <p>Solution de traçabilité</p>
+                </div>
+                <div class="col-5 col-12-medium">
+                    <a href="{{ path('app_info') }}" class="button large icon solid">Comment fonctionne BC24 ?</a>
+                    <a href="{{ path('app_search') }}" class="button large icon solid">Rechercher un produit</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-    <h2>INDEX</h2>
+    <!-- Features -->
+    <div id="features-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-4 col-12-medium">
 
-</div>
+                    <!-- Box -->
+                    <section class="box feature">
+                        <a href="{{ path('app_search') }}" class="image featured"><img src="{{ asset('images/pic01.jpg') }}" alt="" /></a>
+                        <div class="inner">
+                            <header>
+                                <h2>Recherche</h2>
+                                <p>Consulter la trace d'un produit</p>
+                            </header>
+                            <p>Scannez simplement votre produit et consultez l'intégralité de son parcours grâce à la technologie de la Blockchain !</p>
+                        </div>
+                    </section>
+
+                </div>
+                <div class="col-4 col-12-medium">
+
+                    <!-- Box -->
+                    <section class="box feature">
+                        <a href="{{ path('app_recent') }}" class="image featured"><img src="{{ asset('images/pic02.jpg') }}" alt="" /></a>
+                        <div class="inner">
+                            <header>
+                                <h2>Consultation</h2>
+                                <p>Consulter les derniers produits dangereux</p>
+                            </header>
+                            <p>Nos équipes veillent à votre santé ! Retrouvez ici tous les produits récemment déclarés impropres à la consommation.</p>
+                        </div>
+                    </section>
+
+                </div>
+                <div class="col-4 col-12-medium">
+
+                    <!-- Box -->
+                    <section class="box feature">
+                        <a href="{{ path('app_report_reportAliment') }}" class="image featured"><img src="{{  asset('images/pic03.jpg') }}" alt="" /></a>
+                        <div class="inner">
+                            <header>
+                                <h2>Signalement</h2>
+                                <p>Signaler un produit</p>
+                            </header>
+                            <p>Votre article acheté récemment semble étrange ? Signalez-le nous, nous étudierons le problème et reviendrons vers vous</p>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div id="main-wrapper">
+        <div class="container">
+            <div class="row gtr-200">
+                <div class="col-4 col-12-medium">
+
+                    <!-- Sidebar -->
+                    <div id="sidebar">
+                        <section class="widget thumbnails">
+                            <h3>Votre métier</h3>
+                            <div class="grid">
+                                <div class="row gtr-50">
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic04.jpg') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic05.jpg') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic06.jpg') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic07.jpg') }}" alt="" /></a></div>
+                                </div>
+                            </div>
+
+                        </section>
+                    </div>
+
+                </div>
+                <div class="col-8 col-12-medium imp-medium">
+
+                    <!-- Content -->
+                    <div id="content">
+                        <section class="last">
+                            <h2>Notre site s'adresse également aux professionnels</h2>
+                            <p>Vous êtes <b>Producteur</b>, <b>Équarrisseur</b> ou vous travaillez dans une <b>Usine de production</b> ? Vous pouvez réaliser ici toutes les tâches
+                                liées à la traçabilité de vos produits.</p>
+                            <p>Notre site propose des services pour faciliter ces tâches, et rassurer les consommateurs sur ce qu'il se trouve dans leurs assiettes. <br>
+                                Interessé(e) ? Enregistrez vous ici !</p>
+                            {# TODO : Page création de compte pro + Rôles + Pages différentes #}
+                            <a href="{{ path('app_admin_user_request') }}" class="button icon solid fa-arrow-circle-right">Création de compte Professionnel</a>
+                        </section>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

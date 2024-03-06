@@ -1,0 +1,59 @@
+/* General form styles */
+.form-style {
+    width: 50%;
+   
+    min-height: 500px; /* Adjust the minimum height as needed */
+    margin: 40px auto;
+    padding: 40px;
+    background: #e0dfdf;
+    border-radius: 8px;
+    
+}
+
+/* Style all input fields and textareas */
+.form-style input[type="text"],
+.form-style input[type="email"],
+.form-style textarea {
+    width: calc(100% - 20px); /* Full width minus padding */
+    padding: 10px;
+    margin-bottom: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* Style the label elements */
+.form-style label {
+    font-size: 1.2em;
+    margin-bottom: 4px;
+    color: #666;
+}
+
+/* Style the submit button */
+.form-style input[type="submit"] {
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #5cb85c;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover effect for the submit button */
+.form-style input[type="submit"]:hover {
+    background-color: #4cae4c;
+}
+
+/* Style for the textarea element specifically */
+.form-style textarea {
+    height: 100px; /* Set a fixed height */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-style {
+        width: 90%;
+        margin: 20px auto;
+    }
+}

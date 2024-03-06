@@ -1,1 +1,23 @@
-modify
+{% extends 'admin/admin.html.twig' %}
+
+{% block body %}
+
+    <div class="container-fluid">
+        <h1>Modifier une ressource : </h1><br>
+        <div class="row">
+            {% for resource in resources %}
+
+            <div class="card mr-2 mb-2" style="width: 18rem;">
+                <div class="card-body ">
+                    <h5 class="card-title">{{ resource.resourceName }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">{{ resource.id }}</h6>
+                    <p class="card-text">{{ resource.description }}</p>
+                    <a href="{{ path('app_admin_modifySpecific', {'id': resource.id}) }}" class="card-link">Modifier cette ressource</a>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,25 @@
+.centered-text {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.centered-text h1,
+.centered-text h2 {
+    color: #333;
+}
+
+.delete-account-button {
+    padding: 10px 20px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.delete-account-button:hover {
+    background-color: #cc3333; /* Darken the button color on hover */
+}

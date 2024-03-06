@@ -1,47 +1,81 @@
 <header>
-    <nav class="navbar navbar-expand-md navbar-light" style="background-color: #34aadc;">
-        <div class="container-fluid">
-            <!-- Navbar brand/logo -->
-            <a class="navbar-brand" href="{{ path('app_index') }}">
-                <img src="{{ asset('images/logo.webp') }}" alt="Logo BC24" style="height: auto; width: 80px;">
-            </a>
-            <!-- Toggle button for mobile navigation -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <!-- Navbar links -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <!-- Non-button nav items aligned to the left -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_index') }}">Accueil</a>
-                    </li>
+	{%block stylesheets%}
+	<link href="{{ asset('CSS/header.css') }}" rel="stylesheet">
+	{%endblock%}
+
+	<nav class="navbar navbar-expand-md navbar-light" style="background-color: #34aadc;">
+		<div
+			class="container-fluid">
+			<!-- Navbar brand/logo -->
+			<a class="navbar-brand" href="{{ path('app_index') }}">
+				<img src="{{ asset('images/logo.webp') }}" alt="Logo BC24" style="height: auto; width: 80px;">
+			</a>
+			<!-- Toggle button for mobile navigation -->
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<!-- Navbar links -->
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul
+					class="navbar-nav">
+					<!-- Non-button nav items aligned to the left -->
+					<li class="nav-item">
+						<a class="nav-link" href="{{ path('app_index') }}">Accueil</a>
+					</li>
 
 					<li class="nav-item">
 						<a class="nav-link" href="{{ path('app_search') }}">Rechercher un produit
-							
+
 						</a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="{{ path('app_report') }}">Signaler un produit
-							
+						<a class="nav-link" href="{{ path('app_report_reportAliment') }}">Signaler un produit
+
 						</a>
-	
-                    <!-- ... other non-button nav items ... -->
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <!-- Button-styled nav items aligned to the right -->
-                    <li class="nav-item">
-                        <a class="btn-transparent" href="{{ path('app_admin') }}">Admin</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn-transparent" href="{{ path('app_contact') }}">Contacter</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn-transparent" href="{{ path('app_login') }}">Connexion</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="{{ path('app_recent') }}">Produits dangereux ajoutés récemment
+
+						</a>
+						
+					</li>
+				</ul>
+				<ul
+					class="navbar-nav ms-auto">
+					<!-- Button-styled nav items aligned to the right -->
+
+					{% if app.user and "ROLE_ADMIN" in app.user.roles %}
+						<li class="nav-item">
+							<a class="btn-transparent" href="{{ path('app_admin') }}">Admin</a>
+						</li>
+					{% endif %}
+
+
+					<li class="nav-item">
+						<a class="btn-transparent" href="{{ path('app_contact') }}">Contacter</a>
+					</li>
+
+
+					{% if app.user %}
+						<li class="nav-item">
+							<a class="btn-transparent" href="{{ path('app_user_account') }}">Mon Compte</a>
+						</li>
+						<li class="nav-item">
+							<a class="btn-transparent" href="{{ path('app_logout') }}">Déconnexion</a>
+						</li>
+
+					{% else %}
+						<li class="nav-item">
+							<a class="btn-transparent" href="{{ path('app_login') }}">Connexion</a>
+						</li>
+						<li class="nav-item">
+							<a class="btn-transparent" href="{{ path('app_register') }}">Créer un compte</a>
+						</li>
+					{% endif %}
+
+
+				</ul>
+			</div>
+		</div>
+	</nav>
 </header>
