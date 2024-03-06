@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -193,37 +194,6 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/user/request', name: 'app_admin_user_request')]
-    public function userRequestRole(Request $request, ManagerRegistry $doctrine): Response
-    {
-        $UserRoleRequest = new UserRoleRequest();
-        $user = $this->getUser();
-        $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
-
-        if (count($repoRequest) > 0) {
-            $UserRoleRequest = $repoRequest[0];
-        }
-        $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
-            $UserRoleRequest->setIdUser($user);
-            $UserRoleRequest->setRead(false);
-            $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-            $entityManager->persist($UserRoleRequest);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Votre demande à bien été envoyée');
-            return $this->redirectToRoute('app_index');
-        }
-
-        return $this->render('admin/UserRequest.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
-
     #[Route('/request/check', name: 'app_admin_request_check')]
     public function userRequestCheck(Request $request, ManagerRegistry $doctrine): Response
     {
@@ -246,7 +216,7 @@ class AdminController extends AbstractController
         if($validation == "true"){
             $user = $doctrine->getRepository(User::class)->find($userRoleRequest->getIdUser());
             $entityManager = $doctrine->getManager();
-            $entityManager->persist($user->setSpecificRoles("$role"));
+            $entityManager->persist($user->setSpecificRole("$role"));
         }
         $userRoleRequest->setRead(true);
         $entityManager->flush();

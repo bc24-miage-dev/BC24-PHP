@@ -23,6 +23,7 @@
                             </thead>
                             <tbody>
                                 {% for userRequest in UserRoleRequest %}
+                                    {% if userRequest.read == 0 %}
                                     <tr>    
                                         <td>{{ userRequest.iduser.lastname }}</td>
                                         <td>{{ userRequest.iduser.firstname }}</td>
@@ -34,6 +35,7 @@
                                             <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "false", 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Refuser</a>
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>

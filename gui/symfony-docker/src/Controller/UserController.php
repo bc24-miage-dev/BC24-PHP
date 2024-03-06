@@ -11,7 +11,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use App\Form\ModifierUserType;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\UserRoleRequest;
+use App\Form\UserRoleRequestType;
 
+#[Route('/user')]
 class UserController extends AbstractController
 {
     private $tokenStorage;
@@ -21,7 +24,7 @@ class UserController extends AbstractController
     }
 
 
-    #[Route('/user', name: 'app_user_account')]
+    #[Route('/', name: 'app_user_account')]
     public function myAccount(): Response
     {
         return $this->render('user/MyAccount.html.twig', [
@@ -29,7 +32,7 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/user/deleteAccount', name: 'app_user_delete')]
+    #[Route('/deleteAccount', name: 'app_user_delete')]
     public function deleteUser(ManagerRegistry $doctrine): Response
     {
         $user = $this->getUser();
@@ -39,7 +42,7 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_index');
     }
 
-    #[Route('/user/delete', name: 'app_user_delete_process')]
+    #[Route('/delete', name: 'app_user_delete_process')]
     public function deleteUserProcess(ManagerRegistry $doctrine): RedirectResponse
     {
         $user = $this->getUser();
@@ -55,7 +58,7 @@ class UserController extends AbstractController
         return $this->redirectToRoute('app_index');
     }
 
-    #[Route('/user/update', name: 'app_user_update')]
+    #[Route('/update', name: 'app_user_update')]
     public function modifUser(Request $request, ManagerRegistry $doctrine): Response
     {
         $user = $this->getUser();
@@ -80,5 +83,35 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/request', name: 'app_admin_user_request')]
+    public function userRequestRole(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $UserRoleRequest = new UserRoleRequest();
+        $user = $this->getUser();
+        $repository = $doctrine->getRepository(UserRoleRequest::class);
+        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
+
+        if (count($repoRequest) > 0) {
+            $UserRoleRequest = $repoRequest[0];
+        }
+        $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $UserRoleRequest->setIdUser($user);
+            $UserRoleRequest->setRead(false);
+            $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+            $entityManager->persist($UserRoleRequest);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre demande à bien été envoyée');
+            return $this->redirectToRoute('app_index');
+        }
+
+        return $this->render('user/UserRequest.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 
 }
