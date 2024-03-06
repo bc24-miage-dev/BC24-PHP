@@ -11,7 +11,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use App\Form\ModifierUserType;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\UserRoleRequest;
+use App\Form\UserRoleRequestType;
 
+#[Route('/user')]
 class UserController extends AbstractController
 {
     private $tokenStorage;
@@ -19,9 +22,9 @@ class UserController extends AbstractController
     {
         $this->tokenStorage = $tokenStorage;
     }
-    
-    
-    #[Route('/myAccount', name: 'app_myaccount')]
+
+
+    #[Route('/', name: 'app_user_account')]
     public function myAccount(): Response
     {
         return $this->render('user/MyAccount.html.twig', [
@@ -29,21 +32,19 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/myAccount/Suppr', name: 'app_deleteMyAccount')]
-    public function deleteUser(User $user = null, ManagerRegistry $doctrine): Response
-    {   
+    #[Route('/deleteAccount', name: 'app_user_delete')]
+    public function deleteUser(ManagerRegistry $doctrine): Response
+    {
         $user = $this->getUser();
         if ($user) {
-            return $this->render('user/SuppSoon.html.twig',[]);
+            return $this->render('user/SuppSoon.html.twig');
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexsitant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
-    #[Route('/accountDel', name: 'app_deleteMyAccount2')]
-    public function deleteUser2(User $user = null, ManagerRegistry $doctrine): RedirectResponse
-    {   
+    #[Route('/delete', name: 'app_user_delete_process')]
+    public function deleteUserProcess(ManagerRegistry $doctrine): RedirectResponse
+    {
         $user = $this->getUser();
         if ($user) {
             $entityManager = $doctrine->getManager();
@@ -51,37 +52,66 @@ class UserController extends AbstractController
             $entityManager->flush();
             //Kill la session
             $this->tokenStorage->setToken(null);
+            $this->addFlash('success', 'Votre compte a bien été supprimé');
             return $this->redirectToRoute('app_index');
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexsitant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
-    #[Route('/myAccount/update', name: 'app_updateMyAccount')]
+    #[Route('/update', name: 'app_user_update')]
     public function modifUser(Request $request, ManagerRegistry $doctrine): Response
-    {   
+    {
         $user = $this->getUser();
         if ($user) {
             $form = $this->createForm(ModifierUserType::class, $user);
             $form->handleRequest($request);
 
             if($form -> isSubmitted() && $form -> isValid()){
-                
+
                 $entityManager = $doctrine->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
-                return $this->redirectToRoute('app_myaccount');
+                return $this->redirectToRoute('app_user_account');
             }
             $form = $this->createForm(ModifierUserType::class, $user);
 
-            return $this->render('user/ModifAccount.html.twig',['form' => $form->createView()
+            return $this->render('user/ModifAccount.html.twig', ['form' => $form->createView()
         ]);
         }
         return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexsitant',
+            'information' => 'Compte inexistant',
         ]);
     }
 
+    #[Route('/request', name: 'app_admin_user_request')]
+    public function userRequestRole(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $UserRoleRequest = new UserRoleRequest();
+        $user = $this->getUser();
+        $repository = $doctrine->getRepository(UserRoleRequest::class);
+        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
+
+        if (count($repoRequest) > 0) {
+            $UserRoleRequest = $repoRequest[0];
+        }
+        $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $UserRoleRequest->setIdUser($user);
+            $UserRoleRequest->setRead(false);
+            $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+            $entityManager->persist($UserRoleRequest);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre demande à bien été envoyée');
+            return $this->redirectToRoute('app_index');
+        }
+
+        return $this->render('user/UserRequest.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 
 }

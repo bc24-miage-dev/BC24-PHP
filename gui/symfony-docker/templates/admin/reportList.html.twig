@@ -1,22 +1,25 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin/admin.html.twig' %}
 
-{% block title %}Hello StaticController!{% endblock %}
+{% block title %}BC24-Admin{% endblock %}
 
 {% block body %}
-   
 
-    {% for reportElement in report %}
-        <h1 style='text-align:center'>
-        {{ reportElement.resource.ResourceName }}
+    <div class="container-fluid">
+    <h1>Liste des signalements récents : </h1><br>
+        {% if report %}
+        {% for reportElement in report %}
 
-
-        {{ reportElement.description }}
-        <a href="{{ path('app_admin_checkReport', {'id': reportElement.id }) }}">check report</a>
-        </h1>
-
-
-    {% endfor %}
-
-
-
+            <div class="card mr-2 mb-2" style="width: 80%;">
+                <div class="card-body ">
+                    <h5 class="card-title">{{ reportElement.resource.id }} - {{ reportElement.resource.ResourceName }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">Date : {{ reportElement.date|date('d/m/Y') }}</h6>
+                    <p class="card-text">{{ reportElement.description }}</p>
+                    <a href="{{ path('app_admin_checkReport', {'id': reportElement.id}) }}" class="card-link">Check Report</a>
+                </div>
+            </div>
+        {% endfor %}
+        {% else %}
+            <p>Il n'y a pas de signalements récents</p>
+        {% endif %}
+    </div>
 {% endblock %}

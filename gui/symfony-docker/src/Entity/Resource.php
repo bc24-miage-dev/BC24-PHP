@@ -140,7 +140,7 @@ class Resource
 
         return $this;
     }
-    
+
     public function getOrigin(): ?ProductionSite
     {
         return $this->origin;

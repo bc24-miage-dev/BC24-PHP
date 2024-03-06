@@ -1,11 +1,44 @@
-{% extends 'base.html.twig' %}
-
+{% extends 'admin/admin.html.twig' %}
 
 {% block body %}
-{{report.description}}
-{{report.date|date('Y-m-d')}}
-{{resource.id}}
+<div class="container-fluid">
+    <h1>Signalement n°{{ report.id }}</h1><br>
+
+        <div class="row">
+        <div class="col-md-6">
+            <h2>Informations</h2>
+            <p><strong>Signalement effectué le :</strong> {{ report.date|date('Y-m-d') }}</p>
+            <p><strong>Signalement effectué par :</strong> {{ report.user.firstName }} {{ report.user.lastName }}</p>
+            <p><strong>Signalement effectué pour :</strong> {{ report.resource.ResourceName }}</p>
+        </div>
+        <div class="col-md-6">
+            <h2>Description</h2>
+            <p>{{ report.description }}</p>
+            <p><strong>Date de création du produit :</strong> {{ report.resource.date|date('Y-m-d') }}</p>
+        </div>
+        </div>
+
+    <a href="{{ path('app_admin_checkReportProcess', {'idRep': report.id, 'action': 'safe'}) }}" class="btn btn-success btn-icon-split">
+        <span class="icon text-white-50">
+            <i class="fas fa-check"></i>
+        </span>
+        <span class="text">Ce produit n'est pas dangereux</span>
+    </a>
+    <a href="{{ path('app_admin_checkReportProcess', {'idRep': report.id, 'action': 'delete'}) }}" class="btn btn-danger btn-icon-split">
+        <span class="icon text-white-50">
+            <i class="fas fa-exclamation-triangle"></i>
+        </span>
+        <span class="text">Ce produit est dangereux</span>
+    </a>
+    <br>
+    <a href="{{ path('app_admin_reportList') }}" class="btn btn-secondary btn-icon-split mt-4">
+        <span class="icon text-white-50">
+            <i class="fas fa-arrow-right"></i>
+        </span>
+        <span class="text">Retour à la liste des signalements</span>
+    </a>
 
 
+</div>
 
 {% endblock %}

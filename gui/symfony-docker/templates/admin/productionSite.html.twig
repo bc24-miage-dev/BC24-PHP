@@ -1,0 +1,23 @@
+{# templates/admin/create_production_site.html.twig #}
+
+{% extends 'admin/admin.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+    <h1>Créer un site de production </h1><br>
+
+        {{ form_start(form) }}
+        {{ form_row(form.ProductionSiteName,  {
+            label: 'Nom du site de production'
+        }) }}
+        {{ form_row(form.Address, {
+            label: 'Adresse' })
+        }}
+        {{ form_row(form.ProductionSiteTel,{
+            label: 'Téléphone' })
+        }}
+
+    {{ form_end(form) }}
+
+    </div>
+{% endblock %}

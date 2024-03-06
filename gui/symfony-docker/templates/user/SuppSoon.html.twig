@@ -1,13 +1,20 @@
-{% extends 'base.html.twig' %}
+{% extends 'template.html.twig' %}
 {% block meta %} <meta http-equiv="refresh" content="10;{{ path('app_deleteMyAccount2') }}" charset="UTF-8"> {% endblock %}
-{% block title %}Register{% endblock %}
+{% block title %}BC24-Supprimer mon compte{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('CSS/deleteuser.css') }}" />
+{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
-Votre compte sera supprimé d'ici 10 secondes.
-<a href="{{ path('app_deleteMyAccount2') }}">Supprimer mon compte maintenant </a>
-<h1> oubliez pas de faire un truc ici en mode toutes vos infos seront supprimés pour toujours TRUC BIDULE </h1>
-
+<div style="text-align: center; margin-top: 50px;">
+    <h1 style="color: #333;"> Vous êtes sur le point de supprimer définitivement votre compte et toutes les informations qui y sont associées </h1>
+    <br>
+    <h2 style="color: #555;">Voulez-vous vraiment supprimer votre compte ?</h2>
+    <br>
+    <button onclick="window.location.href='{{ path('app_user_delete_process') }}';" class="delete-account-button">
+        Supprimer mon compte maintenant
+    </button>
+</div>
 {% endblock %}

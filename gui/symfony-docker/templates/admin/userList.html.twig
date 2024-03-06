@@ -1,0 +1,69 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block title %}Liste des Utilisateurs{% endblock %}
+
+{% block body %}
+    <h1 style='text-align:center'>Liste des Utilisateurs</h1>
+    <hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>ID</th>
+                                    <th>Rôles</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.lastname }}</td>
+                                        <td>{{ user.firstname }}</td>
+                                        <td>{{ user.id }}</td>
+                                        <td>
+                                            {% if user.roles|length == 1 %}
+                                                 <p>User</p>
+                                            {% else %}
+                                                {% for role in user.roles %}
+                                                    {% if role != "ROLE_USER" and role != "ROLE_PRO" %}
+                                                        {{ role|replace({'ROLE_': ''})|capitalize}}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if "ROLE_ADMIN" in user.roles %}
+                                            <p> Aucune action possible </p>
+                                        {% else %}
+                                            <div class="dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Assigner Rôle
+                                            <span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ELEVEUR'}) }}">Éleveur</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_TRANSPORTEUR'}) }}">Transporteur</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_EQUARRISSEUR'}) }}">Équarrisseur</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USINE'}) }}">Usine</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_COMMERCANT'}) }}">Commerçant</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ADMIN'}) }}">Admin</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USER'})  }}">User Classique</a></li>
+                                            </ul>
+                                            </div>
+                                        {% endif %}
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

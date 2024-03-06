@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Resource;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class StaticController extends AbstractController
 {
@@ -38,47 +40,7 @@ class StaticController extends AbstractController
     public function recentReport(ManagerRegistry $doctrine): Response
     {
         $repository = $doctrine->getRepository(Resource::class);
-        $resourcesC = $repository->findLastContaminatedResources();
+        $resourcesC = $repository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
         return $this->render('static/recent.html.twig', ['resourcesC' => $resourcesC]);
-    }
-
-    #[Route('/consommateur', name: 'app_consommateur')]
-    public function consommateur(): Response
-    {
-        return $this->render('static/consommateur.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
-    }
-
-    #[Route('/producteur', name: 'app_producteur')]
-    public function producteur(): Response
-    {
-        return $this->render('static/producteur.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
-    }
-
-    #[Route('/usine', name: 'app_usine')]
-    public function usine(): Response
-    {
-        return $this->render('static/usine.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
-    }
-
-    #[Route('/equarisseur', name: 'app_equarisseur')]
-    public function equarisseur(): Response
-    {
-        return $this->render('static/equarisseur.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
-    }
-
-    #[Route('/static_logout', name: 'app_static_logout')]
-    public function contact(): Response
-    {
-        return $this->render('static/logout.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
     }
 }

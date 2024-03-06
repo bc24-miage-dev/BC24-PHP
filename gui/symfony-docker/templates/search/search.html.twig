@@ -1,12 +1,19 @@
+
+{% extends 'template.html.twig' %}
+
 {% block title %}Recherche{% endblock %}
 
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('css/search.css') }}" />
+{% endblock %}
+
 {% block body %}
-    {{ form_start(form) }}
-    {{ form_row(form.id,  {
-        label: 'Tag NFC'
-    }) }}
-    {{ form_row(form.submit, {
-        label: 'Rechercher'
-    }) }}
+<div class="search-container">
+    <h1>Tag NFC</h1>
+    {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Search by Tag NFC'}}) }}
+        <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
     {{ form_end(form) }}
+</div>
+
 {% endblock %}
