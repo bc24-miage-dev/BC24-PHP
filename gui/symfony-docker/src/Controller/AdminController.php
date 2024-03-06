@@ -2,21 +2,20 @@
 
 namespace App\Controller;
 
+use App\Entity\ProductionSite;
+use App\Entity\Report;
+use App\Entity\Resource;
+use App\Entity\User;
 use App\Entity\UserRoleRequest;
+use App\Form\ProductionSiteType;
+use App\Form\ResourceModifierType;
+use App\Form\ResourceType;
 use App\Form\UserRoleRequestType;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Resource;
-use App\Form\ResourceType;
-use Doctrine\Persistence\ManagerRegistry;
-use App\Entity\Report;
-use App\Form\ResourceModifierType;
-use App\Entity\User;
-use App\Entity\ProductionSite;
-use App\Form\ProductionSiteType;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -198,18 +197,25 @@ class AdminController extends AbstractController
     public function userRequestRole(Request $request, ManagerRegistry $doctrine): Response
     {
         $UserRoleRequest = new UserRoleRequest();
+        $user = $this->getUser();
+        $repository = $doctrine->getRepository(UserRoleRequest::class);
+        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
+
+        if (count($repoRequest) > 0) {
+            $UserRoleRequest = $repoRequest[0];
+        }
         $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-            $user = $this->getUser();
             $UserRoleRequest->setIdUser($user);
+            $UserRoleRequest->setRead(false);
             $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
             $entityManager->persist($UserRoleRequest);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Production Site created successfully');
+            $this->addFlash('success', 'Votre demande à bien été envoyée');
             return $this->redirectToRoute('app_index');
         }
 
@@ -227,6 +233,25 @@ class AdminController extends AbstractController
         $repository = $doctrine->getRepository(UserRoleRequest::class);
         $UserRoleRequest = $repository->findAll();
         return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
+    }
+    
+    #[Route('/request/roleEdit/{id}/{validation}/{role}', name: 'app_admin_request_roleEdit')]
+    public function userRequestRoleEdit(ManagerRegistry $doctrine, $id, $validation, $role): Response
+    {
+        if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_index');
+        }
+        $userRoleRequestRepository = $doctrine->getRepository(UserRoleRequest::class)->find($id);
+        $userRoleRequest = $userRoleRequestRepository;
+        if($validation == "true"){
+            $user = $doctrine->getRepository(User::class)->find($userRoleRequest->getIdUser());
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($user->setSpecificRoles("$role"));
+        }
+        $userRoleRequest->setRead(true);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_admin_userList');
     }
 
 

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\UserRoleRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<UserRoleRequest>
@@ -46,4 +47,21 @@ class UserRoleRequestRepository extends ServiceEntityRepository
     //        ;
     //    }
     
+    public function requestAlreadySend(User $user): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.idUser = ' . $user->getId())
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    public function findRoleRequestByUserId(int $id): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.idUser = ' . $id)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
