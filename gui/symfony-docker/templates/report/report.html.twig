@@ -1,7 +1,12 @@
 {% extends 'template.html.twig' %}
 
+{% block stylesheet %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('CSS/report.css') }}" />
+{% endblock %}
 
 {% block body %}
+<div class="form-container">
     <h1>Signalez un produit</h1>
 
     <form method="post">
@@ -14,7 +19,7 @@
             <textarea class="form-control" id="description" name="description" placeholder="Description"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Ajouter</button>
-    <a href="{{ path('app_index') }}">Retour à l'accueil</a>
-
-
+        <a href="{{ path('app_index') }}" class="btn-link">Retour à l'accueil</a>
+    </form>
+</div>
 {% endblock %}

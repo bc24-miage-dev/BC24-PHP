@@ -1,0 +1,71 @@
+.h1 {
+    margin-bottom: 40px; 
+    font-size: 2rem; 
+    
+}
+/* Styles for the search container */
+.search-container {
+    text-align: center;
+    margin-top: 120px; /* Adjust as needed */
+}
+
+/* Styles for the search form itself */
+.search-form {
+    position: relative;
+    display: inline-block; /* Center the form */
+}
+
+/* Styles for the input field */
+.search-input {
+    width: 1000px; /* Set the width of the input */
+    padding: 10px 50px 10px 20px; /* Padding to make space for the search icon */
+    font-size: 1rem;
+    border-radius: 20px;
+    border: solid 1px #ccc;
+    outline: none;
+    margin-bottom: 30px; /* Space below the input */
+    
+}
+
+/* Styles for the search button with the icon */
+.search-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.search-button img {
+    width: 30px; /* Size of the icon */
+}
+
+/* Adjust the placeholder color and style as needed */
+.search-input::placeholder {
+    color: #ccc;
+}
+
+/* Hover effects for the search bar */
+.search-input:hover,
+.search-input:focus {
+    box-shadow: 0 0 8px rgba(203, 201, 201, 0.1);
+}
+
+/* To remove default webkit appearance */
+.search-input[type='search']::-webkit-search-cancel-button,
+.search-input[type='search']::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-container {
+        margin-top: 50px;
+    }
+    
+    .search-input {
+        width: calc(100% - 60px); /* Full width minus padding and button */
+    }
+}

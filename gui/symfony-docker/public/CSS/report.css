@@ -1,0 +1,68 @@
+h1 {
+    margin-bottom: 75px;/* Increase the bottom margin to create more gap */
+}
+
+
+
+
+
+/* Style the form container */
+.form-container {
+    width: 50%;
+   
+    min-height: 500px;/* Adjust as necessary */
+    margin: 40px auto; /* Centers the form with top and bottom margin */
+    padding: 20px;
+    background: #ffffff; /* White background */
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+/* Style the labels */
+.form-container label {
+    font-size: 1.1rem; /* Larger font size for labels */
+    margin-bottom: 5px; /* Space between label and input */
+    display: block; /* Ensure it takes its own line */
+    color: #333333; /* Dark grey color for better readability */
+}
+
+/* Style the inputs */
+.form-container .form-control {
+    font-size: 1rem; /* Comfortable font size for inputs */
+    border-radius: 5px; /* Slightly rounded borders for inputs */
+    margin-bottom: 1rem; /* Space between each form-group */
+}
+
+/* Style the primary button */
+.form-container .btn-primary {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-color: #007bff;
+    padding: 10px 20px; /* Larger padding for a bigger button */
+    border-radius: 5px; /* Rounded borders for the button */
+    font-size: 1.1rem; /* Larger text in the button */
+    box-shadow: none; /* Optional: remove Bootstrap default box-shadow */
+    margin-right: 10px; /* Space between button and link */
+}
+
+/* Style for the return link */
+.form-container a {
+    font-size: 1rem; /* Size of the link text */
+    color: #007bff; /* Same color as the button for consistency */
+    margin-top: 40px; /* Space on top of the link */
+    display: inline-block; /* To enable margin-top */
+    text-decoration: none; /* Remove underline from the link */
+}
+
+
+
+.form-container a:hover {
+    text-decoration: underline; /* Add underline on hover for link */
+}
+
+/* Adjustments for smaller screens */
+@media (max-width: 768px) {
+    .form-container {
+        width: 90%;
+        margin: 20px auto;
+    }
+}

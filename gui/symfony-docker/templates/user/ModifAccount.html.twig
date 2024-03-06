@@ -1,17 +1,22 @@
 {% extends 'template.html.twig' %}
 
-{% block title %}BC24-Modifier mes informations
+{% block title %}BC24-Modifier mes informations{% endblock %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('CSS/modifyuser.css') }}" />
 {% endblock %}
 
 {% block body %}
-	{% for flash_error in app.flashes('verify_email_error') %}
-		<div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-	{% endfor %}
+    <div class="form-style">
+        {% for flash_error in app.flashes('verify_email_error') %}
+            <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+        {% endfor %}
 
-	{{ form_start(form)}}
-		{{ form_row(form.firstname) }}
-		{{ form_row(form.lastname) }}
-	{{ form_end(form) }}
-
-
+        {{ form_start(form, {'attr': {'class': 'my-form'}}) }}
+            {{ form_row(form.firstname) }}
+            {{ form_row(form.lastname) }}   
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
+
