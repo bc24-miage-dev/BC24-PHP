@@ -1,0 +1,46 @@
+.resource-details {
+    max-width: 800px; /* Limit the width to keep the text readable */
+    margin: 2rem auto; /* Center the container with margin on top and bottom */
+    padding: 2rem; /* Add some padding around the content */
+    background: #f8f8f8; /* A light grey background */
+    border-radius: 8px; /* Rounded corners for the container */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* A subtle shadow for depth */
+    font-family: 'Arial', sans-serif; /* Optional: Change the font */
+}
+
+.resource-details h2, 
+.resource-details h3 {
+    color: #333; /* Darker color for headings for contrast */
+    margin-bottom: 0.5rem; /* Space below headings */
+}
+
+.resource-details p {
+    color: #666; /* Lighter text color for paragraph */
+    line-height: 1.6; /* More readable line height */
+    margin-bottom: 0.5rem; /* Space below paragraphs */
+}
+
+.resource-details a {
+    color: #1a0dab; /* Classic link color */
+    text-decoration: none; /* Optional: removes underline */
+}
+
+.resource-details a:hover {
+    text-decoration: underline; /* Adds underline on hover for links */
+}
+
+.resource-details ul {
+    list-style-type: none; /* Remove default list styling */
+    padding-left: 0; /* Remove default padding */
+}
+
+.resource-details li {
+    padding: 0.2rem 0; /* Space out list items */
+}
+
+@media (max-width: 768px) {
+    .resource-details {
+        margin: 1rem; /* Less margin on smaller screens */
+        padding: 1rem; /* Less padding on smaller screens */
+    }
+}
