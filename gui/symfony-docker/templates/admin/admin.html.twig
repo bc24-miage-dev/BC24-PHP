@@ -33,8 +33,14 @@
 
     <li class="nav-item">
         <a class="nav-link" href="{{ path('app_admin_reportList') }}">
-            <i class="fas fa-fw fa-check"></i>
+            <i class="fas fa-fw fa-exclamation-circle"></i>
             <span>Check le dernier report de ressource</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_admin_request_check') }}">
+            <i class="fas fa-fw fa-tools"></i>
+            <span>Check les demandes de rôles</span></a>
     </li>
 
     <li class="nav-item">
@@ -70,7 +76,7 @@
         <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
     </div>
 
-    <a href="{{ path('app_admin_request_check') }}" class="btn btn-danger">Regarder les demandes professionnels</a>
+
 {% endblock %}
 
 

@@ -6,6 +6,7 @@
     <h1 style='text-align:center'>Liste des Utilisateurs</h1>
     <hr>
     <div class="container">
+        {% if UserRoleRequest %}
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -23,19 +24,18 @@
                             </thead>
                             <tbody>
                                 {% for userRequest in UserRoleRequest %}
-                                    {% if userRequest.read == 0 %}
-                                    <tr>    
+
+                                    <tr>
                                         <td>{{ userRequest.iduser.lastname }}</td>
                                         <td>{{ userRequest.iduser.firstname }}</td>
                                         <td>{{ userRequest.iduser.id }}</td>
-                                        <td>{{ userRequest.roleRequest }}</td>
+                                        <td>{{ userRequest.roleRequest|replace({'ROLE_': ''})|capitalize }}</td>
                                         <td>{{ userRequest.description }}</td>
                                         <td>
                                             <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "true" , 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Accepter</a>
                                             <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "false", 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Refuser</a>
                                         </td>
                                     </tr>
-                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -43,5 +43,9 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <h2 style="text-align: center">Pas de requête actuellement</h2>
+        {% endif %}
     </div>
+
 {% endblock %}

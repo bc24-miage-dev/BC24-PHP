@@ -201,10 +201,10 @@ class AdminController extends AbstractController
             return $this->redirectToRoute('app_index');
         }
         $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $UserRoleRequest = $repository->findAll();
+        $UserRoleRequest = $repository->findBy(['Read' => false]);
         return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
     }
-    
+
     #[Route('/request/roleEdit/{id}/{validation}/{role}', name: 'app_admin_request_roleEdit')]
     public function userRequestRoleEdit(ManagerRegistry $doctrine, $id, $validation, $role): Response
     {
@@ -219,6 +219,8 @@ class AdminController extends AbstractController
             $entityManager->persist($user->setSpecificRole("$role"));
         }
         $userRoleRequest->setRead(true);
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($userRoleRequest);
         $entityManager->flush();
 
         return $this->redirectToRoute('app_admin_userList');
