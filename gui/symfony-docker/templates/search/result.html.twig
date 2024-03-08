@@ -20,7 +20,8 @@
     <p>Weight: {{ resource.getWeight }}</p>
     <p>Price: ${{ resource.getPrice }}</p>
     <p>Description: {{ resource.getDescription }}</p>
-    <p>Date: {{ resource.getDate ? resource.getDate|date('Y-m-d H:i:s') : 'Not available' }}</p>
+    <p>Date: {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Not available' }}</p>
+    <p>Heure: {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Not available' }}</p>
 
     <h3>Origin Production Site</h3>
     <p>Name: {{ resource.getOrigin.getProductionSiteName }}</p>

@@ -214,7 +214,7 @@ class AdminController extends AbstractController
         $userRoleRequestRepository = $doctrine->getRepository(UserRoleRequest::class)->find($id);
         $userRoleRequest = $userRoleRequestRepository;
         if($validation == "true"){
-            $user = $doctrine->getRepository(User::class)->find($userRoleRequest->getIdUser());
+            $user = $doctrine->getRepository(User::class)->find($userRoleRequest->getUser());
             $entityManager = $doctrine->getManager();
             $entityManager->persist($user->setSpecificRole("$role"));
         }

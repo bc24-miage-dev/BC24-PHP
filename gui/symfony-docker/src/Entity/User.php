@@ -40,9 +40,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Report::class)]
     private Collection $reports;
 
+    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: UserResearch::class)]
+    private Collection $userResearch;
+
     public function __construct()
     {
         $this->reports = new ArrayCollection();
+        $this->userResearch = new ArrayCollection();
     }
 
     // #[ORM\Column(type: 'boolean')]
@@ -190,4 +194,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setRoles($newRoles);
         return $this;
         }
+
+    /**
+     * @return Collection<int, UserResearch>
+     */
+    public function getUserResearch(): Collection
+    {
+        return $this->userResearch;
+    }
+
+    public function addUserResearch(UserResearch $userResearch): static
+    {
+        if (!$this->userResearch->contains($userResearch)) {
+            $this->userResearch->add($userResearch);
+            $userResearch->setIdUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserResearch(UserResearch $userResearch): static
+    {
+        if ($this->userResearch->removeElement($userResearch)) {
+            // set the owning side to null (unless already changed)
+            if ($userResearch->getIdUser() === $this) {
+                $userResearch->setIdUser(null);
+            }
+        }
+
+        return $this;
+    }
 }

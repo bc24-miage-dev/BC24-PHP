@@ -16,7 +16,7 @@ class UserRoleRequest
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $idUser = null;
+    private ?User $User = null;
 
     #[ORM\Column(length: 255)]
     private ?string $roleRequest = null;
@@ -35,14 +35,14 @@ class UserRoleRequest
         return $this->id;
     }
 
-    public function getIdUser(): ?User
+    public function getUser(): ?User
     {
-        return $this->idUser;
+        return $this->User;
     }
 
-    public function setIdUser(User $idUser): static
+    public function setUser(User $User): static
     {
-        $this->idUser = $idUser;
+        $this->User = $User;
 
         return $this;
     }

@@ -26,9 +26,9 @@
                                 {% for userRequest in UserRoleRequest %}
 
                                     <tr>
-                                        <td>{{ userRequest.iduser.lastname }}</td>
-                                        <td>{{ userRequest.iduser.firstname }}</td>
-                                        <td>{{ userRequest.iduser.id }}</td>
+                                        <td>{{ userRequest.User.lastname }}</td>
+                                        <td>{{ userRequest.User.firstname }}</td>
+                                        <td>{{ userRequest.User.id }}</td>
                                         <td>{{ userRequest.roleRequest|replace({'ROLE_': ''})|capitalize }}</td>
                                         <td>{{ userRequest.description }}</td>
                                         <td>

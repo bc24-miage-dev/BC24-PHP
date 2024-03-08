@@ -50,11 +50,15 @@ class Resource
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\OneToMany(mappedBy: 'idResource', targetEntity: UserResearch::class)]
+    private Collection $userResearch;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
         $this->resources = new ArrayCollection();
         $this->reports = new ArrayCollection();
+        $this->userResearch = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -242,6 +246,36 @@ class Resource
     public function setDate(?\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserResearch>
+     */
+    public function getUserResearch(): Collection
+    {
+        return $this->userResearch;
+    }
+
+    public function addUserResearch(UserResearch $userResearch): static
+    {
+        if (!$this->userResearch->contains($userResearch)) {
+            $this->userResearch->add($userResearch);
+            $userResearch->setIdResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserResearch(UserResearch $userResearch): static
+    {
+        if ($this->userResearch->removeElement($userResearch)) {
+            // set the owning side to null (unless already changed)
+            if ($userResearch->getIdResource() === $this) {
+                $userResearch->setIdResource(null);
+            }
+        }
 
         return $this;
     }
