@@ -27,9 +27,13 @@ class ProductionSite
     #[ORM\OneToMany(mappedBy: 'origin', targetEntity: Resource::class)]
     private Collection $resources;
 
+    #[ORM\OneToMany(mappedBy: 'FactoryOwner', targetEntity: FactoryRecipe::class)]
+    private Collection $factoryRecipes;
+
     public function __construct()
     {
         $this->resources = new ArrayCollection();
+        $this->factoryRecipes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,6 +101,36 @@ class ProductionSite
             // set the owning side to null (unless already changed)
             if ($resource->getOrigin() === $this) {
                 $resource->setOrigin(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FactoryRecipe>
+     */
+    public function getFactoryRecipes(): Collection
+    {
+        return $this->factoryRecipes;
+    }
+
+    public function addFactoryRecipe(FactoryRecipe $factoryRecipe): static
+    {
+        if (!$this->factoryRecipes->contains($factoryRecipe)) {
+            $this->factoryRecipes->add($factoryRecipe);
+            $factoryRecipe->setFactoryOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFactoryRecipe(FactoryRecipe $factoryRecipe): static
+    {
+        if ($this->factoryRecipes->removeElement($factoryRecipe)) {
+            // set the owning side to null (unless already changed)
+            if ($factoryRecipe->getFactoryOwner() === $this) {
+                $factoryRecipe->setFactoryOwner(null);
             }
         }
 
