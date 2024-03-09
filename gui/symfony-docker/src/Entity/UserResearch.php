@@ -45,9 +45,9 @@ class UserResearch
         return $this->Resource;
     }
 
-    public function setIesource(?Resource $Resource): static
+    public function setResource(?Resource $Resource): static
     {
-        $this->idResource = $Resource;
+        $this->Resource = $Resource;
 
         return $this;
     }

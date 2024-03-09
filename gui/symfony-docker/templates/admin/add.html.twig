@@ -12,9 +12,23 @@
         {{ form_row(form.id,  {
             label: 'Tag NFC'
         }) }}
-        {{ form_row(form.ResourceName, {
-            label: 'Nom de la nouvelle ressource'
-        }) }}
+
+        <label> Nom de la nouvelle ressource :
+            <select name="{{ field_name(form.ResourceName) }}" class="form-control">
+                {% for name, id in field_choices(form.ResourceName) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <br>
+        <label> ID du propriétaire actuel de la ressource :
+            <select name="{{ field_name(form.currentOwner) }}" class="form-control">
+                {% for name, id in field_choices(form.currentOwner) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
 
         {{ form_row(form.isFinalProduct, {
             label: 'Est un produit fini'

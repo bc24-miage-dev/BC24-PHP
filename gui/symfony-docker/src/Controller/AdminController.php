@@ -48,7 +48,7 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-
+            $resource->setIsLifeCycleOver(false);
             $entityManager->persist($resource);
             $entityManager->flush();
 

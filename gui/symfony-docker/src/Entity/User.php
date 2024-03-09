@@ -40,13 +40,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'User', targetEntity: Report::class)]
     private Collection $reports;
 
-    #[ORM\OneToMany(mappedBy: 'idUser', targetEntity: UserResearch::class)]
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: UserResearch::class)]
     private Collection $userResearch;
+
+    #[ORM\OneToMany(mappedBy: 'currentOwner', targetEntity: Resource::class)]
+    private Collection $ownedResources;
 
     public function __construct()
     {
         $this->reports = new ArrayCollection();
         $this->userResearch = new ArrayCollection();
+        $this->ownedResources = new ArrayCollection();
     }
 
     // #[ORM\Column(type: 'boolean')]
@@ -219,6 +223,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($userResearch->getIdUser() === $this) {
                 $userResearch->setIdUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Resource>
+     */
+    public function getOwnedResources(): Collection
+    {
+        return $this->ownedResources;
+    }
+
+    public function addOwnedResources(Resource $ownedResources): static
+    {
+        if (!$this->ownedResources->contains($ownedResources)) {
+            $this->ownedResources->add($ownedResources);
+            $ownedResources->setCurrentOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnedResources(Resource $ownedResources): static
+    {
+        if ($this->ownedResources->removeElement($ownedResources)) {
+            // set the owning side to null (unless already changed)
+            if ($ownedResources->getCurrentOwner() === $this) {
+                $ownedResources->setCurrentOwner(null);
             }
         }
 

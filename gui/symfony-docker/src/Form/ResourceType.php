@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\ProductionSite;
 use App\Entity\Resource;
+use App\Entity\ResourceName;
+use App\Entity\User;
 use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -17,12 +19,21 @@ class ResourceType extends AbstractType
     {
         $builder
             ->add('id')
-            ->add('ResourceName')
+            ->add('ResourceName', EntityType::class, [
+                'class' => ResourceName::class,
+                'choice_label' => 'name',
+                'required' => true,
+            ])
             ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')
             ->add('price')
             ->add('description')
+            ->add('currentOwner', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => 'id',
+            ])
+            ->add('ResourceType')
             ->add('components', EntityType::class, [
                 'class' => Resource::class,
                 'choice_label' => 'id',

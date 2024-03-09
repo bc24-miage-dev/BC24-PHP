@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\ProductionSite;
 use App\Entity\Resource;
+use App\Entity\ResourceName;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,7 +16,10 @@ class ResourceModifierType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('ResourceName')
+            ->add('ResourceName', EntityType::class, [
+                'class' => ResourceName::class,
+                'choice_label' => 'name',
+            ])
             ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')

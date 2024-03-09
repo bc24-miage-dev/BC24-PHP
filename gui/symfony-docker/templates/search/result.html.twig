@@ -13,7 +13,7 @@
 {{ parent() }}
 
 <div class="resource-details">
-    <h2>Resource Details: {{ resource.getResourceName }}</h2>
+    <h2>Resource Details: {{ resource.ResourceName.name }}</h2>
     <p>ID: {{ resource.getId }}</p>
     <p>Is Final Product: {{ resource.isIsFinalProduct ? 'Yes' : 'No' }}</p>
     <p>Is Contaminated: {{ resource.isIsContamined ? 'Yes' : 'No' }}</p>

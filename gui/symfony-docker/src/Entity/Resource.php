@@ -16,9 +16,6 @@ class Resource
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $ResourceName = null;
-
     #[ORM\Column]
     private ?bool $isFinalProduct = null;
 
@@ -50,8 +47,22 @@ class Resource
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\OneToMany(mappedBy: 'idResource', targetEntity: UserResearch::class)]
+    #[ORM\OneToMany(mappedBy: 'Resource', targetEntity: UserResearch::class)]
     private Collection $userResearch;
+
+    #[ORM\ManyToOne(inversedBy: 'ownedResources')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $currentOwner = null;
+
+    #[ORM\Column(length: 20)]
+    private ?string $ResourceType = null;
+
+    #[ORM\Column]
+    private ?bool $IsLifeCycleOver = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ResourcesUsingThisName')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ResourceName $ResourceName = null;
 
     public function __construct()
     {
@@ -69,18 +80,6 @@ class Resource
     public function setId(int $id): static
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getResourceName(): ?string
-    {
-        return $this->ResourceName;
-    }
-
-    public function setResourceName(string $ResourceName): static
-    {
-        $this->ResourceName = $ResourceName;
 
         return $this;
     }
@@ -262,7 +261,7 @@ class Resource
     {
         if (!$this->userResearch->contains($userResearch)) {
             $this->userResearch->add($userResearch);
-            $userResearch->setIdResource($this);
+            $userResearch->setResource($this);
         }
 
         return $this;
@@ -272,10 +271,58 @@ class Resource
     {
         if ($this->userResearch->removeElement($userResearch)) {
             // set the owning side to null (unless already changed)
-            if ($userResearch->getIdResource() === $this) {
-                $userResearch->setIdResource(null);
+            if ($userResearch->getResource() === $this) {
+                $userResearch->setResource(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCurrentOwner(): ?User
+    {
+        return $this->currentOwner;
+    }
+
+    public function setCurrentOwner(?User $currentOwner): static
+    {
+        $this->currentOwner = $currentOwner;
+
+        return $this;
+    }
+
+    public function getResourceType(): ?string
+    {
+        return $this->ResourceType;
+    }
+
+    public function setResourceType(string $ResourceType): static
+    {
+        $this->ResourceType = $ResourceType;
+
+        return $this;
+    }
+
+    public function isIsLifeCycleOver(): ?bool
+    {
+        return $this->IsLifeCycleOver;
+    }
+
+    public function setIsLifeCycleOver(bool $IsLifeCycleOver): static
+    {
+        $this->IsLifeCycleOver = $IsLifeCycleOver;
+
+        return $this;
+    }
+
+    public function getResourceName(): ?ResourceName
+    {
+        return $this->ResourceName;
+    }
+
+    public function setResourceName(?ResourceName $name): static
+    {
+        $this->ResourceName = $name;
 
         return $this;
     }

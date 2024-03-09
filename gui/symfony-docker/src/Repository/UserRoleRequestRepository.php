@@ -46,24 +46,5 @@ class UserRoleRequestRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-    
-    public function requestAlreadySend(User $user): array
-    {
-        return $this->createQueryBuilder('r')
-            ->where('r.idUser = ' . $user->getId())
-            ->getQuery()
-            ->getResult()
-        ;
-    }
 
-    public function findRoleRequestByUserId(int $id): array
-    {
-        return $this->createQueryBuilder('r')
-            ->where('r.idUser = ' . $id)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-
-    
 }

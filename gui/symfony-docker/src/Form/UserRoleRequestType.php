@@ -17,15 +17,15 @@ class UserRoleRequestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-                        ->add('roleRequest', ChoiceType::class , [
+            ->add('roleRequest', ChoiceType::class , [
                 'label' => 'Role Request',
                 'choices' => [
-                    'éleveur' => 'ROLE_ELEVEUR',
-                    'transporteur' => 'ROLE_TRANSPORTEUR',
-                    'équarrisseur' => 'ROLE_EQUARRISSEUR',
-                    'usine' => 'ROLE_USINE',
-                    'commerçant' => 'ROLE_COMMERCANT',
-                    'admin' => 'ROLE_ADMIN',
+                    'Éleveur' => 'ROLE_ELEVEUR',
+                    'Transporteur' => 'ROLE_TRANSPORTEUR',
+                    'Équarrisseur' => 'ROLE_EQUARRISSEUR',
+                    'Usine' => 'ROLE_USINE',
+                    'Commerçant' => 'ROLE_COMMERCANT',
+                    'Admin' => 'ROLE_ADMIN',
                 ],])
                 ->add('Description', null, ['label' => 'Description'])
                     ->add('Envoyer', SubmitType::class)

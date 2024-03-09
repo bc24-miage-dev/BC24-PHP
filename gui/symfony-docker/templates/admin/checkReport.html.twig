@@ -9,7 +9,7 @@
             <h2>Informations</h2>
             <p><strong>Signalement effectué le :</strong> {{ report.date|date('Y-m-d') }}</p>
             <p><strong>Signalement effectué par :</strong> {{ report.user.firstName }} {{ report.user.lastName }}</p>
-            <p><strong>Signalement effectué pour :</strong> {{ report.resource.ResourceName }}</p>
+            <p><strong>Signalement effectué pour :</strong> {{ report.resource.ResourceName.name }}</p>
         </div>
         <div class="col-md-6">
             <h2>Description</h2>

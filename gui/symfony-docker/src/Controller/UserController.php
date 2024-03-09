@@ -89,7 +89,7 @@ class UserController extends AbstractController
         $UserRoleRequest = new UserRoleRequest();
         $user = $this->getUser();
         $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
+        $repoRequest = $repository->findBy(['User'=>$user]);
 
         if (count($repoRequest) > 0) {
             $UserRoleRequest = $repoRequest[0];
