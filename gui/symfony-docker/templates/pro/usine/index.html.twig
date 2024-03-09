@@ -1,7 +1,36 @@
 {% extends 'pro/proTemplate.html.twig' %}
 
-{% block title %}BC24 PRO-USINE{% endblock %}
+{% block title %}BC24 PRO-Usine{% endblock %}
+
+{% block sidebar %}
+    <div class="sidebar-heading"> Opérations </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-box-open"></i>
+            <span>Signaler une réception</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-utensil-spoon"></i>
+            <span>Créer une recette</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-list-alt"></i>
+            <span>Réaliser un produit</span></a>
+    </li>
+
+{% endblock %}
+
+{% block titrePro %}Usine{% endblock %}
+
 
 {% block body %}
-    Vue usine
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Bienvenue sur la vue Usine de BC24</h1>
+        <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
+    </div>
 {% endblock %}

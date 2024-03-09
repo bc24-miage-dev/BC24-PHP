@@ -52,13 +52,11 @@ class AdminController extends AbstractController
             $entityManager->persist($resource);
             $entityManager->flush();
 
-            return $this->render('admin/add.html.twig', [
-                'state' => 'success',
-            ]);
+            $this->addFlash('success', 'Ressource ajoutée avec succès');
+            return $this->render('admin/admin.html.twig');
 
         } else {
             return $this->render('admin/add.html.twig', [
-                'state' => 'fail',
                 'form' => $form->createView()
             ]);
         }

@@ -2,6 +2,33 @@
 
 {% block title %}BC24 PRO-Commerçant{% endblock %}
 
+{% block sidebar %}
+    <div class="sidebar-heading"> Opérations </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-box-open"></i>
+            <span>Signaler une réception</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Liste de vos produits</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-dollar-sign"></i>
+            <span>Vente</span></a>
+    </li>
+{% endblock %}
+
+{% block titrePro %}Commerçant{% endblock %}
+
 {% block body %}
-    Vue commerçant
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Bienvenue sur la vue Commerçant de BC24</h1>
+        <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
+    </div>
 {% endblock %}

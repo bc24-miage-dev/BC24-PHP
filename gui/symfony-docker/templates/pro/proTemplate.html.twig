@@ -38,7 +38,23 @@
         </a>
         <br>
                              <!--<div class="sidebar-brand-text mx-3">-->
+
+        <!-- partie commune de la Sidebar ; début -->
+        <hr class="sidebar-divider my-0">
+        <li><div class="sidebar-heading"> Navigation </div></li>
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ path('app_pro') }}">
+                <i class="fas fa-fw fa-user-tie"></i>
+                <span>Menu Pro</span></a>
+        </li>
+        <li class="nav-item active"><a class="nav-link" href="{{ path('app_index') }}">
+                <i class="fas fa-fw fa-home"></i>
+                <span>Menu consommateur</span></a>
+        </li>
+        <hr class="sidebar-divider my-0">
+        <!-- Fin partie commune -->
         {% block sidebar %}
+
         <!-- Divider -->
         <!--
         <hr class="sidebar-divider my-0">
@@ -148,13 +164,22 @@
     -->
     {% endblock %}
 
+        <hr class="sidebar-divider my-0">
+
+        <div class="sidebar-heading"> Rétracter la barre </div>
+
+        <br>
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
     <!-- End of Sidebar -->
     </ul>
 
+        <!-- Header -->
     <div id="content-wrapper" class="d-flex flex-column">
         <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
             <div class="text-center">
-                <h1 class="h3 mb-0 text-gray-800">{% block titrePro %}BC24 Pro{% endblock %}</h1>
+                <h1 class="h3 mb-0 text-gray-800">BC24 {% block titrePro %}Pro{% endblock %}</h1>
             </div>
 
             <div class="topbar-divider d-none d-sm-block"></div>
@@ -167,8 +192,8 @@
 
             <span class="ml-sm-auto"><a href="{{ path('app_index') }}">Retourner à la vue utilisateur</a></span>
 
-
         </nav>
+        <!-- End of Header -->
 
         {% for flash_message in app.flashes('success') %}
             <div class="alert alert-success" role="alert">

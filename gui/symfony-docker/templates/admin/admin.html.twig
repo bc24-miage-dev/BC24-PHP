@@ -3,19 +3,6 @@
 {% block title %}BC24 Admin{% endblock %}
 
 {%  block sidebar %}
-    <hr class="sidebar-divider my-0">
-    <li><div class="sidebar-heading"> Navigation </div></li>
-    <li class="nav-item active">
-        <a class="nav-link" href="{{ path('app_admin_index') }}">
-            <i class="fas fa-fw fa-user-tie"></i>
-            <span>Menu Pro</span></a>
-    </li>
-    <li class="nav-item active"><a class="nav-link" href="{{ path('app_index') }}">
-        <i class="fas fa-fw fa-home"></i>
-        <span>Menu consommateur</span></a>
-    </li>
-
-    <hr class="sidebar-divider my-0">
 
 <div class="sidebar-heading"> Opérations </div>
 
@@ -55,19 +42,10 @@
             <span>Création de site de production</span></a>
     </li>
 
-    <hr class="sidebar-divider my-0">
-
-    <div class="sidebar-heading"> Rétracter la barre </div>
-
-    <br>
-    <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle"></button>
-    </div>
-
 {% endblock %}
 
 
-{% block titrePro %}BC24 Admin{% endblock %}
+{% block titrePro %}Admin{% endblock %}
 
 {% block body %}
     <hr class="sidebar-divider my-0">

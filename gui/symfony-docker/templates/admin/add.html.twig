@@ -2,11 +2,6 @@
 
 {% block body %}
 <div class="container-fluid">
-    {% if state == "success" %}
-        <h1>Success ! </h1> <br>
-        <a href="{{ path('app_admin_index') }}">Retour à la vue Admin</a>
-
-    {% else %}
         <h1>Création d'une nouvelle ressource</h1><br>
         {{ form_start(form) }}
         {{ form_row(form.id,  {
@@ -75,7 +70,5 @@
 
         <br><br>
         {{ form_end(form) }}
-
-    {% endif %}
 </div>
 {% endblock %}

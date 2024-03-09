@@ -1,7 +1,49 @@
 {% extends 'pro/proTemplate.html.twig' %}
 
-{% block title %}BC24 PRO-ÉQUARRISSEUR {% endblock %}
+{% block title %}BC24 PRO-Équarrisseur{% endblock %}
+
+{% block sidebar %}
+    <div class="sidebar-heading"> Opérations </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-box-open"></i>
+            <span>Signaler une réception</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Liste des animaux</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-skull"></i>
+            <span>Abattage</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Liste des carcasses</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-slash"></i>
+            <span>Découpe</span></a>
+    </li>
+
+{% endblock %}
+
+{% block titrePro %}Équarrisseur{% endblock %}
+
 
 {% block body %}
-    Vue équarrisseur
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Bienvenue sur la vue Équarrisseur de BC24</h1>
+        <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
+    </div>
 {% endblock %}
+
