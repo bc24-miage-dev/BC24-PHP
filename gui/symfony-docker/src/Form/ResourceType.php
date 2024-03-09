@@ -9,6 +9,7 @@ use App\Entity\User;
 use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -24,6 +25,15 @@ class ResourceType extends AbstractType
                 'choice_label' => 'name',
                 'required' => true,
             ])
+            ->add('ResourceType', ChoiceType::class, [
+                'choices' => [
+                    'ANIMAL' => 'ANIMAL',
+                    'CARCASSE' => 'CARCASSE',
+                    'DEMI-CARCASSE' => 'DEMI-CARCASSE',
+                    'MORCEAU' => 'MORCEAU',
+                    'PRODUIT' => 'PRODUIT'
+                ],
+            ])
             ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')
@@ -33,7 +43,7 @@ class ResourceType extends AbstractType
                 'class' => User::class,
                 'choice_label' => 'id',
             ])
-            ->add('ResourceType')
+
             ->add('components', EntityType::class, [
                 'class' => Resource::class,
                 'choice_label' => 'id',

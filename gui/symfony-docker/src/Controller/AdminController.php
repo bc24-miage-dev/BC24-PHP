@@ -59,7 +59,7 @@ class AdminController extends AbstractController
         } else {
             return $this->render('admin/add.html.twig', [
                 'state' => 'fail',
-                'form' => $form->createView(),
+                'form' => $form->createView()
             ]);
         }
     }

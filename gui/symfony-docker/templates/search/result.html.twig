@@ -34,7 +34,7 @@
             {% for component in resource.getComponents %}
             <li>
                 <a href="{{ path('app_search_result', {'id': component.getId}) }}">
-                    {{ component.getResourceName }} (ID: {{ component.getId }})
+                    {{ component.ResourceName.name }} (ID: {{ component.getId }})
                 </a>
             </li>
             {% endfor %}

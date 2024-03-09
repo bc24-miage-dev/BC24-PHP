@@ -7,9 +7,11 @@ use App\Entity\Resource;
 use App\Entity\ResourceName;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Validator\Constraints\Choice;
 
 class ResourceModifierType extends AbstractType
 {
@@ -19,6 +21,15 @@ class ResourceModifierType extends AbstractType
             ->add('ResourceName', EntityType::class, [
                 'class' => ResourceName::class,
                 'choice_label' => 'name',
+            ])
+            ->add('ResourceType', ChoiceType::class, [
+                'choices' => [
+                    'ANIMAL' => 'ANIMAL',
+                    'CARCASSE' => 'CARCASSE',
+                    'DEMI-CARCASSE' => 'DEMI-CARCASSE',
+                    'MORCEAU' => 'MORCEAU',
+                    'PRODUIT' => 'PRODUIT'
+                ],
             ])
             ->add('isFinalProduct')
             ->add('isContamined')
