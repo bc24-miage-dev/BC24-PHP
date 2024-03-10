@@ -17,9 +17,6 @@ class Resource
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?bool $isFinalProduct = null;
-
-    #[ORM\Column]
     private ?bool $isContamined = null;
 
     #[ORM\Column]
@@ -77,18 +74,6 @@ class Resource
     public function setId(int $id): static
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function isIsFinalProduct(): ?bool
-    {
-        return $this->isFinalProduct;
-    }
-
-    public function setIsFinalProduct(bool $isFinalProduct): static
-    {
-        $this->isFinalProduct = $isFinalProduct;
 
         return $this;
     }

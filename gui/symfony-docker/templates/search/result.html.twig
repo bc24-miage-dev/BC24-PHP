@@ -15,7 +15,7 @@
 <div class="resource-details">
     <h2>Resource Details: {{ resource.ResourceName.name }}</h2>
     <p>ID: {{ resource.getId }}</p>
-    <p>Is Final Product: {{ resource.isIsFinalProduct ? 'Yes' : 'No' }}</p>
+    <p>Is Final Product: {{ resource.ResourceName.ResourceCategory == 'PRODUIT' ? 'Yes' : 'No' }}</p>
     <p>Is Contaminated: {{ resource.isIsContamined ? 'Yes' : 'No' }}</p>
     <p>Weight: {{ resource.getWeight }}</p>
     <p>Price: ${{ resource.getPrice }}</p>

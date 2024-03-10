@@ -22,7 +22,6 @@ class ResourceModifierType extends AbstractType
                 'class' => ResourceName::class,
                 'choice_label' => 'name',
             ])
-            ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')
             ->add('price')

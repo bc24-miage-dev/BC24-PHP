@@ -1,0 +1,12 @@
+{% extends 'pro/equarrisseur/index.html.twig' %}
+
+{% block body %}
+<div class="container-fluid">
+    <h1>Tag NFC de l'animal récupéré</h1>
+    <br>
+    {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+
+    {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Entrez le Tag NFC'}}) }}<br>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

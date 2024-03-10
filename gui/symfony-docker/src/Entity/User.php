@@ -214,7 +214,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->userResearch->contains($userResearch)) {
             $this->userResearch->add($userResearch);
-            $userResearch->setIdUser($this);
+            $userResearch->setUser($this);
         }
 
         return $this;

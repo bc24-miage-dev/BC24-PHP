@@ -25,7 +25,6 @@ class ResourceType extends AbstractType
                 'choice_label' => 'name',
                 'required' => true,
             ])
-            ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')
             ->add('price')

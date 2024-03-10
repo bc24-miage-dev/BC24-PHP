@@ -1,0 +1,7 @@
+{% extends 'pro/equarrisseur/index.html.twig' %}
+
+{%  block body %}
+    {% for resource in resources %}
+        {{ resource.ResourceName.name }} <br>
+    {% endfor %}
+{% endblock %}

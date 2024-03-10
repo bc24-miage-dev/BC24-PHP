@@ -78,9 +78,7 @@ class UserController extends AbstractController
             return $this->render('user/ModifAccount.html.twig', ['form' => $form->createView()
         ]);
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexistant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
     #[Route('/request', name: 'app_admin_user_request')]
