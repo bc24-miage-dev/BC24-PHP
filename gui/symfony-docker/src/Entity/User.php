@@ -46,6 +46,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'currentOwner', targetEntity: Resource::class)]
     private Collection $ownedResources;
 
+    #[ORM\ManyToOne(inversedBy: 'userRelated')]
+    private ?ProductionSite $productionSite = null;
+
     public function __construct()
     {
         $this->reports = new ArrayCollection();
@@ -221,8 +224,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->userResearch->removeElement($userResearch)) {
             // set the owning side to null (unless already changed)
-            if ($userResearch->getIdUser() === $this) {
-                $userResearch->setIdUser(null);
+            if ($userResearch->getUser() === $this) {
+                $userResearch->setUser(null);
             }
         }
 
@@ -255,6 +258,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $ownedResources->setCurrentOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProductionSite(): ?ProductionSite
+    {
+        return $this->productionSite;
+    }
+
+    public function setProductionSite(?ProductionSite $productionSite): static
+    {
+        $this->productionSite = $productionSite;
 
         return $this;
     }

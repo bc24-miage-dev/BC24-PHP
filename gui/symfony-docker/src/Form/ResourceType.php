@@ -25,15 +25,6 @@ class ResourceType extends AbstractType
                 'choice_label' => 'name',
                 'required' => true,
             ])
-            ->add('ResourceType', ChoiceType::class, [
-                'choices' => [
-                    'ANIMAL' => 'ANIMAL',
-                    'CARCASSE' => 'CARCASSE',
-                    'DEMI-CARCASSE' => 'DEMI-CARCASSE',
-                    'MORCEAU' => 'MORCEAU',
-                    'PRODUIT' => 'PRODUIT'
-                ],
-            ])
             ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')
@@ -52,7 +43,7 @@ class ResourceType extends AbstractType
             ])
             ->add('origin', EntityType::class, [
                 'class' => ProductionSite::class,
-'choice_label' => 'ProductionSiteName',
+                'choice_label' => 'ProductionSiteName',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Add Resource',

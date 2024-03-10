@@ -30,10 +30,14 @@ class ProductionSite
     #[ORM\OneToMany(mappedBy: 'FactoryOwner', targetEntity: FactoryRecipe::class)]
     private Collection $factoryRecipes;
 
+    #[ORM\OneToMany(mappedBy: 'productionSite', targetEntity: User::class)]
+    private Collection $userRelated;
+
     public function __construct()
     {
         $this->resources = new ArrayCollection();
         $this->factoryRecipes = new ArrayCollection();
+        $this->userRelated = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -131,6 +135,36 @@ class ProductionSite
             // set the owning side to null (unless already changed)
             if ($factoryRecipe->getFactoryOwner() === $this) {
                 $factoryRecipe->setFactoryOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUserRelated(): Collection
+    {
+        return $this->userRelated;
+    }
+
+    public function addUserRelated(User $userRelated): static
+    {
+        if (!$this->userRelated->contains($userRelated)) {
+            $this->userRelated->add($userRelated);
+            $userRelated->setProductionSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRelated(User $userRelated): static
+    {
+        if ($this->userRelated->removeElement($userRelated)) {
+            // set the owning side to null (unless already changed)
+            if ($userRelated->getProductionSite() === $this) {
+                $userRelated->setProductionSite(null);
             }
         }
 

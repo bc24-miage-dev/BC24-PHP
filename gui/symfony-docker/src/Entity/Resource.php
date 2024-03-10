@@ -54,9 +54,6 @@ class Resource
     #[ORM\JoinColumn(nullable: false)]
     private ?User $currentOwner = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $ResourceType = null;
-
     #[ORM\Column]
     private ?bool $IsLifeCycleOver = null;
 
@@ -287,18 +284,6 @@ class Resource
     public function setCurrentOwner(?User $currentOwner): static
     {
         $this->currentOwner = $currentOwner;
-
-        return $this;
-    }
-
-    public function getResourceType(): ?string
-    {
-        return $this->ResourceType;
-    }
-
-    public function setResourceType(string $ResourceType): static
-    {
-        $this->ResourceType = $ResourceType;
 
         return $this;
     }

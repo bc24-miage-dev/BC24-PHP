@@ -22,15 +22,6 @@ class ResourceModifierType extends AbstractType
                 'class' => ResourceName::class,
                 'choice_label' => 'name',
             ])
-            ->add('ResourceType', ChoiceType::class, [
-                'choices' => [
-                    'ANIMAL' => 'ANIMAL',
-                    'CARCASSE' => 'CARCASSE',
-                    'DEMI-CARCASSE' => 'DEMI-CARCASSE',
-                    'MORCEAU' => 'MORCEAU',
-                    'PRODUIT' => 'PRODUIT'
-                ],
-            ])
             ->add('isFinalProduct')
             ->add('isContamined')
             ->add('weight')

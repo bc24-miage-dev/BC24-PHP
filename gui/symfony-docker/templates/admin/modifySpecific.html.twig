@@ -14,13 +14,6 @@
                 {% endfor %}
             </select>
         </label>
-        <label> Type de la ressource:
-            <select name="{{ field_name(form.ResourceType) }}" class="form-control">
-                {% for name, id in field_choices(form.ResourceType) %}
-                    <option value="{{ id }}">{{ name }}</option>
-                {% endfor %}
-            </select>
-        </label>
 
         {{ form_row(form.isFinalProduct, {
             label: 'Est un produit fini'

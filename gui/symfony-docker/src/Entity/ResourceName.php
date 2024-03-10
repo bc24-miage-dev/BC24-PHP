@@ -21,6 +21,10 @@ class ResourceName
     #[ORM\OneToMany(mappedBy: 'ResourceName', targetEntity: Resource::class)]
     private Collection $ResourcesUsingThisName;
 
+    #[ORM\ManyToOne(inversedBy: 'ResourceNamesRelated')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ResourceCategory $resourceCategory = null;
+
     public function __construct()
     {
         $this->ResourcesUsingThisName = new ArrayCollection();
@@ -69,6 +73,18 @@ class ResourceName
                 $resourcesUsingThisName->setResourceName(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResourceCategory(): ?ResourceCategory
+    {
+        return $this->resourceCategory;
+    }
+
+    public function setResourceCategory(?ResourceCategory $resourceCategory): static
+    {
+        $this->resourceCategory = $resourceCategory;
 
         return $this;
     }
