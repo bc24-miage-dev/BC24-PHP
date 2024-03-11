@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[ORM\Entity(repositoryClass: ResourceRepository::class)]
 class Resource
@@ -296,4 +297,37 @@ class Resource
 
         return $this;
     }
+
+
+    public function findAllChildren(): array {
+        $array = [$this];
+    
+        foreach ($this->getResources() as $resource) {
+            array_push($array, ...$resource->findAllChildren());
+        }
+    
+        return $array;
+    }
+    
+
+ /** 
+ * @param EntityManagerInterface $entityManager 
+ */
+public function contaminateChildren(EntityManagerInterface $entityManager): void
+{
+    
+      
+        $entityManager->persist($this);
+        
+        $parentResources = $this->findAllChildren();
+        foreach ($parentResources as $parentResource) {
+            if (!$parentResource->isIsContamined()) {
+                $parentResource->setIsContamined(true);
+                $entityManager->persist($parentResource);
+            }
+        }
+
+      $entityManager->flush();
+    
+}
 }

@@ -85,6 +85,13 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
+            $isContamined = $form->get('isContamined')->getData();
+
+            if ($isContamined) { 
+                $resource->contaminateResourceAndParents($entityManager);
+                }
+
+
             $entityManager->persist($resource);
             $entityManager->flush();
             return $this->redirectToRoute('app_admin_modify');
