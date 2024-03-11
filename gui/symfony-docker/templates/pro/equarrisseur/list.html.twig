@@ -2,6 +2,6 @@
 
 {%  block body %}
     {% for resource in resources %}
-        {{ resource.ResourceName.name }} <br>
+        <a href="{{ path('app_equarrisseur_job', {'id' : resource.id}) }}">{{ resource.ResourceName.name }} {{ resource.id }}</a>
     {% endfor %}
 {% endblock %}

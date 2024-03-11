@@ -53,6 +53,7 @@ class ResourceRepository extends ServiceEntityRepository
                 ->join('r.ResourceName', 'rn')
                 ->join('rn.resourceCategory', 'rc')
             ->andWhere('r.currentOwner = :owner')
+            ->andWhere('r.IsLifeCycleOver = false')
             ->andWhere('rc.category = :category')
             ->setParameter('category', $resourceCategory)
             ->setParameter('owner', $owner)
