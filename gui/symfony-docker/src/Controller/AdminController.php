@@ -85,10 +85,9 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-            $isContamined = $form->get('isContamined')->getData();
 
-            if ($isContamined) { 
-                $resource->contaminateResourceAndParents($entityManager);
+            if ($form->get('isContamined')->getData()){
+                $resource->contaminateChildren($entityManager);
                 }
 
 

@@ -315,16 +315,11 @@ class Resource
  */
 public function contaminateChildren(EntityManagerInterface $entityManager): void
 {
-    
-      
-        $entityManager->persist($this);
         
-        $parentResources = $this->findAllChildren();
-        foreach ($parentResources as $parentResource) {
-            if (!$parentResource->isIsContamined()) {
+        foreach ($this->findAllChildren() as $parentResource) { 
                 $parentResource->setIsContamined(true);
                 $entityManager->persist($parentResource);
-            }
+            
         }
 
       $entityManager->flush();
