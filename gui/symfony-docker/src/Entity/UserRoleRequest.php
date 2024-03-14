@@ -30,6 +30,9 @@ class UserRoleRequest
     #[ORM\Column(type: Types::TEXT)]
     private ?string $Description = null;
 
+    #[ORM\ManyToOne(inversedBy: 'userRoleRequests')]
+    private ?ProductionSite $ProductionSite = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,6 +94,18 @@ class UserRoleRequest
     public function setDescription(string $Description): static
     {
         $this->Description = $Description;
+
+        return $this;
+    }
+
+    public function getProductionSite(): ?ProductionSite
+    {
+        return $this->ProductionSite;
+    }
+
+    public function setProductionSite(?ProductionSite $ProductionSite): static
+    {
+        $this->ProductionSite = $ProductionSite;
 
         return $this;
     }

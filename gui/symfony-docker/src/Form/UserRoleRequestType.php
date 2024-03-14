@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Entity\ProductionSite;
 use App\Entity\UserRoleRequest;
 use Doctrine\DBAL\Types\StringType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -27,6 +28,10 @@ class UserRoleRequestType extends AbstractType
                     'Commerçant' => 'ROLE_COMMERCANT',
                     'Admin' => 'ROLE_ADMIN',
                 ],])
+                ->add('ProductionSite', EntityType::class, [
+                    'class' => ProductionSite::class,
+                    'choice_label' => 'ProductionSiteName',
+                ])
                 ->add('Description', null, ['label' => 'Description'])
                     ->add('Envoyer', SubmitType::class)
                 ;

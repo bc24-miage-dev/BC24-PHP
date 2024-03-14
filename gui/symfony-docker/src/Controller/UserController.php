@@ -97,10 +97,12 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
+            $UserRoleRequest = $form->getData();
             $UserRoleRequest->setUser($user);
             $UserRoleRequest->setRead(false);
             $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
             $entityManager->persist($UserRoleRequest);
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Votre demande à bien été envoyée');
