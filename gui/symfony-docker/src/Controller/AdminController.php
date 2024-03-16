@@ -71,6 +71,7 @@ class AdminController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $components = $resource->getComponents();
         $form = $this->createForm(ResourceModifierType::class, $resource);
         $form->handleRequest($request);
 
@@ -80,12 +81,11 @@ class AdminController extends AbstractController
             if ($form->get('isContamined')->getData()) {
                 $resource->contaminateChildren($entityManager);
             }
-
             $entityManager->persist($resource);
             $entityManager->flush();
             return $this->redirectToRoute('app_admin_modify');
         }
-        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource]);
+        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource, 'components' => $components]);
     }
 
     #[Route('/reportList', name: 'app_admin_reportList')]
