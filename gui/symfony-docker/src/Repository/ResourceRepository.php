@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Resource;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -45,4 +46,18 @@ class ResourceRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findByOwnerAndResourceCategory(User $owner, String $resourceCategory): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.currentOwner = :owner')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('rc.category = :category')
+            ->setParameter('category', $resourceCategory)
+            ->setParameter('owner', $owner)
+            ->getQuery()
+            ->getResult();
+    }
 }

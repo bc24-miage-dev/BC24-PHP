@@ -7,13 +7,13 @@
 
 
         {{ form_start(form) }}
-        {{ form_row(form.ResourceName, {
-            label: 'Nom de la nouvelle ressource :'
-        }) }}
-
-        {{ form_row(form.isFinalProduct, {
-            label: 'Est un produit fini'
-        }) }}
+        <label> Nom de la ressource:
+            <select name="{{ field_name(form.ResourceName) }}" class="form-control">
+                {% for name, id in field_choices(form.ResourceName) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
 
         {{ form_row(form.isContamined, {
             label: 'Est dangereux'
@@ -33,8 +33,8 @@
         }}
 
         <label> NFC des Composants :
-            {% for i in 0..5 %}
-                <input class="ml-3" type="number" name="{{ field_name(form.components) }}">
+            {% for i in 0..(components|length - 1) %}
+                <input class="ml-3" type="number" name="{{ field_name(form.components) }}" value="{{ components[i].id }}">
             {% endfor %}
 
         </label>

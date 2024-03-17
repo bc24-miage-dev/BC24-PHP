@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[ORM\Entity(repositoryClass: ResourceRepository::class)]
 class Resource
@@ -15,12 +16,6 @@ class Resource
     //#[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $ResourceName = null;
-
-    #[ORM\Column]
-    private ?bool $isFinalProduct = null;
 
     #[ORM\Column]
     private ?bool $isContamined = null;
@@ -50,11 +45,26 @@ class Resource
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\OneToMany(mappedBy: 'Resource', targetEntity: UserResearch::class)]
+    private Collection $userResearch;
+
+    #[ORM\ManyToOne(inversedBy: 'ownedResources')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $currentOwner = null;
+
+    #[ORM\Column]
+    private ?bool $IsLifeCycleOver = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ResourcesUsingThisName')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ResourceName $ResourceName = null;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
         $this->resources = new ArrayCollection();
         $this->reports = new ArrayCollection();
+        $this->userResearch = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,30 +75,6 @@ class Resource
     public function setId(int $id): static
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getResourceName(): ?string
-    {
-        return $this->ResourceName;
-    }
-
-    public function setResourceName(string $ResourceName): static
-    {
-        $this->ResourceName = $ResourceName;
-
-        return $this;
-    }
-
-    public function isIsFinalProduct(): ?bool
-    {
-        return $this->isFinalProduct;
-    }
-
-    public function setIsFinalProduct(bool $isFinalProduct): static
-    {
-        $this->isFinalProduct = $isFinalProduct;
 
         return $this;
     }
@@ -245,4 +231,98 @@ class Resource
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, UserResearch>
+     */
+    public function getUserResearch(): Collection
+    {
+        return $this->userResearch;
+    }
+
+    public function addUserResearch(UserResearch $userResearch): static
+    {
+        if (!$this->userResearch->contains($userResearch)) {
+            $this->userResearch->add($userResearch);
+            $userResearch->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserResearch(UserResearch $userResearch): static
+    {
+        if ($this->userResearch->removeElement($userResearch)) {
+            // set the owning side to null (unless already changed)
+            if ($userResearch->getResource() === $this) {
+                $userResearch->setResource(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCurrentOwner(): ?User
+    {
+        return $this->currentOwner;
+    }
+
+    public function setCurrentOwner(?User $currentOwner): static
+    {
+        $this->currentOwner = $currentOwner;
+
+        return $this;
+    }
+
+    public function isIsLifeCycleOver(): ?bool
+    {
+        return $this->IsLifeCycleOver;
+    }
+
+    public function setIsLifeCycleOver(bool $IsLifeCycleOver): static
+    {
+        $this->IsLifeCycleOver = $IsLifeCycleOver;
+
+        return $this;
+    }
+
+    public function getResourceName(): ?ResourceName
+    {
+        return $this->ResourceName;
+    }
+
+    public function setResourceName(?ResourceName $name): static
+    {
+        $this->ResourceName = $name;
+
+        return $this;
+    }
+
+
+    public function findAllChildren(): array {
+        $array = [$this];
+    
+        foreach ($this->getResources() as $resource) {
+            array_push($array, ...$resource->findAllChildren());
+        }
+    
+        return $array;
+    }
+    
+
+ /** 
+ * @param EntityManagerInterface $entityManager 
+ */
+public function contaminateChildren(EntityManagerInterface $entityManager): void
+{
+        
+        foreach ($this->findAllChildren() as $parentResource) { 
+                $parentResource->setIsContamined(true);
+                $entityManager->persist($parentResource);
+            
+        }
+
+      $entityManager->flush();
+    
+}
 }

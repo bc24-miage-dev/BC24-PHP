@@ -1,0 +1,7 @@
+{% extends 'pro/equarrisseur/index.html.twig' %}
+
+{%  block body %}
+    {% for resource in resources %}
+        <a href="{{ path('app_equarrisseur_job', {'id' : resource.id}) }}">{{ resource.ResourceName.name }} {{ resource.id }}</a>
+    {% endfor %}
+{% endblock %}

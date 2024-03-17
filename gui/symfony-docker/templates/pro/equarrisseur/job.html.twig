@@ -1,0 +1,18 @@
+{% extends 'pro/equarrisseur/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+    {% if category == 'ANIMAL' %}
+        <h1>Informations sur cet animal :</h1>
+        {{ resource.ResourceName.name }} {{ resource.id }} {{ resource.weight }} <br>
+        <a href="{{ path('app_equarrisseur_equarrir', {'id' : resource.id}) }}">Équarrir</a>
+    {% else %}
+        <h1>Informations sur cette carcasse</h1>
+        {{ resource.ResourceName.name }} {{ resource.id }} {{ resource.weight }} <br>
+        <a href="{{ path('app_equarrisseur_decoupe', {'id' : resource.id}) }}">Découper</a>
+    {% endif %}
+    </div>
+{% endblock %}
+
+
+

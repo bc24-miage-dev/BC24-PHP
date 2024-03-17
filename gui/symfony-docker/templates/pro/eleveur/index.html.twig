@@ -2,6 +2,36 @@
 
 {% block title %}BC24 PRO-Éleveur{% endblock %}
 
+{%  block sidebar %}
+
+    <div class="sidebar-heading"> Opérations </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_eleveur_list') }}">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Liste de vos animaux</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_eleveur_naissance') }}">
+            <i class="fas fa-fw fa-bell"></i>
+            <span>Signaler une naissance</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_eleveur_acquire') }}">
+            <i class="fas fa-fw fa-truck"></i>
+            <span>Signaler une réception</span></a>
+    </li>
+
+
+
+{% endblock %}
+
+{% block titrePro %}Éleveur{% endblock %}
 {% block body %}
-    Vue éleveur
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Bienvenue sur la vue Éleveur de BC24</h1>
+        <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
+    </div>
 {% endblock %}

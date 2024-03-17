@@ -13,14 +13,15 @@
 {{ parent() }}
 
 <div class="resource-details">
-    <h2>Resource Details: {{ resource.getResourceName }}</h2>
+    <h2>Resource Details: {{ resource.ResourceName.name }}</h2>
     <p>ID: {{ resource.getId }}</p>
-    <p>Is Final Product: {{ resource.isIsFinalProduct ? 'Yes' : 'No' }}</p>
+    <p>Is Final Product: {{ resource.ResourceName.ResourceCategory == 'PRODUIT' ? 'Yes' : 'No' }}</p>
     <p>Is Contaminated: {{ resource.isIsContamined ? 'Yes' : 'No' }}</p>
     <p>Weight: {{ resource.getWeight }}</p>
     <p>Price: ${{ resource.getPrice }}</p>
     <p>Description: {{ resource.getDescription }}</p>
-    <p>Date: {{ resource.getDate ? resource.getDate|date('Y-m-d H:i:s') : 'Not available' }}</p>
+    <p>Date: {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Not available' }}</p>
+    <p>Heure: {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Not available' }}</p>
 
     <h3>Origin Production Site</h3>
     <p>Name: {{ resource.getOrigin.getProductionSiteName }}</p>
@@ -33,7 +34,7 @@
             {% for component in resource.getComponents %}
             <li>
                 <a href="{{ path('app_search_result', {'id': component.getId}) }}">
-                    {{ component.getResourceName }} (ID: {{ component.getId }})
+                    {{ component.ResourceName.name }} (ID: {{ component.getId }})
                 </a>
             </li>
             {% endfor %}

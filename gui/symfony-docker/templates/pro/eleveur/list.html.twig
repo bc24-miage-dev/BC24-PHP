@@ -1,0 +1,7 @@
+{% extends 'pro/eleveur/index.html.twig' %}
+
+{%  block body %}
+    {% for animal in animaux %}
+        {{ animal.ResourceName.name }} <br>
+    {% endfor %}
+{% endblock %}

@@ -11,7 +11,7 @@
 
             <div class="card mr-2 mb-2" style="width: 80%;">
                 <div class="card-body ">
-                    <h5 class="card-title">{{ reportElement.resource.id }} - {{ reportElement.resource.ResourceName }}</h5>
+                    <h5 class="card-title">{{ reportElement.resource.id }} - {{ reportElement.resource.ResourceName.name }}</h5>
                     <h6 class="card-subtitle mb-2 text-body-secondary">Date : {{ reportElement.date|date('d/m/Y') }}</h6>
                     <p class="card-text">{{ reportElement.description }}</p>
                     <a href="{{ path('app_admin_checkReport', {'id': reportElement.id}) }}" class="card-link">Check Report</a>

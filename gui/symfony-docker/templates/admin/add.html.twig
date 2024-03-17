@@ -2,23 +2,27 @@
 
 {% block body %}
 <div class="container-fluid">
-    {% if state == "success" %}
-        <h1>Success ! </h1> <br>
-        <a href="{{ path('app_admin_index') }}">Retour à la vue Admin</a>
-
-    {% else %}
         <h1>Création d'une nouvelle ressource</h1><br>
         {{ form_start(form) }}
         {{ form_row(form.id,  {
             label: 'Tag NFC'
         }) }}
-        {{ form_row(form.ResourceName, {
-            label: 'Nom de la nouvelle ressource'
-        }) }}
 
-        {{ form_row(form.isFinalProduct, {
-            label: 'Est un produit fini'
-        }) }}
+        <label> Nom de la nouvelle ressource :
+            <select name="{{ field_name(form.ResourceName) }}" class="form-control">
+                {% for name, id in field_choices(form.ResourceName) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label> ID du propriétaire actuel de la ressource :
+            <select name="{{ field_name(form.currentOwner) }}" class="form-control">
+                {% for name, id in field_choices(form.currentOwner) %}
+                    <option value="{{ id }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+        </label>
 
         {{ form_row(form.isContamined, {
             label: 'Est dangereux'
@@ -55,7 +59,5 @@
 
         <br><br>
         {{ form_end(form) }}
-
-    {% endif %}
 </div>
 {% endblock %}

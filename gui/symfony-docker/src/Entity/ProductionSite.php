@@ -27,9 +27,24 @@ class ProductionSite
     #[ORM\OneToMany(mappedBy: 'origin', targetEntity: Resource::class)]
     private Collection $resources;
 
+    #[ORM\OneToMany(mappedBy: 'FactoryOwner', targetEntity: FactoryRecipe::class)]
+    private Collection $factoryRecipes;
+
+    #[ORM\OneToMany(mappedBy: 'productionSite', targetEntity: User::class)]
+    private Collection $userRelated;
+
+    #[ORM\OneToMany(mappedBy: 'ProductionSite', targetEntity: UserRoleRequest::class)]
+    private Collection $userRoleRequests;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $Validate = false;
+
     public function __construct()
     {
         $this->resources = new ArrayCollection();
+        $this->factoryRecipes = new ArrayCollection();
+        $this->userRelated = new ArrayCollection();
+        $this->userRoleRequests = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,6 +114,108 @@ class ProductionSite
                 $resource->setOrigin(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, FactoryRecipe>
+     */
+    public function getFactoryRecipes(): Collection
+    {
+        return $this->factoryRecipes;
+    }
+
+    public function addFactoryRecipe(FactoryRecipe $factoryRecipe): static
+    {
+        if (!$this->factoryRecipes->contains($factoryRecipe)) {
+            $this->factoryRecipes->add($factoryRecipe);
+            $factoryRecipe->setFactoryOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFactoryRecipe(FactoryRecipe $factoryRecipe): static
+    {
+        if ($this->factoryRecipes->removeElement($factoryRecipe)) {
+            // set the owning side to null (unless already changed)
+            if ($factoryRecipe->getFactoryOwner() === $this) {
+                $factoryRecipe->setFactoryOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUserRelated(): Collection
+    {
+        return $this->userRelated;
+    }
+
+    public function addUserRelated(User $userRelated): static
+    {
+        if (!$this->userRelated->contains($userRelated)) {
+            $this->userRelated->add($userRelated);
+            $userRelated->setProductionSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRelated(User $userRelated): static
+    {
+        if ($this->userRelated->removeElement($userRelated)) {
+            // set the owning side to null (unless already changed)
+            if ($userRelated->getProductionSite() === $this) {
+                $userRelated->setProductionSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserRoleRequest>
+     */
+    public function getUserRoleRequests(): Collection
+    {
+        return $this->userRoleRequests;
+    }
+
+    public function addUserRoleRequest(UserRoleRequest $userRoleRequest): static
+    {
+        if (!$this->userRoleRequests->contains($userRoleRequest)) {
+            $this->userRoleRequests->add($userRoleRequest);
+            $userRoleRequest->setProductionSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRoleRequest(UserRoleRequest $userRoleRequest): static
+    {
+        if ($this->userRoleRequests->removeElement($userRoleRequest)) {
+            // set the owning side to null (unless already changed)
+            if ($userRoleRequest->getProductionSite() === $this) {
+                $userRoleRequest->setProductionSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isValidate(): ?bool
+    {
+        return $this->Validate;
+    }
+
+    public function setValidate(?bool $Validate): static
+    {
+        $this->Validate = $Validate;
 
         return $this;
     }

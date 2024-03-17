@@ -1,7 +1,7 @@
 .h1 {
-    margin-bottom: 40px; 
-    font-size: 2rem; 
-    
+    margin-bottom: 40px;
+    font-size: 2rem;
+
 }
 /* Styles for the search container */
 .search-container {
@@ -24,7 +24,7 @@
     border: solid 1px #ccc;
     outline: none;
     margin-bottom: 30px; /* Space below the input */
-    
+
 }
 
 /* Styles for the search button with the icon */
@@ -64,7 +64,7 @@
     .search-container {
         margin-top: 50px;
     }
-    
+
     .search-input {
         width: calc(100% - 60px); /* Full width minus padding and button */
     }

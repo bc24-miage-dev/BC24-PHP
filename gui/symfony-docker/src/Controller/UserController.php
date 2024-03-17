@@ -78,9 +78,7 @@ class UserController extends AbstractController
             return $this->render('user/ModifAccount.html.twig', ['form' => $form->createView()
         ]);
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexistant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
     #[Route('/request', name: 'app_admin_user_request')]
@@ -89,7 +87,7 @@ class UserController extends AbstractController
         $UserRoleRequest = new UserRoleRequest();
         $user = $this->getUser();
         $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
+        $repoRequest = $repository->findBy(['User'=>$user]);
 
         if (count($repoRequest) > 0) {
             $UserRoleRequest = $repoRequest[0];
@@ -99,10 +97,12 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-            $UserRoleRequest->setIdUser($user);
+            $UserRoleRequest = $form->getData();
+            $UserRoleRequest->setUser($user);
             $UserRoleRequest->setRead(false);
             $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
             $entityManager->persist($UserRoleRequest);
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Votre demande à bien été envoyée');

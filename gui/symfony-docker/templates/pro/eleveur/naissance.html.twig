@@ -1,0 +1,30 @@
+{% extends 'pro/eleveur/index.html.twig' %}
+
+{% block body %}
+<div class="container-fluid">
+    <h1>Naissance :</h1><br>
+
+{{ form_start(form) }}
+    <label>Tag NFC:
+        <input type="number" name="{{ field_name(form.id) }}" class="form-control">
+    </label>
+    <br>
+    <label> Espèce de l'animal :
+        <select name="{{ field_name(form.ResourceName) }}" class="form-control">
+            {% for name, id in field_choices(form.ResourceName) %}
+
+                <option value="{{ id }}">{{ name }}</option>
+
+            {% endfor %}
+        </select>
+    </label>
+
+    <br>
+
+    <label>Poids de l'animal (en grammes) :
+        <input type="number" name="{{ field_name(form.weight) }}" class="form-control">
+    </label>
+{{ form_end(form) }}
+</div>
+{% endblock %}
+

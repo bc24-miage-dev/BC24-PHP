@@ -8,9 +8,69 @@
         .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
     </style>
 
-    <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
-        <h2>HISTORY</h2>
 
+        <h2>HISTORY</h2>
+        <!-- si page 1: ne pas afficher précédent et à partir de page 2 afficher l acces a la 1er page -->
+        {% if page > 1 %} 
+        
+            <a href="{{ path('app_history', {'page': page-1}) }}"><</a>
+            {% if page > 2 %}
+            
+            <a href="{{ path('app_history', {'page': 1}) }}">1</a>
+            ...
+            {% endif %}
+            
+        {% endif %}
+
+        <!-- page suivante et précédente -->
+            {% if page > 1 %}
+            <a href="{{ path('app_history', {'page': page -1}) }}">{{ page -1 }}</a> 
+            {% endif %}
+            {{ page }}
+            {% if page < numberPage %}
+            <a href="{{ path('app_history', {'page': page +1}) }}">{{ page +1 }}</a>
+            {% endif %}
+        
+        <!-- idem que au dessus mais inversé -->
+        {% if page != numberPage %} 
+            
+            {% if page < numberPage -1 %} 
+            ...
+            <a href="{{ path('app_history', {'page': numberPage}) }}">{{numberPage}}</a>
+            {% endif %}
+            {% if numberPage >1 %}
+            <a href="{{ path('app_history', {'page': page+1}) }}">></a>
+            {% endif %}
+        {% endif %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date de la recherche</th>
+                    <th>Nom</th>
+                    <th>Contamination</th>
+                    <th>Quantité</th>
+                    <th>Prix</th>
+                </tr>
+            </thead>
+            <tbody>
+                            
+                {% for history1 in history %}
+                <tr>
+                    <td>{{ history1.Date|date('d/m/Y') }}</td>
+                    <td><a href="{{ path('app_search_result', {'id': history1.resource.id }) }}">{{ history1.resource.ResourceName.Name }}</a></td>
+
+                    <td {% if history1.Resource.isContamined == true %}
+                    style = "background-color:red"
+                    {% elseif history1.Resource.isContamined == false %}
+                    style = "background-color:green"
+                    {% endif %}>
+                        {{ history1.Resource.isContamined }}</td>
+                    <td>{{ history1.Resource.Weight }}</td>
+                    <td>{{ history1.Resource.Price }}</td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
     </div>
 {% endblock %}
