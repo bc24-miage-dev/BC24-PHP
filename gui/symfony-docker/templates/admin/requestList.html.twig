@@ -32,8 +32,13 @@
                                         <td>{{ userRequest.roleRequest|replace({'ROLE_': ''})|capitalize }}</td>
                                         <td>{{ userRequest.description }}</td>
                                         <td>
+                                        {% if userRequest.productionSite.validate == true %}
                                             <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "true" , 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Accepter</a>
                                             <a href="{{ path('app_admin_request_roleEdit', {'id': userRequest.id, 'validation' : "false", 'role' : userRequest.roleRequest}) }}" class="btn btn-primary">Refuser</a>
+                                        {% else %}
+                                            <a href="{{ path('app_admin_request_productionSiteRequest') }}" class="btn btn-primary">Voir la demande de création site de production</a>
+
+                                        {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}

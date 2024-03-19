@@ -14,4 +14,6 @@ class UsineController extends AbstractController
     {
         return $this->render('pro/usine/index.html.twig');
     }
+
+    
 }

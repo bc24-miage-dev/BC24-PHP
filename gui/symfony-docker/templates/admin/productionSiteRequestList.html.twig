@@ -1,0 +1,56 @@
+{% extends 'admin/admin.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+    
+     <h1 style='text-align:center'>Liste des demandes de création de site de production</h1>
+    <hr>
+    <div class="container">
+        {% if productionSiteList %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nom user</th>
+                                    <th>Prénom user</th>
+                                    <th>ID user</th>
+                                    <th>Nom du site de production</th>
+                                    <th>Adresse du site de production</th>
+                                    <th>Numéro de Téléphone du site de production</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for productionSiteRequest in productionSiteList %}
+                                    {% if productionSiteRequest.productionSite.validate == false %}
+                                        
+                                    
+                                    <tr>
+                                        <td>{{ productionSiteRequest.User.lastname }}</td>
+                                        <td>{{ productionSiteRequest.User.firstname }}</td>
+                                        <td>{{ productionSiteRequest.User.id }}</td>
+                                        <td>{{ productionSiteRequest.productionSite.ProductionSiteName }}</td>
+                                        <td>{{ productionSiteRequest.productionSite.Address }}</td>
+                                        <td>{{ productionSiteRequest.productionSite.ProductionSiteTel }}</td>
+                                        <td>
+                                            <a href="{{ path('app_admin_request_productionSiteRequestEdit', {'id': productionSiteRequest.id, 'validation' : "true" , 'role' : productionSiteRequest.roleRequest}) }}" class="btn btn-primary">Accepter</a>
+                                            <a href="{{ path('app_admin_request_productionSiteRequestEdit', {'id': productionSiteRequest.id, 'validation' : "false", 'role' : productionSiteRequest.roleRequest}) }}" class="btn btn-primary">Refuser</a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <h2 style="text-align: center">Pas de requête actuellement</h2>
+        {% endif %}
+    </div>
+
+    </div>
+{% endblock %}

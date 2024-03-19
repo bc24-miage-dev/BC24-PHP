@@ -13,6 +13,8 @@ use App\Form\ModifierUserType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\UserRoleRequest;
 use App\Form\UserRoleRequestType;
+use App\Entity\ProductionSite;
+use App\Form\ProductionSiteType;
 
 #[Route('/user')]
 class UserController extends AbstractController
@@ -114,4 +116,27 @@ class UserController extends AbstractController
         ]);
     }
 
+    #[Route('/productionSiteRequest', name: 'app_user_productionSiteRequest')]
+
+    public function createProductionSite(ManagerRegistry $doctrine, Request $request): Response
+    {
+        $productionSite = new ProductionSite();
+        $form = $this->createForm(ProductionSiteType::class, $productionSite);
+        $form->handleRequest($request);
+        
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $doctrine->getManager();
+            $productionSite->setValidate(false);
+            $entityManager->persist($productionSite);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Demande de création de site de production enregistrée');
+            return $this->redirectToRoute('app_admin_user_request');
+        }
+
+        return $this->render('user/productionSite.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }

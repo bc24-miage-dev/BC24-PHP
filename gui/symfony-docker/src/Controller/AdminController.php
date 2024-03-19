@@ -204,4 +204,34 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin_userList');
     }
 
+    #[Route('/request/productionSiteRequest', name: 'app_admin_request_productionSiteRequest')]
+    public function usineRequest(ManagerRegistry $doctrine): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $repository = $doctrine->getRepository(UserRoleRequest::class);
+        $productionSite = $repository->findBy(['Read' => false]);
+        return $this->render('admin/productionSiteRequestList.html.twig', ['productionSiteList' => $productionSite]);
+    }
+
+    #[Route('/request/productionSiteRequestEdit/{id}/{validation}', name: 'app_admin_request_productionSiteRequestEdit')]
+
+    public function usineRequestEdit(ManagerRegistry $doctrine, $id, $validation): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $userRoleRequest = $doctrine->getRepository(UserRoleRequest::class)->find($id);
+        $productionSite = $doctrine->getRepository(ProductionSite::class)->find($userRoleRequest->getProductionSite());
+        if ($validation == "true") {
+            $productionSite->setValidate(true);
+        }	
+        else {
+            $userRoleRequest->setRead(true);
+        }
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($userRoleRequest);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_admin_request_productionSiteRequest');
+    }
+
+
 }
