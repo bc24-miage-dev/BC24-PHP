@@ -85,7 +85,7 @@ class AdminController extends AbstractController
             $entityManager->flush();
             return $this->redirectToRoute('app_admin_modify');
         }
-        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource, 'components' => $components]);
+        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource, 'composants' => $components]);
     }
 
     #[Route('/reportList', name: 'app_admin_reportList')]
@@ -222,7 +222,7 @@ class AdminController extends AbstractController
         $productionSite = $doctrine->getRepository(ProductionSite::class)->find($userRoleRequest->getProductionSite());
         if ($validation == "true") {
             $productionSite->setValidate(true);
-        }	
+        }
         else {
             $userRoleRequest->setRead(true);
         }

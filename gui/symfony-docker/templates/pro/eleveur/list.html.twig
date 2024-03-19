@@ -2,6 +2,10 @@
 
 {%  block body %}
     {% for animal in animaux %}
-        {{ animal.ResourceName.name }} <br>
+        {{ animal.ResourceName.name }} {{ animal.id }}
+        <a href="{{ path('app_eleveur_weight', {'id' : animal.id}) }}">Pesée</a>
+        <a href="{{ path('app_eleveur_vaccine', {'id' : animal.id }) }}">Vacciner</a>
+        <a href="{{ path('app_eleveur_disease', {'id' : animal.id }) }}">Signaler une maladie</a>
+        <br><br>
     {% endfor %}
 {% endblock %}

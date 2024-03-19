@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Resource;
 use App\Form\EleveurBirthType;
+use App\Form\EleveurWeightType;
+use App\Form\ResourceModifierType;
 use App\Form\ResourceOwnerChangerType;
 use App\Form\ResourceType;
 use Doctrine\Persistence\ManagerRegistry;
@@ -53,8 +55,9 @@ class EleveurController extends AbstractController
     public function list(ManagerRegistry $doctrine) : Response
     {
         $this->denyAccessUnlessGranted( attribute: 'ROLE_ELEVEUR');
+
         $repository = $doctrine->getRepository(Resource::class);
-        $animaux = $repository->findBy(['currentOwner' => $this->getUser()]);
+        $animaux = $repository->findBy(['currentOwner' => $this->getUser(), 'IsLifeCycleOver' => 'false']);
         return $this->render('pro/eleveur/list.html.twig',
             ['animaux' => $animaux]
         );
@@ -105,5 +108,93 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/acquire.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
+    #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
+    public function weight(Request $request, ManagerRegistry $doctrine, $id): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ELEVEUR');
+
+        $repository = $doctrine->getRepository(Resource::class);
+        $resource = $repository->find($id);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner() != $this->getUser()) {
+
+            $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+
+        $form = $this->createForm(EleveurWeightType::class, $resource);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($resource);
+            $entityManager->flush();
+            $this->addFlash('success', 'L\'animal a bien été pesé');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+        return $this->render('pro/eleveur/weight.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
+    public function vaccine(Request $request, ManagerRegistry $doctrine, $id): Response{
+        $this->denyAccessUnlessGranted('ROLE_ELEVEUR');
+
+        $repository = $doctrine->getRepository(Resource::class);
+        $resource = $repository->find($id);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner() != $this->getUser()) {
+
+            $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+
+        if ($request->isMethod('POST')) {
+            $newVaccine = $request->request->get('vaccine');
+            $date = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+            $dateString = $date->format('Y-m-d');
+            $resource->setDescription($resource->getDescription() . 'VACCIN|' . $newVaccine . '|' . $dateString . ';');
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($resource);
+            $entityManager->flush();
+            $this->addFlash('success', 'Le vaccin a bien été enregistré');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+        return $this->render('pro/eleveur/vaccine.html.twig', ['id' => $id]);
+    }
+
+    #[Route('/disease/{id}', name: 'app_eleveur_disease')]
+    public function disease(Request $request, ManagerRegistry $doctrine, $id): Response{
+        $this->denyAccessUnlessGranted('ROLE_ELEVEUR');
+
+        $repository = $doctrine->getRepository(Resource::class);
+        $resource = $repository->find($id);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner() != $this->getUser()) {
+
+            $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+
+        if ($request->isMethod('POST')) {
+            $newDisease = $request->request->get('disease');
+            $beginDate = $request->request->get('dateBegin');
+            $endDate = $request->request->get('dateEnd');
+
+            $resource->setDescription($resource->getDescription() .
+                'MALADIE|' . $newDisease . '|' . $beginDate . '|' . $endDate . ';');
+
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($resource);
+            $entityManager->flush();
+            $this->addFlash('success', 'La maladie a bien été enregistrée');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+        return $this->render('pro/eleveur/disease.html.twig', ['id' => $id]);
     }
 }
