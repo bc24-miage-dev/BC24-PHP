@@ -45,4 +45,17 @@ class ResourceNameRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findByCategoryAndFamily(String $category, String $family): array
+    {
+        return $this->createQueryBuilder('rn')
+            ->join('rn.resourceCategory', 'rc')
+            ->join('rn.family', 'rf')
+            ->andWhere('rc.category = :category')
+            ->andWhere('rf.name = :family')
+            ->setParameter('category', $category)
+            ->setParameter('family', $family)
+            ->getQuery()
+            ->getResult();
+    }
 }

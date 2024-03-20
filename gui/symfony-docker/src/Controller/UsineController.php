@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Resource;
+use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 
 #[Route('/pro/usine')]
 class UsineController extends AbstractController
@@ -48,6 +50,92 @@ class UsineController extends AbstractController
         return $this->render('pro/usine/acquire.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
+    #[Route('/list', name: 'app_usine_list')]
+    public function list(ManagerRegistry $doctrine): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USINE');
+        $repository = $doctrine->getRepository(Resource::class);
+
+        $resources = $repository->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
+        return $this->render('pro/usine/list.html.twig', [
+            'resources' => $resources
+        ]);
+    }
+
+    #[Route('/decoupe/{id}', name: 'app_usine_decoupe')]
+    public function decoupe(Request $request, ManagerRegistry $doctrine, $id): Response
+    {
+        //$this->denyAccessUnlessGranted('ROLE_USINE');
+        $resourceRepository = $doctrine->getRepository(Resource::class);
+        $resource = $resourceRepository->find($id);
+
+        if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
+            $resource->getResourceName()->getResourceCategory()->getCategory() != 'DEMI-CARCASSE') {
+
+            $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demi-carcasse');
+            return $this->redirectToRoute('app_usine_list');
+        }
+
+        $nameRepository = $doctrine->getRepository(ResourceName::class);
+        $resources = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
+            family: $resourceRepository->find($id)->getResourceName()->getFamily()->getName());
+
+        if ($request->isMethod('POST')) {
+            $entityManager = $doctrine->getManager();
+            $i = 1;
+            while ($request->request->has('tag' . $i)) {
+                $id = $request->request->get('tag' . $i); //Tag NFC
+                $weight = $request->request->get('weight' . $i); //Poids
+                $name = $request->request->get('name' . $i); //Nom (Poitrine, Côte, etc.)
+
+                $childResource = $this->createChildResource($doctrine, $resource);
+                $childResource->setWeight($weight);
+                $childResource->setId($id);
+                $childResource->setResourceName($this->searchInArrayByName($resources, $name));
+
+                $entityManager->persist($childResource);
+                $entityManager->flush();
+                $i++;
+            }
+
+            $resource->setIsLifeCycleOver(true);
+            $entityManager->persist($resource);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'La demi-carcasse a bien été découpée');
+            return $this->redirectToRoute('app_usine_list');
+        }
+
+        return $this->render('pro/usine/decoupe.html.twig', [
+            'demiCarcasse' => $resource, // La demi-carcasse à découper
+            'morceauxPossibles' => $resources // Les ressources possibles à partir d'elle
+        ]);
+    }
+
+    private function createChildResource(ManagerRegistry $doctrine, Resource $resource): Resource
+    {
+        $newChildResource = new Resource();
+        $newChildResource->setCurrentOwner($this->getUser());
+        $newChildResource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $newChildResource->setIsLifeCycleOver(false);
+        $newChildResource->setIsContamined(false);
+        $newChildResource->setPrice(0);
+        $newChildResource->setOrigin($this->getUser()->getProductionSite());
+        $newChildResource->setDescription('');
+        $newChildResource->addComponent($resource);
+        return $newChildResource;
+    }
+
+    private function searchInArrayByName($array, $nameString): ?ResourceName
+    {
+        foreach ($array as $item) {
+            if ($item->getName() == $nameString) {
+                return $item;
+            }
+        }
+        return null;
     }
 
 }

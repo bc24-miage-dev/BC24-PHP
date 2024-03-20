@@ -1,0 +1,10 @@
+{% extends 'pro/usine/index.html.twig' %}
+
+{%  block body %}
+    {% for demiCarcasse in resources %}
+        {{ demiCarcasse.ResourceName.name }} {{ demiCarcasse.id }}
+        <a href="{{ path('app_usine_decoupe', {'id' : demiCarcasse.id}) }}">Découpe</a>
+
+        <br><br>
+    {% endfor %}
+{% endblock %}
