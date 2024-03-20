@@ -4,7 +4,7 @@
 
 {% block stylesheet %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('CSS/user.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/user.css') }}" />
 {% endblock %}
 
 {% block body %}
@@ -24,9 +24,9 @@
 
     <a href="{{ path('app_admin_user_request') }}" class="box">
         <div class="icon-box">
-            <img src="" />(image pour demander un role pro)
+            <i class="fas fa-user-tie"></i> <!-- TODO : Ajout image appropriée ou remise à l'échelle de l'icône -->
         </div>
-        <p>Demander un role</p>
+        <p>Demander un rôle</p>
     </a>
 </div>
 {% endblock %}

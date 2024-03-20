@@ -25,6 +25,9 @@ class ResourceName
     #[ORM\JoinColumn(nullable: false)]
     private ?ResourceCategory $resourceCategory = null;
 
+    #[ORM\ManyToOne(inversedBy: 'resourceNames')]
+    private ?ResourceFamily $family = null;
+
     public function __construct()
     {
         $this->ResourcesUsingThisName = new ArrayCollection();
@@ -85,6 +88,18 @@ class ResourceName
     public function setResourceCategory(?ResourceCategory $resourceCategory): static
     {
         $this->resourceCategory = $resourceCategory;
+
+        return $this;
+    }
+
+    public function getFamily(): ?ResourceFamily
+    {
+        return $this->family;
+    }
+
+    public function setFamily(?ResourceFamily $family): static
+    {
+        $this->family = $family;
 
         return $this;
     }
