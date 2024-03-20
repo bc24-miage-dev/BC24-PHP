@@ -1,0 +1,9 @@
+{% extends 'pro/usine/index.html.twig' %}
+
+{% block body %}
+    <h1>Découpe du produit {{ demiCarcasse.resourceName.name }} </h1>
+
+    {% for morceau in morceauxPossibles %}
+        {{ morceau.name }}
+    {% endfor %}
+{% endblock %}
