@@ -21,7 +21,7 @@ class ProController extends AbstractController
             'ROLE_TRANSPORTEUR' => $this->redirectToRoute('app_transporteur_index'),
             'ROLE_EQUARRISSEUR' => $this->redirectToRoute('app_equarrisseur_index'),
             'ROLE_USINE' => $this->redirectToRoute('app_usine_index'),
-            'ROLE_COMMERCANT' => $this->redirectToRoute('app_commercant_index'),
+            'ROLE_DISTRIBUTEUR' => $this->redirectToRoute('app_distributeur_index'),
             'ROLE_ADMIN' => $this->redirectToRoute('app_admin_index'),
             //Shouldn't be possible but just to put a default case :
             default => $this->redirectToRoute('app_index'),
@@ -35,7 +35,7 @@ class ProController extends AbstractController
             $roles = $this->getUser()->getRoles();
             $isPro=in_array('ROLE_ELEVEUR', $roles) || in_array('ROLE_TRANSPORTEUR', $roles)
             || in_array('ROLE_EQUARRISSEUR', $roles) || in_array('ROLE_USINE', $roles)
-            || in_array('ROLE_COMMERCANT', $roles) || in_array('ROLE_ADMIN', $roles);
+            || in_array('ROLE_DISTRIBUTEUR', $roles) || in_array('ROLE_ADMIN', $roles);
         }
         return $isPro ;
     }

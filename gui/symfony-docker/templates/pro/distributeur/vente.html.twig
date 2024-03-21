@@ -1,0 +1,10 @@
+{% extends 'pro/distributeur/index.html.twig' %}
+
+{% block body %}
+    <h1>Register NFC Tag</h1>
+    {{ form_start(form) }}
+        {{ form_row(form.id) }}
+        {{ form_row(form.isLifeCycleOver) }}
+        <button type="submit">Submit</button>
+    {{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends 'pro/distributeur/index.html.twig' %}
+
+{%  block body %}
+    {% for resource in resource %}
+        {{ resource.ResourceName.name }} {{ resource.id }}
+    {% endfor %}
+{% endblock %}
