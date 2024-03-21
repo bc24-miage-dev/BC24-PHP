@@ -1,15 +1,17 @@
 {% extends 'template.html.twig' %}
 
 {% block title %}BC24 - Traçabilité{% endblock %}
-{% block stylesheets %}
-    {{ parent() }}
-
-{% endblock %}
-
 {% block body %}
-    {{ parent()}}
-    <!-- Banner -->
 
+    {{ parent() }}
+    <!-- Banner -->
+    <div class="search-container">
+        <h1>Tag NFC</h1>
+        {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
+        <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
+        {{ form_end(form) }}
+    </div>
     <div id="banner-wrapper">
         <div id="banner" class="box container">
             <div class="row">

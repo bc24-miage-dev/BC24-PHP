@@ -26,7 +26,6 @@ class SearchController extends AbstractController
                 $data = $form->getData();
                 $id = $data->getId();
 
-                $resource = $doctrine->getRepository(Resource::class)->find($id);
 
                 return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
             }
