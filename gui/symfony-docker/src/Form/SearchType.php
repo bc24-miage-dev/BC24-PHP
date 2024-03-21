@@ -16,7 +16,6 @@ class SearchType extends AbstractType
     {
         $builder
             ->add('id')
-            ->add('submit', SubmitType::class)
         ;
     }
 

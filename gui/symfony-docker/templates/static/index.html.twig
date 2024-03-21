@@ -3,18 +3,20 @@
 {% block title %}BC24 - Traçabilité{% endblock %}
 {% block body %}
 
-    {{ parent() }}
+    {% block stylesheets %} <link rel="stylesheet" href="{{ asset('css/search.css') }}" /> {% endblock %}
+
     <!-- Banner -->
     <div class="search-container">
-        <h1>Rechercher un produit</h1>
-        {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
-        <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
-        {{ form_end(form) }}
-    </div>
+    <h1>Rechercher un produit :</h1>
+    {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+    {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
+    <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
+    {{ form_end(form) }}
+</div>
     <div id="banner-wrapper">
         <div id="banner" class="box container">
             <div class="row">
+
                 <div class="col-7 col-12-medium">
                     <h2>Bienvenue sur le site de BC24</h2>
                     <p>Solution de traçabilité</p>
