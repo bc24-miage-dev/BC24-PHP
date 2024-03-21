@@ -79,7 +79,7 @@
     {% block body %}
         {% if app.user %}
             {% if "ROLE_PRO" in app.user.roles %}
-        <a href="{{ path('app_pro') }}">Passer à la vue Professionnelle</a>
+                {# TODO: lien pro #}
             {% endif %}
         {% endif %}
     {% endblock %}
