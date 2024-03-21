@@ -101,8 +101,9 @@ class EquarrisseurController extends AbstractController
         }
 
         $newCarcasse = $this->createChildResource($doctrine, $resource);
-        $newCarcasse->setResourceName($doctrine->getRepository(ResourceName::class)
-            ->findOneBy(['name' => 'Carcasse de ' . $resource->getResourceName()->getName()]));
+        $nameRepository = $doctrine->getRepository(ResourceName::class);
+        $a = $nameRepository->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
+        $newCarcasse->setResourceName($a[0]);
 
         $resource->setIsLifeCycleOver(true);
 
@@ -135,14 +136,13 @@ class EquarrisseurController extends AbstractController
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list');
         }
-
+        $nameRepository = $doctrine->getRepository(ResourceName::class);
+        $demiCarcasse = $nameRepository->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getFamily()->getName())[0];
         $newHalfCarcasse = $this->createChildResource($doctrine, $resource);
-        $newHalfCarcasse->setResourceName($doctrine->getRepository(ResourceName::class)
-            ->findOneBy(['name' => 'Demi-' . $resource->getResourceName()->getName()]));
+        $newHalfCarcasse->setResourceName($demiCarcasse);
 
         $newHalfCarcasse2 = $this->createChildResource($doctrine, $resource);
-        $newHalfCarcasse2->setResourceName($doctrine->getRepository(ResourceName::class)
-            ->findOneBy(['name' => 'Demi-' . $resource->getResourceName()->getName()]));
+        $newHalfCarcasse2->setResourceName($demiCarcasse);
 
         $resource->setIsLifeCycleOver(true);
 
