@@ -54,32 +54,11 @@ class EleveurController extends AbstractController
     #[Route('/list', name: 'app_eleveur_list')]
     public function list(ManagerRegistry $doctrine) : Response
     {
-        $this->denyAccessUnlessGranted( attribute: 'ROLE_ELEVEUR');
-
         $repository = $doctrine->getRepository(Resource::class);
         $animaux = $repository->findBy(['currentOwner' => $this->getUser(), 'IsLifeCycleOver' => 'false']);
         return $this->render('pro/eleveur/list.html.twig',
             ['animaux' => $animaux]
         );
-    }
-
-    #[Route('/specific/{id}', name: 'app_eleveur_edit')]
-    public function edit(Resource $resource, Request $request, ManagerRegistry $doctrine): Response
-    {
-        //TODO : THIS FUNCTION IS GIBBERISH MADE BY COPILOT
-        $this->denyAccessUnlessGranted( attribute: 'ROLE_ELEVEUR');
-        $form = $this->createForm(ResourceType::class, $resource);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'Les informations de votre animal ont bien été modifiées !');
-            return $this->redirectToRoute('app_eleveur_list');
-        }
-        return $this->render('pro/eleveur/edit.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
 
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
@@ -113,8 +92,6 @@ class EleveurController extends AbstractController
     #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
     public function weight(Request $request, ManagerRegistry $doctrine, $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ELEVEUR');
-
         $repository = $doctrine->getRepository(Resource::class);
         $resource = $repository->find($id);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
@@ -143,8 +120,6 @@ class EleveurController extends AbstractController
 
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
     public function vaccine(Request $request, ManagerRegistry $doctrine, $id): Response{
-        $this->denyAccessUnlessGranted('ROLE_ELEVEUR');
-
         $repository = $doctrine->getRepository(Resource::class);
         $resource = $repository->find($id);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
@@ -170,8 +145,6 @@ class EleveurController extends AbstractController
 
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request, ManagerRegistry $doctrine, $id): Response{
-        $this->denyAccessUnlessGranted('ROLE_ELEVEUR');
-
         $repository = $doctrine->getRepository(Resource::class);
         $resource = $repository->find($id);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||

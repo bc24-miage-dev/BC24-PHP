@@ -25,8 +25,6 @@ class EquarrisseurController extends AbstractController
     #[Route('/acquisition', name: 'app_equarrisseur_acquire')]
     public function acquisition(Request $request, ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_EQUARRISSEUR');
-
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
@@ -56,7 +54,6 @@ class EquarrisseurController extends AbstractController
     public function list(ManagerRegistry $doctrine, String $category) : Response
     {
         $user = $this->getUser();
-        $this->denyAccessUnlessGranted( attribute: 'ROLE_EQUARRISSEUR');
         $repository = $doctrine->getRepository(Resource::class);
         $resources = $repository->findByOwnerAndResourceCategory($user, strtoupper($category));
         return $this->render('pro/equarrisseur/list.html.twig',
@@ -67,8 +64,6 @@ class EquarrisseurController extends AbstractController
     #[Route('/specific/{id}', name: 'app_equarrisseur_job')]
     public function job(ManagerRegistry $doctrine, $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_EQUARRISSEUR');
-
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         if (!$resource || $resource->getCurrentOwner() != $this->getUser()){
             $this->addFlash('error', 'Ressource introuvable');
@@ -90,8 +85,6 @@ class EquarrisseurController extends AbstractController
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
     public function equarrir(ManagerRegistry $doctrine, Request $request, $id)
     {
-        $this->denyAccessUnlessGranted('ROLE_EQUARRISSEUR');
-
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
             $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'){
@@ -127,8 +120,6 @@ class EquarrisseurController extends AbstractController
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
     public function decoupe(ManagerRegistry $doctrine, Request $request, $id)
     {
-        $this->denyAccessUnlessGranted('ROLE_EQUARRISSEUR');
-
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
             $resource->getResourceName()->getResourceCategory()->getCategory() != 'CARCASSE'){

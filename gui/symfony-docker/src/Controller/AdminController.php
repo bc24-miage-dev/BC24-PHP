@@ -23,19 +23,12 @@ class AdminController extends AbstractController
     #[Route('/', name: 'app_admin_index')]
     public function admin(): Response
     {
-
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         return $this->render('admin/admin.html.twig');
     }
 
     #[Route('/add', name: 'app_admin_add')]
     public function add(Request $request, ManagerRegistry $doctrine): Response
     {
-        if (!$this->getUser() || !$this->getUser()->getRoles() || !in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
-            return $this->redirectToRoute('app_index');
-
-        }
         $resource = new Resource();
         $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $form = $this->createForm(ResourceType::class, $resource);
@@ -60,7 +53,6 @@ class AdminController extends AbstractController
     #[Route('/modify', name: 'app_admin_modify')]
     public function modify(ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $resources = $doctrine->getRepository(Resource::class)->findAll();
         return $this->render('admin/modify.html.twig', ['resources' => $resources]);
     }
@@ -68,7 +60,6 @@ class AdminController extends AbstractController
     #[Route('/modify/{id}', name: 'app_admin_modifySpecific')]
     public function modifySpecific(ManagerRegistry $doctrine, Request $request, $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $components = $resource->getComponents();
@@ -91,7 +82,6 @@ class AdminController extends AbstractController
     #[Route('/reportList', name: 'app_admin_reportList')]
     public function reportList(ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $repository = $doctrine->getRepository(Report::class);
         $report = $repository->findallReportedRessource();
         return $this->render('admin/reportList.html.twig', ['report' => $report]);
@@ -101,8 +91,6 @@ class AdminController extends AbstractController
 
     public function checkReport(Request $request, ManagerRegistry $doctrine, $id): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $report = $doctrine->getRepository(Report::class)->find($id);
         $resource = $report->getResource();
 
@@ -113,8 +101,6 @@ class AdminController extends AbstractController
     #[Route('/checkReportProcess/{idRep}/{action}', name: 'app_admin_checkReportProcess')]
     public function checkReportProcess(Request $request, ManagerRegistry $doctrine, $idRep, $action): RedirectResponse
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-
         $report = $doctrine->getRepository(Report::class)->find($idRep);
         $resource = $report->getResource();
         if ($action == 'delete') {
@@ -134,7 +120,6 @@ class AdminController extends AbstractController
 
     public function userList(ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $repository = $doctrine->getRepository(User::class);
         $users = $repository->findAll();
         return $this->render('admin/userList.html.twig', ['users' => $users]);
@@ -143,7 +128,6 @@ class AdminController extends AbstractController
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
     public function userEdit(ManagerRegistry $doctrine, $id, $role): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $user = $doctrine->getRepository(User::class)->find($id);
         $entityManager = $doctrine->getManager();
         $entityManager->persist($user->setSpecificRole("$role"));
@@ -156,7 +140,6 @@ class AdminController extends AbstractController
 
     public function createProductionSite(ManagerRegistry $doctrine, Request $request): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $productionSite = new ProductionSite();
         $form = $this->createForm(ProductionSiteType::class, $productionSite);
         $form->handleRequest($request);
@@ -179,7 +162,6 @@ class AdminController extends AbstractController
     #[Route('/request/check', name: 'app_admin_request_check')]
     public function userRequestCheck(Request $request, ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $repository = $doctrine->getRepository(UserRoleRequest::class);
         $UserRoleRequest = $repository->findBy(['Read' => false]);
         return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
@@ -188,7 +170,6 @@ class AdminController extends AbstractController
     #[Route('/request/roleEdit/{id}/{validation}/{role}', name: 'app_admin_request_roleEdit')]
     public function userRequestRoleEdit(ManagerRegistry $doctrine, $id, $validation, $role): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $userRoleRequestRepository = $doctrine->getRepository(UserRoleRequest::class)->find($id);
         $userRoleRequest = $userRoleRequestRepository;
         if ($validation == "true") {
@@ -207,7 +188,6 @@ class AdminController extends AbstractController
     #[Route('/request/productionSiteRequest', name: 'app_admin_request_productionSiteRequest')]
     public function usineRequest(ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $repository = $doctrine->getRepository(UserRoleRequest::class);
         $productionSite = $repository->findBy(['Read' => false]);
         return $this->render('admin/productionSiteRequestList.html.twig', ['productionSiteList' => $productionSite]);
@@ -217,7 +197,6 @@ class AdminController extends AbstractController
 
     public function usineRequestEdit(ManagerRegistry $doctrine, $id, $validation): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $userRoleRequest = $doctrine->getRepository(UserRoleRequest::class)->find($id);
         $productionSite = $doctrine->getRepository(ProductionSite::class)->find($userRoleRequest->getProductionSite());
         if ($validation == "true") {

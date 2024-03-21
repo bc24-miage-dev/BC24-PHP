@@ -23,8 +23,6 @@ class TransporteurController extends AbstractController
     #[Route('/acquisition', name: 'app_transporteur_acquire')]
     public function acquisition(Request $request, ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_TRANSPORTEUR');
-
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
@@ -49,7 +47,6 @@ class TransporteurController extends AbstractController
     #[Route('/list', name: 'app_transporteur_list')]
     public function list(ManagerRegistry $doctrine) : Response
     {
-        $this->denyAccessUnlessGranted( attribute: 'ROLE_TRANSPORTEUR');
         $repository = $doctrine->getRepository(Resource::class);
         $resource = $repository->findBy(['currentOwner' => $this->getUser()]);
         return $this->render('pro/transporteur/list.html.twig',
@@ -57,5 +54,5 @@ class TransporteurController extends AbstractController
         );
     }
 
-   
+
 }

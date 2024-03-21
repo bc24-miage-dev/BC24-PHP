@@ -17,17 +17,12 @@ class DistributeurController extends AbstractController
     #[Route('/', name: 'app_distributeur_index')]
     public function index(): Response
     {
-        if (! ($this->getUser() && $this->getUser()->getRoles() && in_array('ROLE_DISTRIBUTEUR', $this->getUser()->getRoles()))){
-            return $this->redirectToRoute('app_index');
-        }
         return $this->render('pro/distributeur/index.html.twig');
     }
 
     #[Route('/acquisition', name: 'app_distributeur_acquire')]
     public function acquisition(Request $request, ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_DISTRIBUTEUR');
-
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
@@ -52,7 +47,6 @@ class DistributeurController extends AbstractController
     #[Route('/list', name: 'app_distributeur_list')]
     public function list(ManagerRegistry $doctrine) : Response
     {
-        $this->denyAccessUnlessGranted( attribute: 'ROLE_DISTRIBUTEUR');
         $repository = $doctrine->getRepository(Resource::class);
         $resource = $repository->findBy([
             'currentOwner' => $this->getUser(),
@@ -69,28 +63,28 @@ class DistributeurController extends AbstractController
     public function vendre(Request $request, ManagerRegistry $doctrine): Response
     {
         $this->denyAccessUnlessGranted('ROLE_DISTRIBUTEUR');
-    
+
         $form = $this->createForm(ResourceNfcType::class);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $nfcTag = $form->get('id')->getData();
-    
+
             $resource = $doctrine->getRepository(Resource::class)->findOneBy(['id' => $nfcTag]);
-    
+
             if ($resource && $resource->getCurrentOwner() === $this->getUser()){
                 $resource->setIsLifeCycleOver(true);
-    
+
                 $entityManager = $doctrine->getManager();
                 $entityManager->flush();
-    
+
                 $this->addFlash('success', 'La ressource a bien été vendue');
                 return $this->redirectToRoute('app_distributeur_vendu');
             } else {
                 $this->addFlash('danger', 'Resource not found with provided NFC tag.');
             }
         }
-    
+
         return $this->render('pro/distributeur/vente.html.twig', [
             'form' => $form->createView()
         ]);

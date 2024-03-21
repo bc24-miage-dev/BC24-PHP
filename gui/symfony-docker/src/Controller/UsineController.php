@@ -18,15 +18,12 @@ class UsineController extends AbstractController
     #[Route('/', name: 'app_usine_index')]
     public function index(): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USINE');
         return $this->render('pro/usine/index.html.twig');
     }
 
     #[Route('/arrivage', name:'app_usine_acquire')]
     public function acquire(Request $request, ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USINE');
-
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
@@ -55,7 +52,6 @@ class UsineController extends AbstractController
     #[Route('/list', name: 'app_usine_list')]
     public function list(ManagerRegistry $doctrine): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USINE');
         $repository = $doctrine->getRepository(Resource::class);
 
         $resources = $repository->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
@@ -67,7 +63,6 @@ class UsineController extends AbstractController
     #[Route('/decoupe/{id}', name: 'app_usine_decoupe')]
     public function decoupe(Request $request, ManagerRegistry $doctrine, $id): Response
     {
-        //$this->denyAccessUnlessGranted('ROLE_USINE');
         $resourceRepository = $doctrine->getRepository(Resource::class);
         $resource = $resourceRepository->find($id);
 
