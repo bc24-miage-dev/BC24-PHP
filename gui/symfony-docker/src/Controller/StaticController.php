@@ -41,6 +41,12 @@ class StaticController extends AbstractController
     {
         $repository = $doctrine->getRepository(Resource::class);
         $resourcesC = $repository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
-        return $this->render('static/recent.html.twig', ['resourcesC' => $resourcesC]);
+        $productsC = [];
+        foreach ($resourcesC as $resource){
+            if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'PRODUIT'){
+                $productsC[] = $resource;
+            }
+        }
+        return $this->render('static/recent.html.twig', ['resourcesC' => $productsC]);
     }
 }
