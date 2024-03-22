@@ -298,31 +298,4 @@ class Resource
         return $this;
     }
 
-
-    public function findAllChildren(): array {
-        $array = [$this];
-    
-        foreach ($this->getResources() as $resource) {
-            array_push($array, ...$resource->findAllChildren());
-        }
-    
-        return $array;
-    }
-    
-
- /** 
- * @param EntityManagerInterface $entityManager 
- */
-public function contaminateChildren(EntityManagerInterface $entityManager): void
-{
-        
-        foreach ($this->findAllChildren() as $parentResource) { 
-                $parentResource->setIsContamined(true);
-                $entityManager->persist($parentResource);
-            
-        }
-
-      $entityManager->flush();
-    
-}
 }
