@@ -51,7 +51,7 @@ class StaticController extends AbstractController
         $resourcesC = $repository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
         $productsC = [];
         foreach ($resourcesC as $resource){
-            if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'DEMI-CARCASSE'){
+            if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'PRODUIT'){
                 $productsC[] = $resource;
             }
         }
