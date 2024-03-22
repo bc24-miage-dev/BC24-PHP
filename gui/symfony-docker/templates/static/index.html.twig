@@ -4,10 +4,13 @@
 
 
 {% block body %}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/search.css') }}" />
+    {% endblock %}
 
     <!-- Banner -->
     <div class="search-container">
-        <h1>Tag NFC</h1>
+        <h1>Rechercher un produit :</h1>
         {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
         {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
         <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
@@ -71,7 +74,7 @@
                                 <h2>Signalement</h2>
                                 <p>Signaler un produit</p>
                             </header>
-                            <p>Votre article acheté récemment semble étrange ? Signalez-le nous, nous étudierons le problème et reviendrons vers vous</p>
+                            <p>Votre article acheté récemment semble étrange ? Signalez-le-nous, nous étudierons le problème et reviendrons vers vous</p>
                         </div>
                     </section>
 

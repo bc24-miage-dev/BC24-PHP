@@ -8,9 +8,9 @@
 
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}" />
     <link href="{{ asset('proAssets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="{{ asset('css/search.css') }}" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     {% block stylesheet %}
+
     {% endblock %}
 
     {% block icon %}
@@ -47,9 +47,13 @@
                             {% endif %}
                         </ul>
                     </li>
-                    <li><a href="{{ path('app_contact') }}">Nous Contacter</a></li>
+                    {% if app.user %}
+                        {% if "ROLE_PRO" in app.user.roles %}
+                            <li><a href="{{ path('app_pro') }}">Vue Pro</a> </li>
+                        {% endif %}
+                    {% endif %}
                     <li><a href={{ path('app_report_reportAliment') }}>Signaler un produit</a></li>
-                    <li><a href="{{ path('app_recent') }}">Produits dangereux récents</a></li>
+                    <li><a href="{{ path('app_recent') }}">Produits dangereux</a></li>
                 </ul>
 
             </nav>
@@ -78,11 +82,6 @@
     <!-- body -->
 
     {% block body %}
-        {% if app.user %}
-            {% if "ROLE_PRO" in app.user.roles %}
-                {# TODO: lien pro #}
-            {% endif %}
-        {% endif %}
     {% endblock %}
 
     <!-- Footer -->
