@@ -13,46 +13,63 @@
 {{ parent() }}
 
 <div class="resource-details">
-    <h2>Resource Details: {{ resource.ResourceName.name }}</h2>
-    <p>ID: {{ resource.getId }}</p>
-    <p>Is Final Product: {{ resource.ResourceName.ResourceCategory == 'PRODUIT' ? 'Yes' : 'No' }}</p>
-    <p>Is Contaminated: {{ resource.isIsContamined ? 'Yes' : 'No' }}</p>
-    <p>Weight: {{ resource.getWeight }}</p>
-    <p>Price: ${{ resource.getPrice }}</p>
-    <p>Description: {{ resource.getDescription }}</p>
-    <p>Date: {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Not available' }}</p>
-    <p>Heure: {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Not available' }}</p>
+    <div class="banner-wrapper">
+        <div class="banner" class="box container">
+            <div class="row">
+                <div class="col-6 col-25-medium">
+                    <h2>{{ resource.ResourceName.name }}</h2><hr>
+                    <p>Produit final : {{ resource.ResourceName.ResourceCategory == 'PRODUIT' ? 'Oui' : 'Non' }}</p>
+                    <p>Produit contaminé : {{ resource.isIsContamined ? 'Oui' : 'Non' }}</p>
+                    <p>Poids : {{ resource.getWeight }} kg</p>
+                    <p>Prix : {{ resource.getPrice }} €</p>
+                    {% if resource.getDescription | length > 0 %}
+                        <p>Description : {{ resource.getDescription }}</p>
+                    {% endif %}
+                    <p>Date : {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Non disponible' }}</p>
+                    <p>Heure : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p><br>
+                </div>
+                <div class="col-5 col-25-medium">
+                    <img src="{{ asset('images/pic02.jpg') }}" alt="Resource Image" />
+                </div>
+                <div class="col-25 col-25-medium">
+                    <h3>Origine de Production</h3><hr>
+                    <p>Lieu de production : {{ resource.getOrigin.getProductionSiteName }}</p>
+                    <p>Adresse : {{ resource.getOrigin.getAddress }}</p>
+                    <p>Téléphone : {{ resource.getOrigin.getProductionSiteTel }}</p><br>
+                </div>
+                <div class="col-25 col-25-medium">
+                    <h3>Composition</h3><hr>
+                    {% if resource.getComponents|length > 0 %}
+                        <ul>
+                            {% for component in resource.getComponents %}
+                                <li>
+                                    <a href="{{ path('app_search_result', {'id': component.getId}) }}">
+                                        {{ component.ResourceName.name }} (ID: {{ component.getId }})
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>This resource has no components.</p>
+                    {% endif %}
+                </div>
 
-    <h3>Origin Production Site</h3>
-    <p>Name: {{ resource.getOrigin.getProductionSiteName }}</p>
-    <p>Address: {{ resource.getOrigin.getAddress }}</p>
-    <p>Telephone: {{ resource.getOrigin.getProductionSiteTel }}</p>
+                <div class="col-25 col-25-medium">
+                    <h3>Rapport</h3><hr>
+                    {% if resource.getReports|length > 0 %}
+                        <ul>
+                            {% for report in resource.getReports %}
+                                <li>Report ID: {{ report.getId }}, Description: {{ report.getDescription }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Il n'y a pas de rapport pour cette ressource.</p>
+                    {% endif %}
+                </div>
 
-    <h3>Components</h3>
-    {% if resource.getComponents|length > 0 %}
-        <ul>
-            {% for component in resource.getComponents %}
-            <li>
-                <a href="{{ path('app_search_result', {'id': component.getId}) }}">
-                    {{ component.ResourceName.name }} (ID: {{ component.getId }})
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>This resource has no components.</p>
-    {% endif %}
-
-    <h3>Reports</h3>
-    {% if resource.getReports|length > 0 %}
-        <ul>
-            {% for report in resource.getReports %}
-                <li>Report ID: {{ report.getId }}, Description: {{ report.getDescription }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>There are no reports for this resource.</p>
-    {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}
