@@ -9,22 +9,21 @@
         <h1 class="text-center">Produits dangereux récemment détectés</h1>
         <div class="container">
             <div class="row">
-    {% for resource in resourcesC %}
-       <div class="col-4 col-12-medium">
-            <section class="box feature">
-                <img src="{{ asset('images/pic02.jpg') }}" alt="Image du produit"/>
-                <div class="inner">
-                    <header>
-                        <h2>{{ resource.resourceName.name }}</h2>
-                        <h6>NFC : {{ resource.id }}</h6>
-                        <p>{{ resource.description }}</p>
-                    </header>
-                    <a href="{{ path('app_search_result', {'id': resource.id}) }}">Fiche du produit</a>
-                </div>
-            </section>
-        </div>
-    {% endfor %}
-
+                {% for resource in resourcesC %}
+                    <div class="col-4 col-12-medium">
+                        <section class="box feature">
+                            <img src="{{ asset('images/pic02.jpg') }}" alt="Image du produit"/>
+                            <div class="inner">
+                                <header>
+                                    <h2>{{ resource.resourceName.name }}</h2>
+                                    <h6>NFC : {{ resource.id }}</h6>
+                                    <p>{{ resource.description }}</p>
+                                </header>
+                                <a href="{{ path('app_search_result', {'id': resource.id}) }}">Fiche du produit</a>
+                            </div>
+                        </section>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

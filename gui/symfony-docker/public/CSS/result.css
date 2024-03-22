@@ -8,7 +8,8 @@
     font-family: 'Arial', sans-serif; /* Optional: Change the font */
 }
 
-.resource-details h2, 
+
+.resource-details h2,
 .resource-details h3 {
     color: #333; /* Darker color for headings for contrast */
     margin-bottom: 0.5rem; /* Space below headings */
