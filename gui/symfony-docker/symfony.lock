@@ -189,5 +189,8 @@
     },
     "symfonycasts/verify-email-bundle": {
         "version": "v1.16.2"
+    },
+    "twig/extra-bundle": {
+        "version": "v3.8.0"
     }
 }
