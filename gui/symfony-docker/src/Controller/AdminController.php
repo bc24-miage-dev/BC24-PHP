@@ -10,6 +10,7 @@ use App\Entity\UserRoleRequest;
 use App\Form\ProductionSiteType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceType;
+use App\Handlers\ResourceHandler;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -58,7 +59,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/modify/{id}', name: 'app_admin_modifySpecific')]
-    public function modifySpecific(ManagerRegistry $doctrine, Request $request, $id): Response
+    public function modifySpecific(ManagerRegistry $doctrine, Request $request, ResourceHandler $resourceHandler, $id): Response
     {
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
@@ -70,7 +71,7 @@ class AdminController extends AbstractController
             $entityManager = $doctrine->getManager();
 
             if ($form->get('isContamined')->getData()) {
-                $resource->contaminateChildren($entityManager);
+                $resourceHandler->contaminateChildren($entityManager, $resource);
             }
             $entityManager->persist($resource);
             $entityManager->flush();
