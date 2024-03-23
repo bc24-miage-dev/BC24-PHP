@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Recipe;
 use App\Entity\Resource;
+use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
+use App\Repository\ResourceCategoryRepository;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceNameRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -111,7 +114,7 @@ class UsineController extends AbstractController
         ]);
     }
 
-    #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName', methods: ['POST'])]
+    #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName')]
     public function creationRecetteName(Request $request, ResourceFamilyRepository $repoFamily, ResourceNameRepository $repoName): Response
     {
         if ($request->isMethod('POST')) {
@@ -127,10 +130,41 @@ class UsineController extends AbstractController
     }
 
     #[Route('/creationRecette/ingredients/{name}/{family}', name: 'app_usine_creationRecetteIngredients')]
-    public function creationRecette(Request $request, $name, $family): Response
+    public function creationRecette(Request $request,
+                                    $name, $family,
+                                    ResourceNameRepository $nameRepo,
+                                    ResourceFamilyRepository $familyRepo,
+                                    ResourceCategoryRepository $categoryRepo,
+                                    ManagerRegistry $doctrine): Response
+
     {
+        if ($request->isMethod('POST')) {
+            $list = $request->request->get('list'); //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
+            $newProduct = new ResourceName();
+            $newProduct->setName($name);
+            $newProduct->setFamily($familyRepo->findOneBy(['name' => $family]));
+            $newProduct->setResourceCategory($categoryRepo->findOneBy(['category' => 'PRODUIT']));
+            $newProduct->setProductionSiteOwner($this->getUser()->getProductionSite());
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($newProduct);
+            $entityManager->flush();
+
+            foreach ($list as $element){
+                $recipe = new Recipe();
+                $recipe->setIngredient($nameRepo->findOneBy($element['ingredient']));
+                $recipe->setIngredientNumber($element['quantity']);
+                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $family]));
+                $entityManager->persist($recipe);
+                $entityManager->flush();
+            }
+            $this->addFlash('success', 'La recette a bien été enregistrée');
+            return $this->redirectToRoute('app_usine_index');
+        }
+
+        $ingredients = $nameRepo->findByCategoryAndFamily('MORCEAU', $family);
         return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
-            'name' => $name
+            'name' => $name,
+            'ingredients' => $ingredients
         ]);
     }
 

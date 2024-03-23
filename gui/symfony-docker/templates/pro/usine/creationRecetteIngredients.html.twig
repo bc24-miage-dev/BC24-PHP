@@ -1,0 +1,13 @@
+{% extends 'pro/usine/index.html.twig' %}
+
+{% block body %}
+
+<h1>Création de recette</h1>
+<h3> Indiquez les différents morceaux nécessaires à la fabrication d'un(e) {{ name }}</h3>
+
+INGRÉDIENTS POUR LE FORMULAIRE : <br>
+{% for ingredient in ingredients %}
+{{ ingredient.name }}
+{% endfor %}
+
+{% endblock %}
