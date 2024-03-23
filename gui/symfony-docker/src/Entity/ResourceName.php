@@ -28,9 +28,20 @@ class ResourceName
     #[ORM\ManyToOne(inversedBy: 'resourceNames')]
     private ?ResourceFamily $family = null;
 
+    #[ORM\ManyToOne(inversedBy: 'resourceNamesOwned')]
+    private ?ProductionSite $productionSiteOwner = null;
+
+    #[ORM\OneToMany(mappedBy: 'recipeTitle', targetEntity: Recipe::class)]
+    private Collection $recipes;
+
+    #[ORM\OneToMany(mappedBy: 'ingredient', targetEntity: Recipe::class)]
+    private Collection $recipesThisNameIsIngredient;
+
     public function __construct()
     {
         $this->ResourcesUsingThisName = new ArrayCollection();
+        $this->recipes = new ArrayCollection();
+        $this->recipesThisNameIsIngredient = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,4 +114,77 @@ class ResourceName
 
         return $this;
     }
+
+    public function getProductionSiteOwner(): ?ProductionSite
+    {
+        return $this->productionSiteOwner;
+    }
+
+    public function setProductionSiteOwner(?ProductionSite $productionSiteOwner): static
+    {
+        $this->productionSiteOwner = $productionSiteOwner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recipe>
+     */
+    public function getRecipes(): Collection
+    {
+        return $this->recipes;
+    }
+
+    public function addRecipe(Recipe $recipe): static
+    {
+        if (!$this->recipes->contains($recipe)) {
+            $this->recipes->add($recipe);
+            $recipe->setRecipeTitle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipe(Recipe $recipe): static
+    {
+        if ($this->recipes->removeElement($recipe)) {
+            // set the owning side to null (unless already changed)
+            if ($recipe->getRecipeTitle() === $this) {
+                $recipe->setRecipeTitle(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recipe>
+     */
+    public function getRecipesThisNameIsIngredient(): Collection
+    {
+        return $this->recipesThisNameIsIngredient;
+    }
+
+    public function addRecipesThisNameIsIngredient(Recipe $recipesThisNameIsIngredient): static
+    {
+        if (!$this->recipesThisNameIsIngredient->contains($recipesThisNameIsIngredient)) {
+            $this->recipesThisNameIsIngredient->add($recipesThisNameIsIngredient);
+            $recipesThisNameIsIngredient->setIngredient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipesThisNameIsIngredient(Recipe $recipesThisNameIsIngredient): static
+    {
+        if ($this->recipesThisNameIsIngredient->removeElement($recipesThisNameIsIngredient)) {
+            // set the owning side to null (unless already changed)
+            if ($recipesThisNameIsIngredient->getIngredient() === $this) {
+                $recipesThisNameIsIngredient->setIngredient(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

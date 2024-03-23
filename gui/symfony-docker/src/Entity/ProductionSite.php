@@ -26,10 +26,6 @@ class ProductionSite
 
     #[ORM\OneToMany(mappedBy: 'origin', targetEntity: Resource::class)]
     private Collection $resources;
-
-    #[ORM\OneToMany(mappedBy: 'FactoryOwner', targetEntity: FactoryRecipe::class)]
-    private Collection $factoryRecipes;
-
     #[ORM\OneToMany(mappedBy: 'productionSite', targetEntity: User::class)]
     private Collection $userRelated;
 
@@ -39,12 +35,15 @@ class ProductionSite
     #[ORM\Column(nullable: true)]
     private ?bool $Validate = false;
 
+    #[ORM\OneToMany(mappedBy: 'productionSiteOwner', targetEntity: ResourceName::class)]
+    private Collection $resourceNamesOwned;
+
     public function __construct()
     {
         $this->resources = new ArrayCollection();
-        $this->factoryRecipes = new ArrayCollection();
         $this->userRelated = new ArrayCollection();
         $this->userRoleRequests = new ArrayCollection();
+        $this->resourceNamesOwned = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -119,36 +118,6 @@ class ProductionSite
     }
 
     /**
-     * @return Collection<int, FactoryRecipe>
-     */
-    public function getFactoryRecipes(): Collection
-    {
-        return $this->factoryRecipes;
-    }
-
-    public function addFactoryRecipe(FactoryRecipe $factoryRecipe): static
-    {
-        if (!$this->factoryRecipes->contains($factoryRecipe)) {
-            $this->factoryRecipes->add($factoryRecipe);
-            $factoryRecipe->setFactoryOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFactoryRecipe(FactoryRecipe $factoryRecipe): static
-    {
-        if ($this->factoryRecipes->removeElement($factoryRecipe)) {
-            // set the owning side to null (unless already changed)
-            if ($factoryRecipe->getFactoryOwner() === $this) {
-                $factoryRecipe->setFactoryOwner(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, User>
      */
     public function getUserRelated(): Collection
@@ -216,6 +185,36 @@ class ProductionSite
     public function setValidate(?bool $Validate): static
     {
         $this->Validate = $Validate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ResourceName>
+     */
+    public function getResourceNamesOwned(): Collection
+    {
+        return $this->resourceNamesOwned;
+    }
+
+    public function addResourceNamesOwned(ResourceName $resourceNamesOwned): static
+    {
+        if (!$this->resourceNamesOwned->contains($resourceNamesOwned)) {
+            $this->resourceNamesOwned->add($resourceNamesOwned);
+            $resourceNamesOwned->setProductionSiteOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResourceNamesOwned(ResourceName $resourceNamesOwned): static
+    {
+        if ($this->resourceNamesOwned->removeElement($resourceNamesOwned)) {
+            // set the owning side to null (unless already changed)
+            if ($resourceNamesOwned->getProductionSiteOwner() === $this) {
+                $resourceNamesOwned->setProductionSiteOwner(null);
+            }
+        }
 
         return $this;
     }

@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Resource;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
+use App\Repository\ResourceFamilyRepository;
+use App\Repository\ResourceNameRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -106,6 +108,29 @@ class UsineController extends AbstractController
         return $this->render('pro/usine/decoupe.html.twig', [
             'demiCarcasse' => $resource, // La demi-carcasse à découper
             'morceauxPossibles' => $resources // Les ressources possibles à partir d'elle
+        ]);
+    }
+
+    #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName', methods: ['POST'])]
+    public function creationRecetteName(Request $request, ResourceFamilyRepository $repoFamily, ResourceNameRepository $repoName): Response
+    {
+        if ($request->isMethod('POST')) {
+            $name = $request->request->get('name');
+            $family = $request->request->get('family');
+            return $this->redirectToRoute('app_usine_creationRecetteIngredients', ['name' => $name, 'family' => $family]);
+        }
+        $families = $repoFamily->findAll();
+        return $this->render('pro/usine/creationRecetteName.html.twig',
+        [
+            'families' => $families
+        ]);
+    }
+
+    #[Route('/creationRecette/ingredients/{name}/{family}', name: 'app_usine_creationRecetteIngredients')]
+    public function creationRecette(Request $request, $name, $family): Response
+    {
+        return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
+            'name' => $name
         ]);
     }
 
