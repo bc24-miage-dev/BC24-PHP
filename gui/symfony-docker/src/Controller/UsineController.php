@@ -141,7 +141,7 @@ class UsineController extends AbstractController
 
     {
         if ($request->isMethod('POST')) {
-            $list = $request->request->get('list'); //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
+            $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
             $newProduct = new ResourceName();
             $newProduct->setName($name);
             $newProduct->setFamily($familyRepo->findOneBy(['name' => $family]));
@@ -155,7 +155,7 @@ class UsineController extends AbstractController
                 $recipe = new Recipe();
                 $recipe->setIngredient($nameRepo->findOneBy($element['ingredient']));
                 $recipe->setIngredientNumber($element['quantity']);
-                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $family]));
+                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $family, 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
                 $entityManager->persist($recipe);
                 $entityManager->flush();
             }
