@@ -7,9 +7,11 @@ use App\Entity\Resource;
 use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
+use App\Repository\RecipeRepository;
 use App\Repository\ResourceCategoryRepository;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceNameRepository;
+use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -166,6 +168,74 @@ class UsineController extends AbstractController
             'name' => $name,
             'ingredients' => $ingredients
         ]);
+    }
+
+    #[Route('/choixRecette', name: 'app_usine_choixRecette')]
+    public function choixRecette(ResourceNameRepository $nameRepo) : Response
+    {
+        $ownedRecettes = $nameRepo->findBy(['productionSiteOwner' => $this->getUser()->getProductionSite()]);
+        return $this->render('pro/usine/choixRecette.html.twig', [
+            'titles' => $ownedRecettes
+        ]);
+    }
+
+    #[Route('/recette/{id}', name: 'app_usine_recette')]
+    public function appliRecette($id,
+                                 Request $request,
+                                 ManagerRegistry $doctrine,
+                                 ResourceRepository $resourceRepo,
+                                 RecipeRepository $recipeRepo,
+                                 ResourceNameRepository $nameRepo) : Response
+    {
+        $ingredients = $recipeRepo->findBy(['recipeTitle' => $id]);
+
+        if ($request -> isMethod('POST')){
+            $morceaux = $request->request->all()['morceaux'];
+            $i = 0;
+            foreach ($ingredients as $ingredient){ //Test loop to check if the morceaux match with the recipe
+                for ($j = 0; $j<$ingredient->getIngredientNumber(); $j++){
+                    $resource = $resourceRepo->find($morceaux[$i]);
+                    if ($resource == null || $resource->getResourceName()->getName() != $ingredient->getIngredient()->getName()){
+                        $this->addFlash('error', 'Erreur dans la sélection des morceaux');
+                        return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
+                    }
+                    $i++;
+                }
+            }
+
+            $entityManager = $doctrine->getManager();
+            $newProduct = new Resource();
+            $newProduct->setId($request->request->get('newProductId'));
+            $newProduct->setResourceName($nameRepo->find($id));
+            $newProduct->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+            $newProduct->setCurrentOwner($this->getUser());
+            $newProduct->setIsLifeCycleOver(false);
+            $newProduct->setIsContamined(false);
+            $newProduct->setPrice(0);
+            $newProduct->setOrigin($this->getUser()->getProductionSite());
+            $newProduct->setDescription('');
+            $newProduct->setWeight($request->request->get('weight'));
+            $entityManager->persist($newProduct);
+            $entityManager->flush();
+            foreach ($morceaux as $morceau){
+                $resource = $resourceRepo->find($morceau);
+                $resource->setIsLifeCycleOver(true);
+                $resource->addComponent($newProduct);
+                $entityManager->persist($resource);
+                $entityManager->flush();
+            }
+
+
+
+            $this->addFlash('success', 'La recette a bien été appliquée');
+            return $this->redirectToRoute('app_usine_choixRecette');
+        }
+        $nameProduct = $nameRepo->find($id);
+        return $this->render('pro/usine/appliRecette.html.twig',
+            [
+                'ingredients' => $ingredients,
+                'product' => $nameProduct
+            ]);
     }
 
     private function createChildResource(ManagerRegistry $doctrine, Resource $resource): Resource

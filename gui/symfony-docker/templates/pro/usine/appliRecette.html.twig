@@ -1,0 +1,27 @@
+{% extends 'pro/usine/index.html.twig' %}
+
+{% block body %}
+    <h1>Application de la recette : {{ product.name }}</h1><br>
+    <form method="post">
+        <label> NFC du Nouveau produit :
+            <input type="number" name="newProductId">
+        </label>
+        <br><br>
+
+        <h3>Scannez un tag NFC correspondant pour chaque ingrédient :</h3><br>
+        {% for ingredient in ingredients %}
+           {% for i in 1..ingredient.ingredientNumber %}
+               <label for="prod_{{ loop.index0 }}">{{ ingredient.ingredient.name }} : </label>
+               <input type="number" id="prod_{{ loop.index0 }}" name="morceaux[]">
+               <br>
+           {% endfor %}
+        {% endfor %}
+        <br><br>
+        <label> Poids du produit final (en grammes) :
+            <input type="number" name="weight">
+        </label>
+        <br>
+        <input type="submit" value="Valider et créer le produit">
+    </form>
+
+{% endblock %}
