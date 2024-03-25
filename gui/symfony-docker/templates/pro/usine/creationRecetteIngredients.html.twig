@@ -10,4 +10,42 @@ INGRÉDIENTS POUR LE FORMULAIRE : <br>
 {{ ingredient.name }}
 {% endfor %}
 
+        <div class="row col-md-12 card card-body">
+            <form method="post" action="">
+
+            <table class="table table-striped" id="table">
+                <div id="copy">
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Nombre de morceau</th>
+                    </tr>
+                </thead>
+                    <tbody id="table-body">
+                        <tr class="copy-row">
+                            <td>
+                                <select name="list[1][ingredient]" id="ingredient">
+                                    {% for i in range (0,ingredients|length -1) %}
+                                        {% set ingredient = ingredients[i]%}
+                                        <option value="{{ ingredient.name }}">{{ ingredient.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="list[1][quantity]" id="quantity" >
+                            </td>
+                        </tr>
+                    </tbody>
+                </div>
+            </table>
+            <input type="button" onclick="ajouterLigneChoixIngredient()" value="Ajouter ligne">
+            <button type="submit">Valider</button>
+        </div>
+
+
+    
+{% endblock %}
+
+{% block script %}
+    <script src="{{ asset('assets/js/decoupe.js') }}" defer  ></script>
 {% endblock %}

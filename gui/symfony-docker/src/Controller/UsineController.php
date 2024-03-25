@@ -150,12 +150,11 @@ class UsineController extends AbstractController
             $entityManager = $doctrine->getManager();
             $entityManager->persist($newProduct);
             $entityManager->flush();
-
             foreach ($list as $element){
                 $recipe = new Recipe();
-                $recipe->setIngredient($nameRepo->findOneBy($element['ingredient']));
-                $recipe->setIngredientNumber($element['quantity']);
-                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $family, 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
+                $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
+                $recipe->setIngredientNumber(intval($element['quantity']));
+                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $familyRepo->findOneBy(['name' => $family]), 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
                 $entityManager->persist($recipe);
                 $entityManager->flush();
             }
