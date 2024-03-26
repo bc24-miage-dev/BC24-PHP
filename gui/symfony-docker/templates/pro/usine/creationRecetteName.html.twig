@@ -1,0 +1,26 @@
+{%  extends 'pro/usine/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>Création d'une recette</h1>
+        <h3>Indiquez le nom de votre nouveau produit et le type de viande duquel il sera fait :</h3>
+
+        <br>
+
+        <form method="post">
+            <div class="form-group">
+                <label for="name">Nom du produit</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="family">Type de viande</label>
+                <select class="form-control" id="family" name="family" required>
+                    {% for family in families %}
+                        <option value="{{ family.name }}">{{ family.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Étape suivante</button>
+        </form>
+    </div>
+{% endblock %}

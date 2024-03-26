@@ -66,7 +66,7 @@ class SearchController extends AbstractController
 
         $resource = $doctrine->getRepository(Resource::class)->find($id);
         if (!$resource) {
-            $this->addFlash('error', 'No resource found');
+            $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
             return $this->redirectToRoute('app_search');
         }
         return $this->render('search/result.html.twig', [

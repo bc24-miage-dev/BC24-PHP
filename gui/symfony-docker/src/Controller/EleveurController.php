@@ -8,6 +8,7 @@ use App\Form\EleveurWeightType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceOwnerChangerType;
 use App\Form\ResourceType;
+use App\Repository\ResourceFamilyRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,8 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
-    public function naissance(Request $request, ManagerRegistry $doctrine): Response
+    public function naissance(Request $request,
+                              ManagerRegistry $doctrine): Response
     {
         $resource = new Resource();
         $resource->setIsContamined(false);
@@ -46,7 +48,7 @@ class EleveurController extends AbstractController
         }
 
         return $this->render('pro/eleveur/naissance.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form->createView()
         ]);
 
     }

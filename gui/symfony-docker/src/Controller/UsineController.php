@@ -2,9 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\Recipe;
 use App\Entity\Resource;
+use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
+use App\Repository\RecipeRepository;
+use App\Repository\ResourceCategoryRepository;
+use App\Repository\ResourceFamilyRepository;
+use App\Repository\ResourceNameRepository;
+use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,12 +86,11 @@ class UsineController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $entityManager = $doctrine->getManager();
-            $i = 1;
-            while ($request->request->has('tag' . $i)) {
-                $id = $request->request->get('tag' . $i); //Tag NFC
-                $weight = $request->request->get('weight' . $i); //Poids
-                $name = $request->request->get('name' . $i); //Nom (Poitrine, Côte, etc.)
-
+            $list = $request->request->all()['list'];
+            foreach ($list as $element) {
+                $id = $element['NFC'];
+                $weight = $element['weight'];
+                $name = $element['name'];
                 $childResource = $this->createChildResource($doctrine, $resource);
                 $childResource->setWeight($weight);
                 $childResource->setId($id);
@@ -92,9 +98,7 @@ class UsineController extends AbstractController
 
                 $entityManager->persist($childResource);
                 $entityManager->flush();
-                $i++;
             }
-
             $resource->setIsLifeCycleOver(true);
             $entityManager->persist($resource);
             $entityManager->flush();
@@ -107,6 +111,127 @@ class UsineController extends AbstractController
             'demiCarcasse' => $resource, // La demi-carcasse à découper
             'morceauxPossibles' => $resources // Les ressources possibles à partir d'elle
         ]);
+    }
+
+    #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName')]
+    public function creationRecetteName(Request $request, ResourceFamilyRepository $repoFamily, ResourceNameRepository $repoName): Response
+    {
+        if ($request->isMethod('POST')) {
+            $name = $request->request->get('name');
+            $family = $request->request->get('family');
+            return $this->redirectToRoute('app_usine_creationRecetteIngredients', ['name' => $name, 'family' => $family]);
+        }
+        $families = $repoFamily->findAll();
+        return $this->render('pro/usine/creationRecetteName.html.twig',
+        [
+            'families' => $families
+        ]);
+    }
+
+    #[Route('/creationRecette/ingredients/{name}/{family}', name: 'app_usine_creationRecetteIngredients')]
+    public function creationRecette(Request $request,
+                                    $name, $family,
+                                    ResourceNameRepository $nameRepo,
+                                    ResourceFamilyRepository $familyRepo,
+                                    ResourceCategoryRepository $categoryRepo,
+                                    ManagerRegistry $doctrine): Response
+
+    {
+        if ($request->isMethod('POST')) {
+            $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
+            $newProduct = new ResourceName();
+            $newProduct->setName($name);
+            $newProduct->setFamily($familyRepo->findOneBy(['name' => $family]));
+            $newProduct->setResourceCategory($categoryRepo->findOneBy(['category' => 'PRODUIT']));
+            $newProduct->setProductionSiteOwner($this->getUser()->getProductionSite());
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($newProduct);
+            $entityManager->flush();
+            foreach ($list as $element){
+                $recipe = new Recipe();
+                $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
+                $recipe->setIngredientNumber(intval($element['quantity']));
+                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $familyRepo->findOneBy(['name' => $family]), 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
+                $entityManager->persist($recipe);
+                $entityManager->flush();
+            }
+            $this->addFlash('success', 'La recette a bien été enregistrée');
+            return $this->redirectToRoute('app_usine_index');
+        }
+
+        $ingredients = $nameRepo->findByCategoryAndFamily('MORCEAU', $family);
+        return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
+            'name' => $name,
+            'ingredients' => $ingredients
+        ]);
+    }
+
+    #[Route('/choixRecette', name: 'app_usine_choixRecette')]
+    public function choixRecette(ResourceNameRepository $nameRepo) : Response
+    {
+        $ownedRecettes = $nameRepo->findBy(['productionSiteOwner' => $this->getUser()->getProductionSite()]);
+        return $this->render('pro/usine/choixRecette.html.twig', [
+            'titles' => $ownedRecettes
+        ]);
+    }
+
+    #[Route('/recette/{id}', name: 'app_usine_recette')]
+    public function appliRecette($id,
+                                 Request $request,
+                                 ManagerRegistry $doctrine,
+                                 ResourceRepository $resourceRepo,
+                                 RecipeRepository $recipeRepo,
+                                 ResourceNameRepository $nameRepo) : Response
+    {
+        $ingredients = $recipeRepo->findBy(['recipeTitle' => $id]);
+
+        if ($request -> isMethod('POST')){
+            $morceaux = $request->request->all()['morceaux'];
+            $i = 0;
+            foreach ($ingredients as $ingredient){ //Test loop to check if the morceaux match with the recipe
+                for ($j = 0; $j<$ingredient->getIngredientNumber(); $j++){
+                    $resource = $resourceRepo->find($morceaux[$i]);
+                    if ($resource == null || $resource->getResourceName()->getName() != $ingredient->getIngredient()->getName()){
+                        $this->addFlash('error', 'Erreur dans la sélection des morceaux');
+                        return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
+                    }
+                    $i++;
+                }
+            }
+
+            $entityManager = $doctrine->getManager();
+            $newProduct = new Resource();
+            $newProduct->setId($request->request->get('newProductId'));
+            $newProduct->setResourceName($nameRepo->find($id));
+            $newProduct->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+            $newProduct->setCurrentOwner($this->getUser());
+            $newProduct->setIsLifeCycleOver(false);
+            $newProduct->setIsContamined(false);
+            $newProduct->setPrice(0);
+            $newProduct->setOrigin($this->getUser()->getProductionSite());
+            $newProduct->setDescription('');
+            $newProduct->setWeight($request->request->get('weight'));
+            $entityManager->persist($newProduct);
+            $entityManager->flush();
+            foreach ($morceaux as $morceau){
+                $resource = $resourceRepo->find($morceau);
+                $resource->setIsLifeCycleOver(true);
+                $resource->addComponent($newProduct);
+                $entityManager->persist($resource);
+                $entityManager->flush();
+            }
+
+
+
+            $this->addFlash('success', 'La recette a bien été appliquée');
+            return $this->redirectToRoute('app_usine_choixRecette');
+        }
+        $nameProduct = $nameRepo->find($id);
+        return $this->render('pro/usine/appliRecette.html.twig',
+            [
+                'ingredients' => $ingredients,
+                'product' => $nameProduct
+            ]);
     }
 
     private function createChildResource(ManagerRegistry $doctrine, Resource $resource): Resource
