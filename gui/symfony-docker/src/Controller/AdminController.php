@@ -11,6 +11,11 @@ use App\Form\ProductionSiteType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceType;
 use App\Handlers\ResourceHandler;
+use App\Repository\ProductionSiteRepository;
+use App\Repository\ReportRepository;
+use App\Repository\ResourceRepository;
+use App\Repository\UserRepository;
+use App\Repository\UserRoleRequestRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -27,8 +32,9 @@ class AdminController extends AbstractController
         return $this->render('admin/admin.html.twig');
     }
 
-    #[Route('/add', name: 'app_admin_add')]
-    public function add(Request $request, ManagerRegistry $doctrine): Response
+    #[Route('/add', name: 'app_admin_add')] // Resource creation
+    public function add(Request $request,
+                        ManagerRegistry $doctrine): Response
     {
         $resource = new Resource();
         $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
@@ -51,25 +57,30 @@ class AdminController extends AbstractController
         }
     }
 
-    #[Route('/modify', name: 'app_admin_modify')]
-    public function modify(ManagerRegistry $doctrine): Response
+    #[Route('/modify', name: 'app_admin_modify')] // Resource list for modification
+    public function modify(ResourceRepository $resourceRepo): Response
     {
-        $resources = $doctrine->getRepository(Resource::class)->findAll();
+        $resources = $resourceRepo->findAll();
         return $this->render('admin/modify.html.twig', ['resources' => $resources]);
     }
 
-    #[Route('/modify/{id}', name: 'app_admin_modifySpecific')]
-    public function modifySpecific(ManagerRegistry $doctrine, Request $request, ResourceHandler $resourceHandler, $id): Response
+    #[Route('/modify/{id}', name: 'app_admin_modifySpecific')] // Resource modification
+    public function modifySpecific(ManagerRegistry $doctrine,
+                                   Request $request,
+                                   ResourceHandler $resourceHandler,
+                                   ResourceRepository $resourceRepo,
+                                   $id): Response
     {
-        $resource = $doctrine->getRepository(Resource::class)->find($id);
+        $resource = $resourceRepo->find($id);
+        if (!$resource) {
+            $this->addFlash('error', 'Ressource introuvable');
+            return $this->redirectToRoute('app_admin_modify');
+        }
         $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-        $components = $resource->getComponents();
         $form = $this->createForm(ResourceModifierType::class, $resource);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-
             if ($form->get('isContamined')->getData()) {
                 $resourceHandler->contaminateChildren($entityManager, $resource);
             }
@@ -77,32 +88,32 @@ class AdminController extends AbstractController
             $entityManager->flush();
             return $this->redirectToRoute('app_admin_modify');
         }
-        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource, 'composants' => $components]);
+        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource, 'composants' => $resource->getComponents()]);
     }
 
     #[Route('/reportList', name: 'app_admin_reportList')]
-    public function reportList(ManagerRegistry $doctrine): Response
+    public function reportList(ReportRepository $reportRepo): Response
     {
-        $repository = $doctrine->getRepository(Report::class);
-        $report = $repository->findallReportedRessource();
+        $report = $reportRepo->findBy(criteria:['read' => false], orderBy:['date' => 'DESC']);
         return $this->render('admin/reportList.html.twig', ['report' => $report]);
     }
 
     #[Route('/checkReport/{id}', name: 'app_admin_checkReport')]
 
-    public function checkReport(Request $request, ManagerRegistry $doctrine, $id): Response
+    public function checkReport(ReportRepository $reportRepo,
+                                $id): Response
     {
-        $report = $doctrine->getRepository(Report::class)->find($id);
+        $report = $reportRepo->find($id);
         $resource = $report->getResource();
-
         return $this->render('admin/checkReport.html.twig', ['report' => $report, 'resource' => $resource]);
-
     }
 
     #[Route('/checkReportProcess/{idRep}/{action}', name: 'app_admin_checkReportProcess')]
-    public function checkReportProcess(Request $request, ManagerRegistry $doctrine, $idRep, $action): RedirectResponse
+    public function checkReportProcess(ReportRepository $reportRepo,
+                                        ManagerRegistry $doctrine,
+                                       $idRep, $action): RedirectResponse
     {
-        $report = $doctrine->getRepository(Report::class)->find($idRep);
+        $report = $reportRepo->find($idRep);
         $resource = $report->getResource();
         if ($action == 'delete') {
             $resource->setIsContamined(true);
@@ -119,29 +130,30 @@ class AdminController extends AbstractController
 
     #[Route('/userList', name: 'app_admin_userList')]
 
-    public function userList(ManagerRegistry $doctrine): Response
+    public function userList(UserRepository $userRepo): Response
     {
-        $repository = $doctrine->getRepository(User::class);
-        $users = $repository->findAll();
+        $users = $userRepo->findAll();
         return $this->render('admin/userList.html.twig', ['users' => $users]);
     }
 
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
-    public function userEdit(ManagerRegistry $doctrine, $id, $role): Response
+    public function userEdit(UserRepository $userRepo,
+                             ManagerRegistry $doctrine,
+                             $id, $role): Response
     {
-        
-
-        $user = $doctrine->getRepository(User::class)->find($id);
+        $user = $userRepo->find($id);
+        $user->setSpecificRole("$role");
         $entityManager = $doctrine->getManager();
-        $entityManager->persist($user->setSpecificRole("$role"));
+        $entityManager->persist($user);
         $entityManager->flush();
-        
+
         return $this->redirectToRoute('app_admin_userList');
     }
 
     #[Route('/productionSite', name: 'app_productionSite')]
 
-    public function createProductionSite(ManagerRegistry $doctrine, Request $request): Response
+    public function createProductionSite(ManagerRegistry $doctrine,
+                                         Request $request): Response
     {
         $productionSite = new ProductionSite();
         $form = $this->createForm(ProductionSiteType::class, $productionSite);
@@ -149,41 +161,40 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-            $productionSite->setValidate(true);
+            $productionSite->setValidate(true); // Admin-created production sites are automatically validated
             $entityManager->persist($productionSite);
             $entityManager->flush();
 
             $this->addFlash('success', 'Site de production créé avec succès');
             return $this->redirectToRoute('app_admin_index');
         }
-
         return $this->render('admin/productionSite.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
     #[Route('/request/check', name: 'app_admin_request_check')]
-    public function userRequestCheck(Request $request, ManagerRegistry $doctrine): Response
+    public function userRequestCheck(UserRoleRequestRepository $roleRequestRepo): Response
     {
-        $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $UserRoleRequest = $repository->findBy(['Read' => false]);
+        $UserRoleRequest = $roleRequestRepo->findBy(['Read' => false]); // Select all unread requests
         return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
     }
 
     #[Route('/request/roleEdit/{id}/{validation}/{role}', name: 'app_admin_request_roleEdit')]
-    public function userRequestRoleEdit(ManagerRegistry $doctrine, $id, $validation, $role): Response
+    public function userRequestRoleEdit(ManagerRegistry $doctrine,
+                                        UserRoleRequestRepository $roleRequestRepo,
+                                        UserRepository $userRepo,
+                                        $id, $validation, $role): Response
     {
-        $userRoleRequestRepository = $doctrine->getRepository(UserRoleRequest::class)->find($id);
-        $userRoleRequest = $userRoleRequestRepository;
+        $userRoleRequest = $roleRequestRepo->find($id);
+        $entityManager = $doctrine->getManager();
+
         if ($validation == "true") {
-            $user = $doctrine->getRepository(User::class)->find($userRoleRequest->getUser());
-            $entityManager = $doctrine->getManager();
+            $user = $userRepo->find($userRoleRequest->getUser());
             $entityManager->persist($user->setSpecificRole("$role"));
             $user->setProductionSite($doctrine->getRepository(ProductionSite::class)->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
         }
-
         $userRoleRequest->setRead(true);
-        $entityManager = $doctrine->getManager();
         $entityManager->persist($userRoleRequest);
         $entityManager->flush();
 
@@ -191,19 +202,21 @@ class AdminController extends AbstractController
     }
 
     #[Route('/request/productionSiteRequest', name: 'app_admin_request_productionSiteRequest')]
-    public function usineRequest(ManagerRegistry $doctrine): Response
+    public function usineRequest(UserRoleRequestRepository $roleRequestRepo): Response
     {
-        $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $productionSite = $repository->findBy(['Read' => false]);
+        $productionSite = $roleRequestRepo->findBy(['Read' => false]);
         return $this->render('admin/productionSiteRequestList.html.twig', ['productionSiteList' => $productionSite]);
     }
 
     #[Route('/request/productionSiteRequestEdit/{id}/{validation}', name: 'app_admin_request_productionSiteRequestEdit')]
 
-    public function usineRequestEdit(ManagerRegistry $doctrine, $id, $validation): Response
+    public function usineRequestEdit(ManagerRegistry $doctrine,
+                                     UserRoleRequestRepository $roleRequestRepo,
+                                     ProductionSiteRepository $productionSiteRepo,
+                                     $id, $validation): Response
     {
-        $userRoleRequest = $doctrine->getRepository(UserRoleRequest::class)->find($id);
-        $productionSite = $doctrine->getRepository(ProductionSite::class)->find($userRoleRequest->getProductionSite());
+        $userRoleRequest = $roleRequestRepo->find($id);
+        $productionSite = $productionSiteRepo->find($userRoleRequest->getProductionSite());
         if ($validation == "true") {
             $productionSite->setValidate(true);
         }
