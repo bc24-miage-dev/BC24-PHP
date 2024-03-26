@@ -68,3 +68,9 @@
         width: calc(100% - 60px); /* Full width minus padding and button */
     }
 }
+
+.search-container {
+    background-image: url('images/pic02.jpg'); /* Remplacez par le chemin correct */
+    background-size: cover;
+    background-position: center;
+}

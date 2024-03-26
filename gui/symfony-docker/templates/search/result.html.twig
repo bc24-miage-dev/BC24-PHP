@@ -16,61 +16,61 @@
     <div class="banner-wrapper">
         <div class="banner">
             <div class ="box container">
-            <div class="row">
+                <div class="row">
+                    <div class="col-6 col-25-medium">
+                        <h2>{{ resource.ResourceName.name }}</h2><hr>
+                        <p>Produit final : {{ resource.ResourceName.ResourceCategory == 'PRODUIT' ? 'Oui' : 'Non' }}</p>
+                        <p>Produit contaminé : {{ resource.isIsContamined ? 'Oui' : 'Non' }}</p>
+                        <p>Poids : {{ resource.getWeight }} kg</p>
+                        <p>Prix : {{ resource.getPrice }} €</p>
 
-                <div class="col-6 col-25-medium">
-                    <h2>{{ resource.ResourceName.name }}</h2><hr>
-                    <p>Produit final : {{ resource.ResourceName.ResourceCategory == 'PRODUIT' ? 'Oui' : 'Non' }}</p>
-                    <p>Produit contaminé : {{ resource.isIsContamined ? 'Oui' : 'Non' }}</p>
-                    <p>Poids : {{ resource.getWeight }} kg</p>
-                    <p>Prix : {{ resource.getPrice }} €</p>
-                    {% if resource.getDescription | length > 0 %}
-                        <p>Description : {{ resource.getDescription }}</p>
-                    {% endif %}
-                    <p>Date création : {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Non disponible' }}</p>
-                    <p>Heure création : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p>
-                </div>
-                <div class="col-5 col-25-medium">
-                    <img src="{{ asset('images/pic02.jpg') }}" alt="Resource Image" />
-                </div>
+                        {% if resource.getDescription | length > 0 %}
+                            <p>Description : {{ resource.getDescription }}</p>
+                        {% endif %}
+                        <p>Date création : {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Non disponible' }}</p>
+                        <p>Heure création : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p>
+                    </div>
+                    <div class="col-5 col-25-medium">
+                        <img src="{{ asset('images/pic03.jpg') }}" alt="Resource Image" width="120%"/>
+                    </div>
 
-                <div class="col-25 col-25-medium">
-                    <h3>Origine de Production</h3><hr>
-                    <p>Lieu de production : {{ resource.getOrigin.getProductionSiteName }}</p>
-                    <p>Adresse : {{ resource.getOrigin.getAddress }}</p>
-                    <p>Téléphone : {{ resource.getOrigin.getProductionSiteTel }}</p>
-                </div>
+                    <div class="col-25 col-25-medium">
+                        <h3>Origine de Production</h3><hr>
+                        <p>Lieu de production : {{ resource.getOrigin.getProductionSiteName }}</p>
+                        <p>Adresse : {{ resource.getOrigin.getAddress }}</p>
+                        <p>Téléphone : {{ resource.getOrigin.getProductionSiteTel }}</p>
+                    </div>
 
-                <div class="col-25 col-25-medium">
-                    <h3>Composition</h3><hr>
-                    {% if resource.getComponents|length > 0 %}
-                        <ul>
-                            {% for component in resource.getComponents %}
-                                <li>
-                                    <a href="{{ path('app_search_result', {'id': component.getId}) }}">
-                                        {{ component.ResourceName.name }} (ID: {{ component.getId }})
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>This resource has no components.</p>
-                    {% endif %}
-                </div>
+                    <div class="col-25 col-25-medium">
+                        <h3>Composition</h3><hr>
+                        {% if resource.getComponents|length > 0 %}
+                            <ul>
+                                {% for component in resource.getComponents %}
+                                    <li>
+                                        <a href="{{ path('app_search_result', {'id': component.getId}) }}">
+                                            {{ component.ResourceName.name }} (ID: {{ component.getId }})
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Il n'y a pas de composition pour cette ressource.</p>
+                        {% endif %}
+                    </div>
 
-                <div class="col-25 col-25-medium">
-                    <h3>Rapport</h3><hr>
-                    {% if resource.getReports|length > 0 %}
-                        <ul>
-                            {% for report in resource.getReports %}
-                                <li>Report ID: {{ report.getId }}, Description: {{ report.getDescription }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>Il n'y a pas de rapport pour cette ressource.</p>
-                    {% endif %}
+                    <div class="col-25 col-25-medium">
+                        <h3>Rapport</h3><hr>
+                        {% if resource.getReports|length > 0 %}
+                            <ul>
+                                {% for report in resource.getReports %}
+                                    <li>Report ID: {{ report.getId }}, Description: {{ report.getDescription }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>Il n'y a pas de rapport pour cette ressource.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
 
             </div>
         </div>
