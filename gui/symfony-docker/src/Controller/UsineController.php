@@ -86,12 +86,11 @@ class UsineController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $entityManager = $doctrine->getManager();
-            $i = 1;
-            while ($request->request->has('tag' . $i)) {
-                $id = $request->request->get('tag' . $i); //Tag NFC
-                $weight = $request->request->get('weight' . $i); //Poids
-                $name = $request->request->get('name' . $i); //Nom (Poitrine, Côte, etc.)
-
+            $list = $request->request->all()['list'];
+            foreach ($list as $element) {
+                $id = $element['NFC'];
+                $weight = $element['weight'];
+                $name = $element['name'];
                 $childResource = $this->createChildResource($doctrine, $resource);
                 $childResource->setWeight($weight);
                 $childResource->setId($id);
@@ -99,9 +98,7 @@ class UsineController extends AbstractController
 
                 $entityManager->persist($childResource);
                 $entityManager->flush();
-                $i++;
             }
-
             $resource->setIsLifeCycleOver(true);
             $entityManager->persist($resource);
             $entityManager->flush();

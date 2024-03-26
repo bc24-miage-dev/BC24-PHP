@@ -10,13 +10,13 @@ function ajouterLigne() {
     // Modifier les attributs de la ligne clonée
     // clone.querySelector('#tag1').id = 'tag'+tagCount;
     clone.querySelector('#tag1').value = '';
-    clone.querySelector('#tag1').name = 'tag'+tagCount;
+    clone.querySelector('#tag1').name = "list["+tagCount+"][NFC]";
 
 
-    clone.querySelector('#name1').name = 'name' + tagCount;
+    clone.querySelector('#name1').name = "list["+tagCount+"][name]";
     // alert(clone.querySelector('#name1').name);
     // alert("poids" + tagCount);
-    clone.querySelector('#weight1').name = 'weight' + tagCount;
+    clone.querySelector('#weight1').name = "list["+tagCount+"][weight]";
     clone.querySelector('#weight1').value = '';
 
 }
