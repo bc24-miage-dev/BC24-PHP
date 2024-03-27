@@ -130,19 +130,41 @@ class AdminController extends AbstractController
 
     #[Route('/userList', name: 'app_admin_userList')]
 
-    public function userList(UserRepository $userRepo): Response
+    public function userList(UserRepository $userRepo, ProductionSiteRepository $productionSiteRepo): Response
     {
         $users = $userRepo->findAll();
-        return $this->render('admin/userList.html.twig', ['users' => $users]);
+        $pSites = $productionSiteRepo->findAll();
+        return $this->render('admin/userList.html.twig', ['users' => $users, 'pSites' => $pSites]);
     }
 
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
     public function userEdit(UserRepository $userRepo,
                              ManagerRegistry $doctrine,
-                             $id, $role): Response
+                             $id, $role): RedirectResponse
     {
         $user = $userRepo->find($id);
         $user->setSpecificRole("$role");
+        $entityManager = $doctrine->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_admin_userList');
+    }
+
+    #[Route('/userProdSiteEdit/{id}/{productionSiteId}', name: 'app_admin_userProdSiteEdit')]
+    public function userProdSiteEdit(UserRepository $userRepo,
+                                     ProductionSiteRepository $productionSiteRepo,
+                                     ManagerRegistry $doctrine,
+                                     $id, $productionSiteId) : RedirectResponse
+    {
+        $user = $userRepo->find($id);
+        if ($productionSiteId != -1) {
+            $productionSite = $productionSiteRepo->find($productionSiteId);
+        }
+        else {
+            $productionSite = null;
+        }
+        $user->setProductionSite($productionSite);
         $entityManager = $doctrine->getManager();
         $entityManager->persist($user);
         $entityManager->flush();

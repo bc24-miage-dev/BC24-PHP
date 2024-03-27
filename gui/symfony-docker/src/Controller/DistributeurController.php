@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ResourceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -21,7 +22,9 @@ class DistributeurController extends AbstractController
     }
 
     #[Route('/acquisition', name: 'app_distributeur_acquire')]
-    public function acquisition(Request $request, ManagerRegistry $doctrine): Response
+    public function acquisition(Request $request,
+                                ManagerRegistry $doctrine,
+                                ResourceRepository $resourceRepo): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
@@ -30,13 +33,13 @@ class DistributeurController extends AbstractController
             $data = $form->getData();
             $id = $data->getId();
 
-            $resource = $doctrine->getRepository(Resource::class)->find($id);
-
+            $resource = $resourceRepo->find($id);
             $resource->setCurrentOwner($this->getUser());
+
             $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
-            $this->addFlash('success', 'La resource a bien été enregistré');
+            $this->addFlash('success', 'La ressource a bien été enregistrée');
             return $this->redirectToRoute('app_distributeur_acquire');
         }
         return $this->render('pro/distributeur/acquire.html.twig', [
