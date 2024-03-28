@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Handlers\proAcquireHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,16 +28,13 @@ class TransporteurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $id = $data->getId();
+            $proAcquireHandler = new proAcquireHandler();
 
-            $resource = $doctrine->getRepository(Resource::class)->find($id);
-
-            $resource->setCurrentOwner($this->getUser());
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'La ressource a bien été enregistrée');
+            if($proAcquireHandler->acquire($form, $doctrine, $this->getUser())){
+                $this->addFlash('success', 'La ressource a bien été enregistrée');
+            } else {
+                $this->addFlash('error', 'Ce tag NFC ne correspond pas à une ressource');
+            }
             return $this->redirectToRoute('app_transporteur_acquire');
         }
         return $this->render('pro/transporteur/acquire.html.twig', [

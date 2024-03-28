@@ -25,7 +25,7 @@ class UserRoleRequestType extends AbstractType
                     'Transporteur' => 'ROLE_TRANSPORTEUR',
                     'Équarrisseur' => 'ROLE_EQUARRISSEUR',
                     'Usine' => 'ROLE_USINE',
-                    'Commerçant' => 'ROLE_COMMERCANT',
+                    'Distributeur' => 'ROLE_DISTRIBUTEUR',
                     'Admin' => 'ROLE_ADMIN',
                 ],])
                 ->add('ProductionSite', EntityType::class, [

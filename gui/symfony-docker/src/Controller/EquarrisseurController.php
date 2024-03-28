@@ -6,6 +6,7 @@ use App\Entity\Resource;
 use App\Entity\ResourceName;
 use App\Form\EquarrisseurAnimalAbattageFormType;
 use App\Form\ResourceOwnerChangerType;
+use App\Handlers\proAcquireHandler;
 use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,20 +30,14 @@ class EquarrisseurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $id = $data->getId();
 
-            $resource = $doctrine->getRepository(Resource::class)->find($id);
-            if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+            $proAcquireHandler = new proAcquireHandler();
+
+            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'ANIMAL')){
+                $this->addFlash('success', 'L\'animal a bien été enregistré');
+            } else {
                 $this->addFlash('error', 'Ce tag NFC ne correspond pas à un animal');
-                return $this->redirectToRoute('app_equarrisseur_acquire');
             }
-
-            $resource->setCurrentOwner($this->getUser());
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'L\'animal a bien été enregistré');
             return $this->redirectToRoute('app_equarrisseur_acquire');
         }
         return $this->render('pro/equarrisseur/acquire.html.twig', [

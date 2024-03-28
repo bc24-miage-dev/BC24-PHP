@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Handlers\proAcquireHandler;
 use App\Repository\ResourceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,23 +24,20 @@ class DistributeurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_distributeur_acquire')]
     public function acquisition(Request $request,
-                                ManagerRegistry $doctrine,
-                                ResourceRepository $resourceRepo): Response
+                                ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $id = $data->getId();
+            $proAcquireHandler = new proAcquireHandler();
 
-            $resource = $resourceRepo->find($id);
-            $resource->setCurrentOwner($this->getUser());
-
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'La ressource a bien été enregistrée');
+            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'PRODUIT')){
+                $this->addFlash('success', 'Le produit a bien été enregistré');
+            }
+            else{
+                $this->addFlash('error', 'Ce tag NFC ne correspond pas à un produit');
+            }
             return $this->redirectToRoute('app_distributeur_acquire');
         }
         return $this->render('pro/distributeur/acquire.html.twig', [

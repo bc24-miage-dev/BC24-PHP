@@ -8,6 +8,7 @@ use App\Form\EleveurWeightType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceOwnerChangerType;
 use App\Form\ResourceType;
+use App\Handlers\proAcquireHandler;
 use App\Repository\ResourceFamilyRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,22 +71,16 @@ class EleveurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $id = $data->getId();
+            $proAcquireHandler = new proAcquireHandler();
 
-            $resource = $doctrine->getRepository(Resource::class)->find($id);
-            if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'ANIMAL')){
+                $this->addFlash('success', 'L\'animal a bien été enregistré');
+            } else {
                 $this->addFlash('error', 'Ce tag NFC ne correspond pas à un animal');
-                return $this->redirectToRoute('app_eleveur_acquire');
             }
-
-            $resource->setCurrentOwner($this->getUser());
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'L\'animal a bien été enregistré dans votre élevage');
             return $this->redirectToRoute('app_eleveur_acquire');
         }
+
         return $this->render('pro/eleveur/acquire.html.twig', [
             'form' => $form->createView()
         ]);

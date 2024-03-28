@@ -7,6 +7,7 @@ use App\Entity\Resource;
 use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
+use App\Handlers\proAcquireHandler;
 use App\Repository\RecipeRepository;
 use App\Repository\ResourceCategoryRepository;
 use App\Repository\ResourceFamilyRepository;
@@ -35,21 +36,16 @@ class UsineController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $id = $data->getId();
 
-            $resource = $doctrine->getRepository(Resource::class)->find($id);
-            if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'DEMI-CARCASSE') {
-                $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demi-carcasse');
-                return $this->redirectToRoute('app_usine_acquire');
+            $proAcquireHandler = new proAcquireHandler();
+
+            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'DEMI-CARCASSE')){
+                $this->addFlash('success', 'La demie-carcasse a bien été enregistré');
+            } else {
+                $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demie-carcasse');
             }
-
-            $resource->setCurrentOwner($this->getUser());
-            $entityManager = $doctrine->getManager();
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'La demi-carcasse a bien été enregistrée comme étant vôtre');
             return $this->redirectToRoute('app_usine_acquire');
+
         }
         return $this->render('pro/usine/acquire.html.twig', [
             'form' => $form->createView()
