@@ -53,11 +53,9 @@ class UsineController extends AbstractController
     }
 
     #[Route('/list', name: 'app_usine_list')]
-    public function list(ManagerRegistry $doctrine): Response
+    public function list(ResourceRepository $resourceRepo): Response
     {
-        $repository = $doctrine->getRepository(Resource::class);
-
-        $resources = $repository->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
+        $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
         return $this->render('pro/usine/list.html.twig', [
             'resources' => $resources
         ]);

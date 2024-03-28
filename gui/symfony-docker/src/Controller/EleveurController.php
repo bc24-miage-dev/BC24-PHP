@@ -10,6 +10,7 @@ use App\Form\ResourceOwnerChangerType;
 use App\Form\ResourceType;
 use App\Handlers\proAcquireHandler;
 use App\Repository\ResourceFamilyRepository;
+use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,10 +56,9 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_eleveur_list')]
-    public function list(ManagerRegistry $doctrine) : Response
+    public function list(ResourceRepository $resourceRepo) : Response
     {
-        $repository = $doctrine->getRepository(Resource::class);
-        $animaux = $repository->findBy(['currentOwner' => $this->getUser(), 'IsLifeCycleOver' => 'false']);
+        $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
         return $this->render('pro/eleveur/list.html.twig',
             ['animaux' => $animaux]
         );

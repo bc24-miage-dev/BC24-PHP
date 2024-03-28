@@ -45,12 +45,10 @@ class EquarrisseurController extends AbstractController
         ]);
     }
 
-    #[Route('/list/{category}', name: 'app_equarrisseur_list')]
-    public function list(ManagerRegistry $doctrine, String $category) : Response
+    #[Route('/list/{category}', name: 'app_equarrisseur_list')] // The Equarrisseur have access to the list of his animals and carcasses
+    public function list(ResourceRepository $resourceRepo, String $category) : Response
     {
-        $user = $this->getUser();
-        $repository = $doctrine->getRepository(Resource::class);
-        $resources = $repository->findByOwnerAndResourceCategory($user, strtoupper($category));
+        $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), strtoupper($category));
         return $this->render('pro/equarrisseur/list.html.twig',
             ['resources' => $resources ]
         );

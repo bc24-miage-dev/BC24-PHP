@@ -6,6 +6,7 @@ use App\Entity\Resource;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Resource>
@@ -47,7 +48,7 @@ class ResourceRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-    public function findByOwnerAndResourceCategory(User $owner, String $resourceCategory): array
+    public function findByOwnerAndResourceCategory(UserInterface $owner, String $resourceCategory): array
     {
         return $this->createQueryBuilder('r')
                 ->join('r.ResourceName', 'rn')

@@ -46,15 +46,12 @@ class DistributeurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_distributeur_list')]
-    public function list(ManagerRegistry $doctrine) : Response
+    public function list(ResourceRepository $resourceRepo) : Response
     {
-        $repository = $doctrine->getRepository(Resource::class);
-        $resource = $repository->findBy([
-            'currentOwner' => $this->getUser(),
-            'IsLifeCycleOver' => false
-        ]);
+
+        $produits = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'PRODUIT');
         return $this->render('pro/distributeur/list.html.twig',
-            ['resource' => $resource]
+            ['resource' => $produits]
         );
     }
 

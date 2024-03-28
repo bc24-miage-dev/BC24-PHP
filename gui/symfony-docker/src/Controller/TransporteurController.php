@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Handlers\proAcquireHandler;
+use App\Repository\ResourceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,12 +44,11 @@ class TransporteurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_transporteur_list')]
-    public function list(ManagerRegistry $doctrine) : Response
+    public function list(ResourceRepository $resourceRepo) : Response
     {
-        $repository = $doctrine->getRepository(Resource::class);
-        $resource = $repository->findBy(['currentOwner' => $this->getUser()]);
+        $resources = $resourceRepo->findBy(['currentOwner' => $this->getUser()]); //No limitation on what a transporteur can own
         return $this->render('pro/transporteur/list.html.twig',
-            ['resource' => $resource]
+            ['resource' => $resources]
         );
     }
 
