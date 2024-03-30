@@ -64,10 +64,8 @@ class DistributeurController extends AbstractController
     {
         $form = $this->createForm(ResourceNfcType::class);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $nfcTag = $form->get('id')->getData();
-
             $resource = $resourceRepo->findOneBy(['id' => $nfcTag, 'currentOwner' => $this->getUser()]);
 
             if (!$resource || $resource->isIsLifeCycleOver()){
@@ -79,7 +77,6 @@ class DistributeurController extends AbstractController
             $entityManager = $doctrine->getManager();
             $entityManager->flush();
             $this->addFlash('success', 'La ressource a bien été vendue');
-
             return $this->redirectToRoute('app_distributeur_vendu');
         }
 

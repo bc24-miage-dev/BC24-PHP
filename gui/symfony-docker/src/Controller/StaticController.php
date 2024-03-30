@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\SearchType;
+use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,24 +32,19 @@ class StaticController extends AbstractController
     #[Route('/about', name: 'app_about')]
     public function about(): Response
     {
-        return $this->render('static/about.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
+        return $this->render('static/about.html.twig');
     }
 
     #[Route('/siteInfo', name: 'app_info')]
     public function info(): Response
     {
-        return $this->render('static/info.html.twig', [
-            'controller_name' => 'StaticController',
-        ]);
+        return $this->render('static/info.html.twig');
     }
 
     #[Route('/recent', name: 'app_recent')]
-    public function recentReport(ManagerRegistry $doctrine): Response
+    public function recentReport(ResourceRepository $resourceRepository): Response
     {
-        $repository = $doctrine->getRepository(Resource::class);
-        $resourcesC = $repository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
+        $resourcesC = $resourceRepository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
         $productsC = [];
         foreach ($resourcesC as $resource){
             if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'PRODUIT'){

@@ -60,7 +60,8 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
-    public function acquisition(Request $request, ManagerRegistry $doctrine): Response
+    public function acquisition(Request $request,
+                                ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
@@ -96,12 +97,11 @@ class EleveurController extends AbstractController
 
         $form = $this->createForm(EleveurWeightType::class, $resource);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-
             $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
+
             $this->addFlash('success', 'L\'animal a bien été pesé');
             return $this->redirectToRoute('app_eleveur_list');
         }

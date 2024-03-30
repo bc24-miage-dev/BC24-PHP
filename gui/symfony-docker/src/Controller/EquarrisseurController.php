@@ -7,6 +7,7 @@ use App\Entity\ResourceName;
 use App\Form\EquarrisseurAnimalAbattageFormType;
 use App\Form\ResourceOwnerChangerType;
 use App\Handlers\proAcquireHandler;
+use App\Handlers\ResourceHandler;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,7 +48,7 @@ class EquarrisseurController extends AbstractController
         ]);
     }
 
-    #[Route('/list/{category}', name: 'app_equarrisseur_list')] // The Equarrisseur have access to the list of his animals and carcasses
+    #[Route('/list/{category}', name: 'app_equarrisseur_list')] // An 'Equarrisseur' have access to the list of his animals and carcasses
     public function list(ResourceRepository $resourceRepo,
                          String $category) : Response
     {
@@ -88,21 +89,19 @@ class EquarrisseurController extends AbstractController
     {
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'){
-
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list');
         }
 
-        $newCarcasse = $this->createChildResource($doctrine, $resource);
-        $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
-        $newCarcasse->setResourceName($rN[0]);
-
-        $resource->setIsLifeCycleOver(true);
-
+        $handler = new ResourceHandler();
+        $newCarcasse = $handler->createChildResource($doctrine, $resource, $this->getUser());
         $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class, $newCarcasse);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
+            $newCarcasse->setResourceName($rN[0]);
+            $resource->setIsLifeCycleOver(true);
             $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->persist($newCarcasse);
@@ -117,24 +116,25 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
-    public function decoupe(ManagerRegistry $doctrine, Request $request, $id)
+    public function decoupe(ManagerRegistry $doctrine,
+                            Request $request,
+                            ResourceRepository $resourceRepo,
+                            ResourceNameRepository $resourceNameRepo,
+                            $id) : Response
     {
-        $resource = $doctrine->getRepository(Resource::class)->find($id);
-        if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'CARCASSE'){
-
+        $resource = $resourceRepo->findOneBy(['id'=> $id, 'currentOwner' => $this->getUser()]);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'CARCASSE'){
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list');
         }
-        $nameRepository = $doctrine->getRepository(ResourceName::class);
-        $demiCarcasse = $nameRepository->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getFamily()->getName())[0];
-        $newHalfCarcasse = $this->createChildResource($doctrine, $resource);
+
+        $demiCarcasse = $resourceNameRepo->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getFamily()->getName())[0];
+
+        $handler = new ResourceHandler();
+        $newHalfCarcasse = $handler->createChildResource($doctrine, $resource, $this->getUser());
         $newHalfCarcasse->setResourceName($demiCarcasse);
-
-        $newHalfCarcasse2 = $this->createChildResource($doctrine, $resource);
+        $newHalfCarcasse2 = $handler->createChildResource($doctrine, $resource, $this->getUser());
         $newHalfCarcasse2->setResourceName($demiCarcasse);
-
-        $resource->setIsLifeCycleOver(true);
 
         //Classic form because two different entities must be processed at once
         if ($request->isMethod('POST')) {
@@ -142,6 +142,7 @@ class EquarrisseurController extends AbstractController
             $newHalfCarcasse2->setId($request->request->get('tag2'));
             $newHalfCarcasse->setWeight($request->request->get('weight1'));
             $newHalfCarcasse2->setWeight($request->request->get('weight2'));
+            $resource->setIsLifeCycleOver(true);
 
             $entityManager = $doctrine->getManager();
             $entityManager->persist($newHalfCarcasse);
@@ -152,20 +153,5 @@ class EquarrisseurController extends AbstractController
             return $this->redirectToRoute('app_equarrisseur_index');
         }
         return $this->render('pro/equarrisseur/slice.html.twig');
-    }
-
-
-    private function createChildResource(ManagerRegistry $doctrine, Resource $resource): Resource
-    {
-        $newChildResource = new Resource();
-        $newChildResource->setCurrentOwner($this->getUser());
-        $newChildResource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-        $newChildResource->setIsLifeCycleOver(false);
-        $newChildResource->setIsContamined(false);
-        $newChildResource->setPrice(0);
-        $newChildResource->setOrigin($this->getUser()->getProductionSite());
-        $newChildResource->setDescription('');
-        $newChildResource->addComponent($resource);
-        return $newChildResource;
     }
 }

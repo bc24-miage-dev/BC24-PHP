@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\ResourceRepository;
+use App\Repository\UserResearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,14 +20,13 @@ use App\Entity\UserResearch;
 class SearchController extends AbstractController
 {
 #[Route('/', name: 'app_search')]
-    public function search(Request $request, ManagerRegistry $doctrine): Response
+    public function search(Request $request): Response
     {
             $form = $this->createForm(SearchType::class);
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $data = $form->getData();
                 $id = $data->getId();
-
 
                 return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
             }
@@ -35,14 +36,17 @@ class SearchController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_search_result')]
-    public function result(int $id, ManagerRegistry $doctrine, Request $request): Response
+    public function result(int $id,
+                           ManagerRegistry $doctrine,
+                           UserResearchRepository $userResearchRepository,
+                           ResourceRepository $resourceRepository,
+                           Request $request): Response
     {
         $form = $this->createForm(SearchType::class);
         $form -> handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
-            $repository = $doctrine->getRepository(UserResearch::class);
-            $history = $repository->findBy(['User' => $user]);
+            $history = $userResearchRepository->findBy(['User' => $user]);
             if (count($history) > 0) {
                 $history[0]->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
                 $entityManager = $doctrine->getManager();
@@ -52,7 +56,7 @@ class SearchController extends AbstractController
             else{
                 $userResearch = new UserResearch();
                 $userResearch->setUser($user);
-                $userResearch->setResource($doctrine->getRepository(Resource::class)->find($id));
+                $userResearch->setResource($resourceRepository->find($id));
                 $userResearch->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
                 $entityManager = $doctrine->getManager();
                 $entityManager->persist($userResearch);
@@ -64,7 +68,7 @@ class SearchController extends AbstractController
             return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
         }
 
-        $resource = $doctrine->getRepository(Resource::class)->find($id);
+        $resource = $resourceRepository->find($id);
         if (!$resource) {
             $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
             return $this->redirectToRoute('app_search');
