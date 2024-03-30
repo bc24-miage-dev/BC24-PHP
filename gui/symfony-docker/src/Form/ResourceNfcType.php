@@ -18,9 +18,6 @@ class ResourceNfcType extends AbstractType
     {
         $builder
             ->add('id')
-            ->add('isLifeCycleOver', CheckboxType::class, [
-                'required' => false,
-            ])
         ;
     }
 

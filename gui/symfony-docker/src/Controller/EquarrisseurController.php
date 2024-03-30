@@ -7,6 +7,7 @@ use App\Entity\ResourceName;
 use App\Form\EquarrisseurAnimalAbattageFormType;
 use App\Form\ResourceOwnerChangerType;
 use App\Handlers\proAcquireHandler;
+use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,7 +25,8 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/acquisition', name: 'app_equarrisseur_acquire')]
-    public function acquisition(Request $request, ManagerRegistry $doctrine): Response
+    public function acquisition(Request $request,
+                                ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
@@ -46,7 +48,8 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/list/{category}', name: 'app_equarrisseur_list')] // The Equarrisseur have access to the list of his animals and carcasses
-    public function list(ResourceRepository $resourceRepo, String $category) : Response
+    public function list(ResourceRepository $resourceRepo,
+                         String $category) : Response
     {
         $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), strtoupper($category));
         return $this->render('pro/equarrisseur/list.html.twig',
@@ -55,10 +58,11 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/specific/{id}', name: 'app_equarrisseur_job')]
-    public function job(ManagerRegistry $doctrine, $id): Response
+    public function job(ResourceRepository $resourceRepo,
+                        $id): Response
     {
-        $resource = $doctrine->getRepository(Resource::class)->find($id);
-        if (!$resource || $resource->getCurrentOwner() != $this->getUser()){
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        if (!$resource) {
             $this->addFlash('error', 'Ressource introuvable');
             return $this->redirectToRoute('app_equarrisseur_list');
         }
@@ -76,20 +80,22 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
-    public function equarrir(ManagerRegistry $doctrine, Request $request, $id)
+    public function equarrir(ManagerRegistry $doctrine,
+                             ResourceRepository $resourceRepo,
+                             ResourceNameRepository $resourceNameRepo,
+                             Request $request,
+                             $id)
     {
-        $resource = $doctrine->getRepository(Resource::class)->find($id);
-        if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'){
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'){
 
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list');
         }
 
         $newCarcasse = $this->createChildResource($doctrine, $resource);
-        $nameRepository = $doctrine->getRepository(ResourceName::class);
-        $a = $nameRepository->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
-        $newCarcasse->setResourceName($a[0]);
+        $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
+        $newCarcasse->setResourceName($rN[0]);
 
         $resource->setIsLifeCycleOver(true);
 

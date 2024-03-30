@@ -36,4 +36,17 @@ class ResourceHandler
 
     }
 
+    public function createDefaultNewResource($user) :Resource
+    {
+        $resource = new Resource();
+        $resource->setIsContamined(false);
+        $resource->setPrice(0);
+        $resource->setDescription('');
+        $resource->setOrigin($user->getProductionSite());
+        $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $resource->setCurrentOwner($user);
+        $resource->setIsLifeCycleOver(false);
+        return $resource;
+    }
+
 }

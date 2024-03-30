@@ -43,9 +43,9 @@
 
                     <div class="col-25 col-25-medium">
                         <h3>Composition</h3><hr>
-                        {% if resource.getComponents|length > 0 %}
+                        {% if resource.components|length > 0 %}
                             <ul>
-                                {% for component in resource.getComponents %}
+                                {% for component in resource.components %}
                                     <li>
                                         <a href="{{ path('app_search_result', {'id': component.getId}) }}">
                                             {{ component.ResourceName.name }} (ID: {{ component.getId }})

@@ -9,6 +9,7 @@ use App\Form\ResourceModifierType;
 use App\Form\ResourceOwnerChangerType;
 use App\Form\ResourceType;
 use App\Handlers\proAcquireHandler;
+use App\Handlers\ResourceHandler;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,25 +31,19 @@ class EleveurController extends AbstractController
     public function naissance(Request $request,
                               ManagerRegistry $doctrine): Response
     {
-        $resource = new Resource();
-        $resource->setIsContamined(false);
-        $resource->setPrice(0);
-        $resource->setDescription('');
-        $resource->setOrigin($this->getUser()->getProductionSite());
-        $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-        $resource->setCurrentOwner($this->getUser());
-        $resource->setIsLifeCycleOver(false);
-        $form = $this->createForm(EleveurBirthType::class, $resource);
+        $handler = new ResourceHandler();
+        $resource = $handler->createDefaultNewResource($this->getUser());
 
+        $form = $this->createForm(EleveurBirthType::class, $resource);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
+
             $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée !');
             return $this->redirectToRoute('app_eleveur_index');
         }
-
         return $this->render('pro/eleveur/naissance.html.twig', [
             'form' => $form->createView()
         ]);
@@ -87,19 +82,19 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
-    public function weight(Request $request, ManagerRegistry $doctrine, $id): Response
+    public function weight(Request $request,
+                           ManagerRegistry $doctrine,
+                           ResourceRepository $resourceRepo,
+                           $id): Response
     {
-        $repository = $doctrine->getRepository(Resource::class);
-        $resource = $repository->find($id);
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner() != $this->getUser()) {
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
 
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
 
         $form = $this->createForm(EleveurWeightType::class, $resource);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -116,12 +111,14 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
-    public function vaccine(Request $request, ManagerRegistry $doctrine, $id): Response{
-        $repository = $doctrine->getRepository(Resource::class);
-        $resource = $repository->find($id);
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner() != $this->getUser()) {
+    public function vaccine(Request $request,
+                            ManagerRegistry $doctrine,
+                            ResourceRepository $resourceRepo,
+                            $id): Response{
 
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -141,12 +138,13 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
-    public function disease(Request $request, ManagerRegistry $doctrine, $id): Response{
-        $repository = $doctrine->getRepository(Resource::class);
-        $resource = $repository->find($id);
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner() != $this->getUser()) {
-
+    public function disease(Request $request,
+                            ManagerRegistry $doctrine,
+                            ResourceRepository $resourceRepo,
+                            $id): Response
+    {
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }

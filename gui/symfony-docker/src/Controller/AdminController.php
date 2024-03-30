@@ -36,14 +36,14 @@ class AdminController extends AbstractController
     public function add(Request $request,
                         ManagerRegistry $doctrine): Response
     {
-        $resource = new Resource();
-        $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $handler = new ResourceHandler();
+        $resource = $handler->createDefaultNewResource($this->getUser());
+
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $doctrine->getManager();
-            $resource->setIsLifeCycleOver(false);
             $entityManager->persist($resource);
             $entityManager->flush();
 

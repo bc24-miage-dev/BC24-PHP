@@ -13,7 +13,7 @@
 
                     {% if app.user %}
                         <div class="alert alert-info">
-                            You are already logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                            Vous êtes déjà connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
                         </div>
                     {% endif %}
 
