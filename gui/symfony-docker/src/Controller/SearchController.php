@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\ResourceRepository;
 use App\Repository\UserResearchRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -37,7 +38,7 @@ class SearchController extends AbstractController
 
     #[Route('/{id}', name: 'app_search_result')]
     public function result(int $id,
-                           ManagerRegistry $doctrine,
+                           EntityManagerInterface $entityManager,
                            UserResearchRepository $userResearchRepository,
                            ResourceRepository $resourceRepository,
                            Request $request): Response
@@ -49,19 +50,16 @@ class SearchController extends AbstractController
             $history = $userResearchRepository->findBy(['User' => $user]);
             if (count($history) > 0) {
                 $history[0]->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager = $doctrine->getManager();
                 $entityManager->persist($history[0]);
-                $entityManager->flush();
             }
             else{
                 $userResearch = new UserResearch();
                 $userResearch->setUser($user);
                 $userResearch->setResource($resourceRepository->find($id));
                 $userResearch->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager = $doctrine->getManager();
                 $entityManager->persist($userResearch);
-                $entityManager->flush();
             }
+            $entityManager->flush();
 
             $data = $form->getData();
             $id = $data->getId();

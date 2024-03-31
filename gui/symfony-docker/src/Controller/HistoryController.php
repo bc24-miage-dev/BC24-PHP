@@ -13,8 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class HistoryController extends AbstractController
 {
     #[Route('/history/{page}', name: 'app_history')]
-    public function history(ManagerRegistry $managerRegistry,
-                            UserRepository $userRepository,
+    public function history(UserRepository $userRepository,
                             $page): Response
     {
         $user = $this->getUser();
@@ -30,7 +29,4 @@ class HistoryController extends AbstractController
         ]);
 
     }
-
-
-
 }

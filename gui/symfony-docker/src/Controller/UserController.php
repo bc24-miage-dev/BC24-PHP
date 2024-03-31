@@ -86,6 +86,7 @@ class UserController extends AbstractController
                                     EntityManagerInterface $entityManager,
                                     UserRoleRequestRepository $requestRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $UserRoleRequest = new UserRoleRequest();
         $repoRequest = $requestRepository->findBy(['User' => $this->getUser()]);
 

@@ -12,6 +12,8 @@ use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +31,7 @@ class EleveurController extends AbstractController
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
-                              ManagerRegistry $doctrine): Response
+                              EntityManagerInterface $entityManager): Response
     {
         $handler = new ResourceHandler();
         $resource = $handler->createDefaultNewResource($this->getUser());
@@ -37,7 +39,6 @@ class EleveurController extends AbstractController
         $form = $this->createForm(EleveurBirthType::class, $resource);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
 
@@ -84,7 +85,7 @@ class EleveurController extends AbstractController
 
     #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
     public function weight(Request $request,
-                           ManagerRegistry $doctrine,
+                           EntityManagerInterface $entityManager,
                            ResourceRepository $resourceRepo,
                            $id): Response
     {
@@ -98,7 +99,6 @@ class EleveurController extends AbstractController
         $form = $this->createForm(EleveurWeightType::class, $resource);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
 
@@ -112,7 +112,7 @@ class EleveurController extends AbstractController
 
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
     public function vaccine(Request $request,
-                            ManagerRegistry $doctrine,
+                            EntityManagerInterface $entityManager,
                             ResourceRepository $resourceRepo,
                             $id): Response{
 
@@ -128,7 +128,6 @@ class EleveurController extends AbstractController
             $date = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
             $dateString = $date->format('Y-m-d');
             $resource->setDescription($resource->getDescription() . 'VACCIN|' . $newVaccine . '|' . $dateString . ';');
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
             $this->addFlash('success', 'Le vaccin a bien été enregistré');
@@ -139,7 +138,7 @@ class EleveurController extends AbstractController
 
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request,
-                            ManagerRegistry $doctrine,
+                            EntityManagerInterface $entityManager,
                             ResourceRepository $resourceRepo,
                             $id): Response
     {
@@ -157,7 +156,6 @@ class EleveurController extends AbstractController
             $resource->setDescription($resource->getDescription() .
                 'MALADIE|' . $newDisease . '|' . $beginDate . '|' . $endDate . ';');
 
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
             $this->addFlash('success', 'La maladie a bien été enregistrée');

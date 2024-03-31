@@ -23,7 +23,8 @@ class TransporteurController extends AbstractController
 
 
     #[Route('/acquisition', name: 'app_transporteur_acquire')]
-    public function acquisition(Request $request, ManagerRegistry $doctrine): Response
+    public function acquisition(Request $request,
+                                ManagerRegistry $doctrine): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);

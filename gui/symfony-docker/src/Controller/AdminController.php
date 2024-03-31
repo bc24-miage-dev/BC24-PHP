@@ -16,6 +16,8 @@ use App\Repository\ReportRepository;
 use App\Repository\ResourceRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserRoleRequestRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -34,7 +36,7 @@ class AdminController extends AbstractController
 
     #[Route('/add', name: 'app_admin_add')] // Resource creation
     public function add(Request $request,
-                        ManagerRegistry $doctrine): Response
+                        EntityManagerInterface $entityManager): Response
     {
         $handler = new ResourceHandler();
         $resource = $handler->createDefaultNewResource($this->getUser());
@@ -43,7 +45,6 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->flush();
 
@@ -65,7 +66,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/modify/{id}', name: 'app_admin_modifySpecific')] // Resource modification
-    public function modifySpecific(ManagerRegistry $doctrine,
+    public function modifySpecific(EntityManagerInterface $entityManager,
                                    Request $request,
                                    ResourceHandler $resourceHandler,
                                    ResourceRepository $resourceRepo,
@@ -80,7 +81,6 @@ class AdminController extends AbstractController
         $form = $this->createForm(ResourceModifierType::class, $resource);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
             if ($form->get('isContamined')->getData()) {
                 $resourceHandler->contaminateChildren($entityManager, $resource);
             }
@@ -110,7 +110,7 @@ class AdminController extends AbstractController
 
     #[Route('/checkReportProcess/{idRep}/{action}', name: 'app_admin_checkReportProcess')]
     public function checkReportProcess(ReportRepository $reportRepo,
-                                        ManagerRegistry $doctrine,
+                                        EntityManagerInterface $entityManager,
                                        $idRep, $action): RedirectResponse
     {
         $report = $reportRepo->find($idRep);
@@ -120,7 +120,6 @@ class AdminController extends AbstractController
         }
         $report->setRead(true);
 
-        $entityManager = $doctrine->getManager();
         $entityManager->persist($resource);
         $entityManager->persist($report);
         $entityManager->flush();
@@ -130,7 +129,8 @@ class AdminController extends AbstractController
 
     #[Route('/userList', name: 'app_admin_userList')]
 
-    public function userList(UserRepository $userRepo, ProductionSiteRepository $productionSiteRepo): Response
+    public function userList(UserRepository $userRepo,
+                             ProductionSiteRepository $productionSiteRepo): Response
     {
         $users = $userRepo->findAll();
         $pSites = $productionSiteRepo->findAll();
@@ -139,12 +139,11 @@ class AdminController extends AbstractController
 
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
     public function userEdit(UserRepository $userRepo,
-                             ManagerRegistry $doctrine,
+                             EntityManagerInterface $entityManager,
                              $id, $role): RedirectResponse
     {
         $user = $userRepo->find($id);
         $user->setSpecificRole("$role");
-        $entityManager = $doctrine->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -154,7 +153,7 @@ class AdminController extends AbstractController
     #[Route('/userProdSiteEdit/{id}/{productionSiteId}', name: 'app_admin_userProdSiteEdit')]
     public function userProdSiteEdit(UserRepository $userRepo,
                                      ProductionSiteRepository $productionSiteRepo,
-                                     ManagerRegistry $doctrine,
+                                     EntityManagerInterface $entityManager,
                                      $id, $productionSiteId) : RedirectResponse
     {
         $user = $userRepo->find($id);
@@ -165,7 +164,6 @@ class AdminController extends AbstractController
             $productionSite = null;
         }
         $user->setProductionSite($productionSite);
-        $entityManager = $doctrine->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -174,7 +172,7 @@ class AdminController extends AbstractController
 
     #[Route('/productionSite', name: 'app_productionSite')]
 
-    public function createProductionSite(ManagerRegistry $doctrine,
+    public function createProductionSite(EntityManagerInterface $entityManager,
                                          Request $request): Response
     {
         $productionSite = new ProductionSite();
@@ -182,7 +180,6 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
             $productionSite->setValidate(true); // Admin-created production sites are automatically validated
             $entityManager->persist($productionSite);
             $entityManager->flush();
@@ -203,18 +200,18 @@ class AdminController extends AbstractController
     }
 
     #[Route('/request/roleEdit/{id}/{validation}/{role}', name: 'app_admin_request_roleEdit')]
-    public function userRequestRoleEdit(ManagerRegistry $doctrine,
+    public function userRequestRoleEdit(EntityManagerInterface $entityManager,
                                         UserRoleRequestRepository $roleRequestRepo,
+                                        ProductionSiteRepository $productionSiteRepo,
                                         UserRepository $userRepo,
                                         $id, $validation, $role): Response
     {
         $userRoleRequest = $roleRequestRepo->find($id);
-        $entityManager = $doctrine->getManager();
 
         if ($validation == "true") {
             $user = $userRepo->find($userRoleRequest->getUser());
             $entityManager->persist($user->setSpecificRole("$role"));
-            $user->setProductionSite($doctrine->getRepository(ProductionSite::class)->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
+            $user->setProductionSite($productionSiteRepo->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
         }
         $userRoleRequest->setRead(true);
         $entityManager->persist($userRoleRequest);
@@ -232,7 +229,7 @@ class AdminController extends AbstractController
 
     #[Route('/request/productionSiteRequestEdit/{id}/{validation}', name: 'app_admin_request_productionSiteRequestEdit')]
 
-    public function usineRequestEdit(ManagerRegistry $doctrine,
+    public function usineRequestEdit(EntityManagerInterface $entityManager,
                                      UserRoleRequestRepository $roleRequestRepo,
                                      ProductionSiteRepository $productionSiteRepo,
                                      $id, $validation): Response
@@ -245,7 +242,6 @@ class AdminController extends AbstractController
         else {
             $userRoleRequest->setRead(true);
         }
-        $entityManager = $doctrine->getManager();
         $entityManager->persist($userRoleRequest);
         $entityManager->flush();
 

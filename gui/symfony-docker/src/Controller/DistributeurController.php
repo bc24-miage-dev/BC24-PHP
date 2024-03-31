@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Handlers\proAcquireHandler;
 use App\Repository\ResourceRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -60,7 +61,7 @@ class DistributeurController extends AbstractController
     #[Route('/vente', name: 'app_distributeur_vendu')]
     public function vendre(Request $request,
                            ResourceRepository $resourceRepo,
-                           ManagerRegistry $doctrine): Response
+                           EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ResourceNfcType::class);
         $form->handleRequest($request);
@@ -74,7 +75,7 @@ class DistributeurController extends AbstractController
             }
 
             $resource->setIsLifeCycleOver(true);
-            $entityManager = $doctrine->getManager();
+            $entityManager->persist($resource);
             $entityManager->flush();
             $this->addFlash('success', 'La ressource a bien été vendue');
             return $this->redirectToRoute('app_distributeur_vendu');

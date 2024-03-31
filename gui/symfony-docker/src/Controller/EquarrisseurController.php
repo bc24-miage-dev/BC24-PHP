@@ -10,6 +10,7 @@ use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -81,7 +82,7 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
-    public function equarrir(ManagerRegistry $doctrine,
+    public function equarrir(EntityManagerInterface $entityManager,
                              ResourceRepository $resourceRepo,
                              ResourceNameRepository $resourceNameRepo,
                              Request $request,
@@ -102,7 +103,6 @@ class EquarrisseurController extends AbstractController
             $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
             $newCarcasse->setResourceName($rN[0]);
             $resource->setIsLifeCycleOver(true);
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($resource);
             $entityManager->persist($newCarcasse);
             $entityManager->flush();
@@ -116,7 +116,7 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
-    public function decoupe(ManagerRegistry $doctrine,
+    public function decoupe(EntityManagerInterface $entityManager,
                             Request $request,
                             ResourceRepository $resourceRepo,
                             ResourceNameRepository $resourceNameRepo,
@@ -144,7 +144,6 @@ class EquarrisseurController extends AbstractController
             $newHalfCarcasse2->setWeight($request->request->get('weight2'));
             $resource->setIsLifeCycleOver(true);
 
-            $entityManager = $doctrine->getManager();
             $entityManager->persist($newHalfCarcasse);
             $entityManager->persist($newHalfCarcasse2);
             $entityManager->flush();
