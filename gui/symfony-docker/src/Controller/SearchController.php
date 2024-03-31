@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Handlers\PictureHandler;
 use App\Repository\ResourceRepository;
 use App\Repository\UserResearchRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +21,9 @@ use App\Entity\UserResearch;
 #[Route('/search')]
 class SearchController extends AbstractController
 {
-#[Route('/', name: 'app_search')]
+    private EntityManagerInterface $entityManager;
+
+    #[Route('/', name: 'app_search')]
     public function search(Request $request): Response
     {
             $form = $this->createForm(SearchType::class);
@@ -41,6 +44,7 @@ class SearchController extends AbstractController
                            EntityManagerInterface $entityManager,
                            UserResearchRepository $userResearchRepository,
                            ResourceRepository $resourceRepository,
+                           PictureHandler $pictureHandler,
                            Request $request): Response
     {
         $form = $this->createForm(SearchType::class);
@@ -63,6 +67,7 @@ class SearchController extends AbstractController
 
             $data = $form->getData();
             $id = $data->getId();
+
             return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
         }
 
@@ -71,11 +76,18 @@ class SearchController extends AbstractController
             $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
             return $this->redirectToRoute('app_search');
         }
+
+        $categoryName = $resource->getResourceName()->getResourceCategory()->getCategory();
+        $imagePath = $pictureHandler->getImageForCategory($categoryName);
+
         return $this->render('search/result.html.twig', [
             'form' => $form -> createView(),
-            'resource' => $resource
+            'resource' => $resource,
+            'imagePath' => $imagePath,
         ]);
     }
+
+
 }
 
 

@@ -9,6 +9,7 @@
 
 {% block body %}
 
+
 {# Le formulaire de recherche #}
 {{ parent() }}
 
@@ -31,8 +32,12 @@
                         <p>Heure création : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p>
                     </div>
                     <div class="col-5 col-25-medium">
-                        <img src="{{ asset('images/pic03.jpg') }}" alt="Resource Image" width="120%"/>
+                        <img src="{{ asset(imagePath) }}" alt="Image description" width="120%">
+
+
                     </div>
+
+
 
                     <div class="col-25 col-25-medium">
                         <h3>Origine de Production</h3><hr>
