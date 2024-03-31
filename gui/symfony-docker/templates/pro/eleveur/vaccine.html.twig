@@ -6,7 +6,7 @@
         <br>
         <form action="{{ path('app_eleveur_vaccine', {'id' : id}) }}" method="post">
             <label for="vaccine">Vaccin effectué :
-            <select required name="vaccine" id="vaccine">
+            <select class="custom-select" required name="vaccine" id="vaccine">
                 <option value="Vaccin A" selected>Vaccin A</option>
                 <option value="Vaccin B">Vaccin B</option>
                 <option value="Vaccin C">Vaccin C</option>
@@ -14,7 +14,8 @@
                 <option value="Vaccin E">Vaccin E</option>
             </select>
             </label>
-            <input type="submit" value="Enregistrer">
+            <br>
+            <input class="btn btn-primary" type="submit" value="Enregistrer">
         </form>
 
     </div>

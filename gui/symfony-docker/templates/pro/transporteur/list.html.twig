@@ -1,7 +1,22 @@
 {% extends 'pro/transporteur/index.html.twig' %}
 
 {%  block body %}
-    {% for resource in resource %}
-        {{ resource.ResourceName.name }} {{ resource.id }}
-    {% endfor %}
+    <div class="container-fluid">
+        <h1 class="mt-4">Votre cargaison :</h1>
+        <br>
+        {% if resources %}
+
+            {% for resource in resources %}
+                <div class="card mr-2 mb-2" style="width: 100%;">
+                    <div class="card-body ">
+                        <h5 class="card-title">{{ resource.ResourceName.name }} - {{ resource.id }}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <p>Votre cargaison est vide.</p>
+        {% endif %}
+    </div>
+
 {% endblock %}

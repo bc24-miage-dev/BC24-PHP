@@ -1,11 +1,23 @@
 {% extends 'pro/eleveur/index.html.twig' %}
 
-{%  block body %}
-    {% for animal in animaux %}
-        {{ animal.ResourceName.name }} {{ animal.id }}
-        <a href="{{ path('app_eleveur_weight', {'id' : animal.id}) }}">Pesée</a>
-        <a href="{{ path('app_eleveur_vaccine', {'id' : animal.id }) }}">Vacciner</a>
-        <a href="{{ path('app_eleveur_disease', {'id' : animal.id }) }}">Signaler une maladie</a>
-        <br><br>
-    {% endfor %}
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="mt-4">Liste de vos animaux</h1>
+    {% if animaux %}
+
+        {% for animal in animaux %}
+            <div class="card mr-2 mb-2" style="width: 100%;">
+                <div class="card-body ">
+                    <h5 class="card-title">{{ animal.ResourceName.name }} - {{ animal.id }}</h5>
+                    <a href="{{ path('app_eleveur_weight', {'id' : animal.id}) }}" class="card-link">Pesée</a>
+                    <a href="{{ path('app_eleveur_vaccine', {'id' : animal.id }) }}" class="card-link">Vacciner</a>
+                    <a href="{{ path('app_eleveur_disease', {'id' : animal.id }) }}" class="card-link">Signaler une maladie</a>
+                </div>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <p>Vous n'avez pas encore d'animaux</p>
+    {% endif %}
+    </div>
 {% endblock %}

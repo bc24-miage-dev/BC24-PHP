@@ -48,7 +48,7 @@ class TransporteurController extends AbstractController
     {
         $resources = $resourceRepo->findBy(['currentOwner' => $this->getUser()]); //No limitation on what a transporteur can own
         return $this->render('pro/transporteur/list.html.twig',
-            ['resource' => $resources]
+            ['resources' => $resources]
         );
     }
 

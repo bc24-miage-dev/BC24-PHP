@@ -51,7 +51,7 @@ class DistributeurController extends AbstractController
 
         $produits = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'PRODUIT');
         return $this->render('pro/distributeur/list.html.twig',
-            ['resource' => $produits]
+            ['resources' => $produits]
         );
     }
 

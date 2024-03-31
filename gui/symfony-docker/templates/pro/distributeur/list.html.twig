@@ -1,7 +1,20 @@
 {% extends 'pro/distributeur/index.html.twig' %}
 
 {%  block body %}
-    {% for resource in resource %}
-        {{ resource.ResourceName.name }} {{ resource.id }}
-    {% endfor %}
+    <div class="container-fluid">
+        {% if resources %}
+            {% for product in resources %}
+                <div class="card mr-2 mb-2" style="width: 100%;">
+                    <div class="card-body ">
+                        <h5 class="card-title">{{ product.ResourceName.name }} - NFC: {{ product.id }}</h5>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <br>
+            <p>Vous n'avez aucun produit en stock</p>
+        {% endif %}
+
+    </div>
 {% endblock %}

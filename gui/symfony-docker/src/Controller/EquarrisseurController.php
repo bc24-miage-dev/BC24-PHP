@@ -94,7 +94,7 @@ class EquarrisseurController extends AbstractController
         }
 
         $handler = new ResourceHandler();
-        $newCarcasse = $handler->createChildResource($doctrine, $resource, $this->getUser());
+        $newCarcasse = $handler->createChildResource($resource, $this->getUser());
         $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class, $newCarcasse);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -131,9 +131,9 @@ class EquarrisseurController extends AbstractController
         $demiCarcasse = $resourceNameRepo->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getFamily()->getName())[0];
 
         $handler = new ResourceHandler();
-        $newHalfCarcasse = $handler->createChildResource($doctrine, $resource, $this->getUser());
+        $newHalfCarcasse = $handler->createChildResource($resource, $this->getUser());
         $newHalfCarcasse->setResourceName($demiCarcasse);
-        $newHalfCarcasse2 = $handler->createChildResource($doctrine, $resource, $this->getUser());
+        $newHalfCarcasse2 = $handler->createChildResource($resource, $this->getUser());
         $newHalfCarcasse2->setResourceName($demiCarcasse);
 
         //Classic form because two different entities must be processed at once

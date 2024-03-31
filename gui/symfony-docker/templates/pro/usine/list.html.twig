@@ -1,10 +1,21 @@
 {% extends 'pro/usine/index.html.twig' %}
 
 {%  block body %}
-    {% for demiCarcasse in resources %}
-        {{ demiCarcasse.ResourceName.name }} {{ demiCarcasse.id }}
-        <a href="{{ path('app_usine_decoupe', {'id' : demiCarcasse.id}) }}">Découpe</a>
+    <div class="container-fluid">
+        {% if resources %}
+            {% for demiCarcasse in resources %}
+                <div class="card mr-2 mb-2" style="width: 100%;">
+                    <div class="card-body ">
+                        <h5 class="card-title">{{ demiCarcasse.ResourceName.name }} - {{ demiCarcasse.id }}</h5>
+                        <a href="{{ path('app_usine_decoupe', {'id' : demiCarcasse.id}) }}" class="card-link">Plus de détails</a>
+                    </div>
+                </div>
+            {% endfor %}
 
-        <br><br>
-    {% endfor %}
+        {% else %}
+            <br>
+            <p>Vous n'avez aucune Demi-carcasse</p>
+        {% endif %}
+
+    </div>
 {% endblock %}

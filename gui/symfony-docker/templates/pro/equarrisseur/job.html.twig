@@ -2,15 +2,35 @@
 
 {% block body %}
     <div class="container-fluid">
+        <div class="banner">
     {% if category == 'ANIMAL' %}
-        <h1>Informations sur cet animal :</h1>
-        {{ resource.ResourceName.name }} {{ resource.id }} {{ resource.weight }} <br>
-        <a href="{{ path('app_equarrisseur_equarrir', {'id' : resource.id}) }}">Équarrir</a>
+        <h1>Informations sur cet animal</h1>
+        <br>
+
+        <ul class="list-group">
+            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
+            <li class="list-group-item">NFC : {{ resource.id }}</li>
+            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+        </ul>
+        <br>
+        <a href="{{ path('app_equarrisseur_equarrir', {'id' : resource.id}) }}">
+            <button class="btn btn-primary">Équarrir</button>
+        </a>
     {% else %}
         <h1>Informations sur cette carcasse</h1>
-        {{ resource.ResourceName.name }} {{ resource.id }} {{ resource.weight }} <br>
-        <a href="{{ path('app_equarrisseur_decoupe', {'id' : resource.id}) }}">Découper</a>
+        <br>
+        <ul class="list-group">
+            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
+            <li class="list-group-item">NFC : {{ resource.id }}</li>
+            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+        </ul>
+        <br>
+
+        <a href="{{ path('app_equarrisseur_decoupe', {'id' : resource.id}) }}">
+            <button class="btn btn-primary">Découper</button>
+        </a>
     {% endif %}
+        </div>
     </div>
 {% endblock %}
 

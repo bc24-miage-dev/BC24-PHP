@@ -4,11 +4,7 @@
 
 <h1>Création de recette</h1>
 <h3> Indiquez les différents morceaux nécessaires à la fabrication d'un(e) {{ name }}</h3>
-
-INGRÉDIENTS POUR LE FORMULAIRE : <br>
-{% for ingredient in ingredients %}
-{{ ingredient.name }}
-{% endfor %}
+    <br>
 
         <div class="row col-md-12 card card-body">
             <form method="post" action="">
@@ -17,8 +13,8 @@ INGRÉDIENTS POUR LE FORMULAIRE : <br>
                 <div id="copy">
                 <thead>
                     <tr>
-                        <th>Ingredient</th>
-                        <th>Nombre de morceau</th>
+                        <th>Ingrédient</th>
+                        <th>Quantité requise</th>
                     </tr>
                 </thead>
                     <tbody id="table-body">
@@ -43,7 +39,7 @@ INGRÉDIENTS POUR LE FORMULAIRE : <br>
         </div>
 
 
-    
+
 {% endblock %}
 
 {% block script %}

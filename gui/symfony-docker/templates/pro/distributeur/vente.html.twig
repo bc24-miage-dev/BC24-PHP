@@ -1,10 +1,18 @@
 {% extends 'pro/distributeur/index.html.twig' %}
 
 {% block body %}
-    <h1>Register NFC Tag</h1>
-    {{ form_start(form) }}
-        {{ form_row(form.id) }}
-        {{ form_row(form.isLifeCycleOver) }}
-        <button type="submit">Submit</button>
-    {{ form_end(form) }}
+    <div class="container-fluid">
+        <h1>Vente</h1>
+        <p>Scannez le code du produit vendu</p>
+        <br>
+
+        {{ form_start(form) }}
+        <label> Tag NFC :
+            <input type="number" name="{{ field_name(form.id) }}" class="form-control" >
+        </label>
+
+
+            <button class="btn btn-primary" type="submit">Vente</button>
+        {{ form_end(form) }}
+    </div>
 {% endblock %}
