@@ -2,82 +2,69 @@
 
 namespace App\Controller;
 
+use App\Form\SearchType;
 use App\Repository\ResourceRepository;
 use App\Repository\UserResearchRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Resource;
-use App\Form\SearchType;
-use App\Entity\UserResearch;
-
-
+use App\Handlers\UserResearchHandler;
 
 #[Route('/search')]
 class SearchController extends AbstractController
 {
-#[Route('/', name: 'app_search')]
+    #[Route('/', name: 'app_search')]
     public function search(Request $request): Response
-    {
-            $form = $this->createForm(SearchType::class);
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $data = $form->getData();
-                $id = $data->getId();
+    {   
+        $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
 
-                return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
-            }
-            return $this->render('search/search.html.twig', [
-                'form' => $form->createView()
-            ]);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $id = $form->getData()->getId();
+            return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
+        }
+
+        return $this->render('search/search.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/{id}', name: 'app_search_result')]
     public function result(int $id,
-                           EntityManagerInterface $entityManager,
-                           UserResearchRepository $userResearchRepository,
-                           ResourceRepository $resourceRepository,
-                           Request $request): Response
-    {
+        EntityManagerInterface $entityManager,
+        UserResearchRepository $userResearchRepository,
+        ResourceRepository $resourceRepository,
+        Request $request): Response {
         $form = $this->createForm(SearchType::class);
-        $form -> handleRequest($request);
+        $form->handleRequest($request);
+        
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            $history = $userResearchRepository->findBy(['User' => $user]);
-            if (count($history) > 0) {
-                $history[0]->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager->persist($history[0]);
-            }
-            else{
-                $userResearch = new UserResearch();
-                $userResearch->setUser($user);
-                $userResearch->setResource($resourceRepository->find($id));
-                $userResearch->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager->persist($userResearch);
-            }
-            $entityManager->flush();
-
-            $data = $form->getData();
-            $id = $data->getId();
-            return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
+            return $this->redirect($this->generateUrl('app_search_result', ['id' => $form->getData()->getId()]));
         }
-
+        
         $resource = $resourceRepository->find($id);
         if (!$resource) {
             $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
             return $this->redirectToRoute('app_search');
         }
+
+        if ($user = $this->getUser()) {
+            $history = $userResearchRepository->findOneBy(['User' => $user, 'Resource' => $resourceRepository->find($id)]);
+            if ($history) {
+                $history->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+                $entityManager->persist($history);
+            } else {
+                $handler = new UserResearchHandler();
+                $entityManager->persist($handler->createUserResearch($user, $resource));
+            }
+            $entityManager->flush();
+        }
+
         return $this->render('search/result.html.twig', [
-            'form' => $form -> createView(),
-            'resource' => $resource
+            'form' => $form->createView(),
+            'resource' => $resource,
         ]);
     }
 }
-
-
-
-
