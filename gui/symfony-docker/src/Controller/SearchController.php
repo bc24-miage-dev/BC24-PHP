@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Handlers\PictureHandler;
 use App\Form\SearchType;
 use App\Repository\ResourceRepository;
 use App\Repository\UserResearchRepository;
@@ -15,6 +16,8 @@ use App\Handlers\UserResearchHandler;
 #[Route('/search')]
 class SearchController extends AbstractController
 {
+    private EntityManagerInterface $entityManager;
+
     #[Route('/', name: 'app_search')]
     public function search(Request $request): Response
     {   
@@ -33,15 +36,35 @@ class SearchController extends AbstractController
 
     #[Route('/{id}', name: 'app_search_result')]
     public function result(int $id,
-        EntityManagerInterface $entityManager,
-        UserResearchRepository $userResearchRepository,
-        ResourceRepository $resourceRepository,
-        Request $request): Response {
+                           EntityManagerInterface $entityManager,
+                           UserResearchRepository $userResearchRepository,
+                           ResourceRepository $resourceRepository,
+                           PictureHandler $pictureHandler,
+                           Request $request): Response
+    {
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this->redirect($this->generateUrl('app_search_result', ['id' => $form->getData()->getId()]));
+            $user = $this->getUser();
+            $history = $userResearchRepository->findBy(['User' => $user]);
+            if (count($history) > 0) {
+                $history[0]->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+                $entityManager->persist($history[0]);
+            }
+            else{
+                $userResearch = new UserResearch();
+                $userResearch->setUser($user);
+                $userResearch->setResource($resourceRepository->find($id));
+                $userResearch->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+                $entityManager->persist($userResearch);
+            }
+            $entityManager->flush();
+
+            $data = $form->getData();
+            $id = $data->getId();
+
+            return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
         }
         
         $resource = $resourceRepository->find($id);
@@ -49,6 +72,9 @@ class SearchController extends AbstractController
             $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
             return $this->redirectToRoute('app_search');
         }
+
+        $categoryName = $resource->getResourceName()->getResourceCategory()->getCategory();
+        $imagePath = $pictureHandler->getImageForCategory($categoryName);
 
         if ($user = $this->getUser()) {
             $history = $userResearchRepository->findOneBy(['User' => $user, 'Resource' => $resourceRepository->find($id)]);
@@ -63,8 +89,11 @@ class SearchController extends AbstractController
         }
 
         return $this->render('search/result.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form -> createView(),
             'resource' => $resource,
+            'imagePath' => $imagePath,
         ]);
     }
+
+
 }
