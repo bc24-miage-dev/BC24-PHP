@@ -13,9 +13,10 @@ class LoginSecurityController extends AbstractController
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
+        //if ($this->getUser() && $this->getUser()->getId() == 320) {
+        //    $this->addFlash('error', 'Il n\'y a pas de compte associé à cet identifiant');
+        //    return $this->redirectToRoute('app_index');
+        //}
 
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
