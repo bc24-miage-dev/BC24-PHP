@@ -46,24 +46,7 @@ class SearchController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            $history = $userResearchRepository->findBy(['User' => $user]);
-            if (count($history) > 0) {
-                $history[0]->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager->persist($history[0]);
-            }
-            else{
-                $userResearch = new UserResearch();
-                $userResearch->setUser($user);
-                $userResearch->setResource($resourceRepository->find($id));
-                $userResearch->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager->persist($userResearch);
-            }
-            $entityManager->flush();
-
-            $data = $form->getData();
-            $id = $data->getId();
-
+            $id = $form->getData()->getId();
             return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
         }
         
