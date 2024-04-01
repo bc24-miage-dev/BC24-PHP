@@ -15,7 +15,7 @@ class ResourceHandler
         $array = [$resource];
 
         foreach ($resource->getResources() as $childResource) {
-            array_push($array, ...$childResource->findAllChildren());
+            array_push($array, ...$this->findAllChildren($childResource));
         }
 
         return $array;

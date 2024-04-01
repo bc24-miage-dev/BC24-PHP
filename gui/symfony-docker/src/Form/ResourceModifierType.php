@@ -25,7 +25,6 @@ class ResourceModifierType extends AbstractType
             ->add('isContamined')
             ->add('weight')
             ->add('price')
-            ->add('description')
             ->add('origin', EntityType::class, [
                 'class' => ProductionSite::class,
 'choice_label' => 'id',
