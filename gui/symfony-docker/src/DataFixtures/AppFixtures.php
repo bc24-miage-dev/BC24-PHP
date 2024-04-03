@@ -112,6 +112,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $newUser->setRoles(["ROLE_" . strtoupper($userName), "ROLE_PRO"]);
             $newUser->setFirstname(ucfirst($userName));
             $newUser->setLastname("The" . ucfirst($userName));
+            $newUser->setWalletAddress('Wallet'. $userName);
 
             if (isset($productionSites[$userName])) { // If the user is a professional with a production site
                 $newUser->setProductionSite($manager->getRepository(ProductionSite::class)->findOneBy(['ProductionSiteName' => $productionSites[$userName]]));
