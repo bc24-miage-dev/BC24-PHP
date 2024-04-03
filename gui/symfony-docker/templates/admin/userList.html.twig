@@ -25,6 +25,8 @@
                             </thead>
                             <tbody>
                                 {% for user in users %}
+                                    {% if user.deletedAt == null %}
+                                    
                                     <tr>
                                         <td>{{ user.lastname }}</td>
                                         <td>{{ user.firstname }}</td>
@@ -100,6 +102,7 @@
                                             </form>
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
