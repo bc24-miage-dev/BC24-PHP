@@ -59,6 +59,9 @@ class Resource
     #[ORM\JoinColumn(nullable: false)]
     private ?ResourceName $ResourceName = null;
 
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $Genre = null;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
@@ -294,6 +297,18 @@ class Resource
     public function setResourceName(?ResourceName $name): static
     {
         $this->ResourceName = $name;
+
+        return $this;
+    }
+
+    public function getGenre(): ?string
+    {
+        return $this->Genre;
+    }
+
+    public function setGenre(?string $Genre): static
+    {
+        $this->Genre = $Genre;
 
         return $this;
     }

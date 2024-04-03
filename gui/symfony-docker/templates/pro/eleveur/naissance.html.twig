@@ -24,6 +24,14 @@
     <label>Poids de l'animal (en grammes) :
         <input type="number" name="{{ field_name(form.weight) }}" class="form-control">
     </label>
+
+    <label>Genre :
+        <select name="{{ field_name(form.Genre) }}" class="form-control">
+            <option value="M">Mâle</option>
+            <option value="F">Femelle</option>
+        </select>
+    </label>
+
 {{ form_end(form) }}
 </div>
 {% endblock %}

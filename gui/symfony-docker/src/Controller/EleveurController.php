@@ -151,10 +151,9 @@ class EleveurController extends AbstractController
         if ($request->isMethod('POST')) {
             $newDisease = $request->request->get('disease');
             $beginDate = $request->request->get('dateBegin');
-            $endDate = $request->request->get('dateEnd');
 
             $resource->setDescription($resource->getDescription() .
-                'MALADIE|' . $newDisease . '|' . $beginDate . '|' . $endDate . ';');
+                'MALADIE|' . $newDisease . '|' . $beginDate . ';');
 
             $entityManager->persist($resource);
             $entityManager->flush();

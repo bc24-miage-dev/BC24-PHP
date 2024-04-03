@@ -29,6 +29,7 @@ class EleveurBirthType extends AbstractType
                     ->setParameter('category', 'ANIMAL');
             }
         ])
+            ->add('Genre')
             ->add('weight')
             ->add('submit', SubmitType::class, [
                 'label' => 'Confirmer la naissance'
