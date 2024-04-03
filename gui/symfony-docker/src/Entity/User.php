@@ -49,7 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'userRelated')]
     private ?ProductionSite $productionSite = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $WalletAddress = null;
 
     public function __construct()
@@ -282,7 +282,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->WalletAddress;
     }
 
-    public function setWalletAddress(string $WalletAddress): static
+    public function setWalletAddress(?string $WalletAddress): static
     {
         $this->WalletAddress = $WalletAddress;
 
