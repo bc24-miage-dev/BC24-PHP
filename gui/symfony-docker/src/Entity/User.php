@@ -49,6 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'userRelated')]
     private ?ProductionSite $productionSite = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $WalletAddress = null;
+
     public function __construct()
     {
         $this->reports = new ArrayCollection();
@@ -270,6 +273,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setProductionSite(?ProductionSite $productionSite): static
     {
         $this->productionSite = $productionSite;
+
+        return $this;
+    }
+
+    public function getWalletAddress(): ?string
+    {
+        return $this->WalletAddress;
+    }
+
+    public function setWalletAddress(string $WalletAddress): static
+    {
+        $this->WalletAddress = $WalletAddress;
 
         return $this;
     }
