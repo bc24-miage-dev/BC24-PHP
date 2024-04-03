@@ -9,9 +9,10 @@
             <div class="card mr-2 mb-2" style="width: 100%;">
                 <div class="card-body ">
                     <h5 class="card-title">{{ animal.ResourceName.name }} - {{ animal.id }}</h5>
-                    <a href="{{ path('app_eleveur_weight', {'id' : animal.id}) }}" class="card-link">Pesée</a>
+                    <a href="{{ path('app_eleveur_weight', {'id' : animal.id}) }}" class="card-link">Peser</a>
                     <a href="{{ path('app_eleveur_vaccine', {'id' : animal.id }) }}" class="card-link">Vacciner</a>
                     <a href="{{ path('app_eleveur_disease', {'id' : animal.id }) }}" class="card-link">Signaler une maladie</a>
+                    <a href="{{ path('app_eleveur_nutrition', {'id' : animal.id }) }}" class="card-link">Nutrition</a>
                 </div>
             </div>
         {% endfor %}

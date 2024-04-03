@@ -136,6 +136,33 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/vaccine.html.twig', ['id' => $id]);
     }
 
+    #[Route('/nutrition/{id}', name: 'app_eleveur_nutrition')]
+    public function nutrition(Request $request,
+                            EntityManagerInterface $entityManager,
+                            ResourceRepository $resourceRepo,
+        $id): Response{
+
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+            $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+
+        if ($request->isMethod('POST')) {
+            $newNutrition = $request->request->get('nutrition');
+            $date = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+            $dateString = $date->format('Y-m-d');
+            $resource->setDescription($resource->getDescription() . 'NUTRITION|' . $newNutrition . '|' . $dateString . ';');
+            $entityManager->persist($resource);
+            $entityManager->flush();
+            $this->addFlash('success', 'Votre animal a bien mangé');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+        return $this->render('pro/eleveur/nutrition.html.twig', ['id' => $id]);
+    }
+
+
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request,
                             EntityManagerInterface $entityManager,
