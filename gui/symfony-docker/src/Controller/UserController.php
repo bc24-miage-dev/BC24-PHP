@@ -101,6 +101,7 @@ class UserController extends AbstractController
             $UserRoleRequest->setUser($this->getUser());
             $UserRoleRequest->setRead(false);
             $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+            $UserRoleRequest->setWalletAddress($this->getUser()->getWalletAddress());
             $entityManager->persist($UserRoleRequest);
             $entityManager->flush();
 
