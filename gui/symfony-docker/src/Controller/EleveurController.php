@@ -151,9 +151,7 @@ class EleveurController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $newNutrition = $request->request->get('nutrition');
-            $date = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
-            $dateString = $date->format('Y-m-d');
-            $resource->setDescription($resource->getDescription() . 'NUTRITION|' . $newNutrition . '|' . $dateString . ';');
+            $resource->setDescription($resource->getDescription() . 'NUTRITION|' . $newNutrition . ';');
             $entityManager->persist($resource);
             $entityManager->flush();
             $this->addFlash('success', 'Votre animal a bien mangé');
