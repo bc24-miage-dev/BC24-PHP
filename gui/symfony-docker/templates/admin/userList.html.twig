@@ -20,6 +20,7 @@
                                     <th>Donner un rôle</th>
                                     <th>Site associé</th>
                                     <th>Associer un site</th>
+                                    <th>Wallet Address (enter to validate)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -92,6 +93,11 @@
                                             {% else %}
                                                 <p> Aucune action possible </p>
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                            <form method="post" action="{{ path('app_admin_userWalletAddressEdit', {'id': user.id}) }}">
+                                                <input type="text" name="walletAddress" value= {{user.walletAddress}}>
+                                            </form>
                                         </td>
                                     </tr>
                                 {% endfor %}
