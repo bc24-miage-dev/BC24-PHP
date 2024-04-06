@@ -14,7 +14,7 @@ class ResourceNameHandler
     {
         $resourceName = new ResourceName();
         $resourceName->setName($name);
-        $resourceName->setFamily($family);
+        $resourceName->addResourceFamily($family);
         $resourceName->setResourceCategory($category);
         $resourceName->setProductionSiteOwner($owner);
         return $resourceName;

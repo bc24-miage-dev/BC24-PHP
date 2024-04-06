@@ -16,11 +16,9 @@ use App\Handlers\UserResearchHandler;
 #[Route('/search')]
 class SearchController extends AbstractController
 {
-    private EntityManagerInterface $entityManager;
-
     #[Route('/', name: 'app_search')]
     public function search(Request $request): Response
-    {   
+    {
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
 
@@ -44,12 +42,12 @@ class SearchController extends AbstractController
     {
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $id = $form->getData()->getId();
             return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
         }
-        
+
         $resource = $resourceRepository->find($id);
         if (!$resource) {
             $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');

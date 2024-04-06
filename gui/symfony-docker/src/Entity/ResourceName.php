@@ -25,9 +25,6 @@ class ResourceName
     #[ORM\JoinColumn(nullable: false)]
     private ?ResourceCategory $resourceCategory = null;
 
-    #[ORM\ManyToOne(inversedBy: 'resourceNames')]
-    private ?ResourceFamily $family = null;
-
     #[ORM\ManyToOne(inversedBy: 'resourceNamesOwned')]
     private ?ProductionSite $productionSiteOwner = null;
 
@@ -37,11 +34,15 @@ class ResourceName
     #[ORM\OneToMany(mappedBy: 'ingredient', targetEntity: Recipe::class)]
     private Collection $recipesThisNameIsIngredient;
 
+    #[ORM\ManyToMany(targetEntity: ResourceFamily::class, inversedBy: 'resourceNames')]
+    private Collection $resourceFamilies;
+
     public function __construct()
     {
         $this->ResourcesUsingThisName = new ArrayCollection();
         $this->recipes = new ArrayCollection();
         $this->recipesThisNameIsIngredient = new ArrayCollection();
+        $this->resourceFamilies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,19 +103,6 @@ class ResourceName
 
         return $this;
     }
-
-    public function getFamily(): ?ResourceFamily
-    {
-        return $this->family;
-    }
-
-    public function setFamily(?ResourceFamily $family): static
-    {
-        $this->family = $family;
-
-        return $this;
-    }
-
     public function getProductionSiteOwner(): ?ProductionSite
     {
         return $this->productionSiteOwner;
@@ -183,6 +171,30 @@ class ResourceName
                 $recipesThisNameIsIngredient->setIngredient(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ResourceFamily>
+     */
+    public function getResourceFamilies(): Collection
+    {
+        return $this->resourceFamilies;
+    }
+
+    public function addResourceFamily(ResourceFamily $resourceFamily): static
+    {
+        if (!$this->resourceFamilies->contains($resourceFamily)) {
+            $this->resourceFamilies->add($resourceFamily);
+        }
+
+        return $this;
+    }
+
+    public function removeResourceFamily(ResourceFamily $resourceFamily): static
+    {
+        $this->resourceFamilies->removeElement($resourceFamily);
 
         return $this;
     }

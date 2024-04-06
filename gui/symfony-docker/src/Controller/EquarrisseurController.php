@@ -100,8 +100,9 @@ class EquarrisseurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getFamily()->getName());
-            $newCarcasse->setResourceName($rN[0]);
+            $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
+            // Since the $resource is an animal, we can assume that it has only one family (vache, porc, etc.)
+            $newCarcasse->setResourceName($rN);
             $resource->setIsLifeCycleOver(true);
             $entityManager->persist($resource);
             $entityManager->persist($newCarcasse);
@@ -120,6 +121,7 @@ class EquarrisseurController extends AbstractController
                             Request $request,
                             ResourceRepository $resourceRepo,
                             ResourceNameRepository $resourceNameRepo,
+                            ResourceHandler $handler,
                             $id) : Response
     {
         $resource = $resourceRepo->findOneBy(['id'=> $id, 'currentOwner' => $this->getUser()]);
@@ -128,9 +130,9 @@ class EquarrisseurController extends AbstractController
             return $this->redirectToRoute('app_equarrisseur_list');
         }
 
-        $demiCarcasse = $resourceNameRepo->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getFamily()->getName())[0];
+        $demiCarcasse = $resourceNameRepo->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
+        //Same here, we can assume that a carcasse has only one family
 
-        $handler = new ResourceHandler();
         $newHalfCarcasse = $handler->createChildResource($resource, $this->getUser());
         $newHalfCarcasse->setResourceName($demiCarcasse);
         $newHalfCarcasse2 = $handler->createChildResource($resource, $this->getUser());

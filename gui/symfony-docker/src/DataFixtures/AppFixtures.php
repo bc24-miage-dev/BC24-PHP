@@ -55,9 +55,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $carcasse->setName('Carcasse de ' . $familyName);
             $demiCarcasse->setName('Demi-carcasse de ' . $familyName);
 
-            $animal->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
-            $carcasse->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
-            $demiCarcasse->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+            $animal->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+            $carcasse->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+            $demiCarcasse->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
 
             $animal->setResourceCategory($manager->getRepository(ResourceCategory::class)->findOneBy(['category' => 'ANIMAL']));
             $carcasse->setResourceCategory($manager->getRepository(ResourceCategory::class)->findOneBy(['category' => 'CARCASSE']));
@@ -74,7 +74,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             foreach ($morceauxNames as $morceauName) {
                 $morceau = new ResourceName();
                 $morceau->setName($morceauName . ' de ' . $familyName);
-                $morceau->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+                $morceau->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
                 $morceau->setResourceCategory($manager->getRepository(ResourceCategory::class)->findOneBy(['category' => 'MORCEAU']));
                 $manager->persist($morceau);
                 $manager->flush();
