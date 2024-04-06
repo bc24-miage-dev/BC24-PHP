@@ -80,7 +80,8 @@ class UsineController extends AbstractController
         }
 
         $resources = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
-            family: $resourceRepository->find($id)->getResourceName()->getFamily()->getName());
+            family: $resourceRepository->find($id)->getResourceName()->getResourceFamilies()[0]->getName());
+            // Only products can have multiple families
 
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list'];
@@ -150,7 +151,7 @@ class UsineController extends AbstractController
                 $recipe = new Recipe();
                 $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
                 $recipe->setIngredientNumber(intval($element['quantity']));
-                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $familyRepo->findOneBy(['name' => $family]), 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
+                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
                 $entityManager->persist($recipe);
                 $entityManager->flush();
             }

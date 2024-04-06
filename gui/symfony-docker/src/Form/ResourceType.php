@@ -28,7 +28,6 @@ class ResourceType extends AbstractType
             ->add('isContamined')
             ->add('weight')
             ->add('price')
-            ->add('description')
             ->add('currentOwner', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'id',

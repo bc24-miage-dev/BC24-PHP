@@ -18,7 +18,7 @@ class ResourceFamily
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'family', targetEntity: ResourceName::class)]
+    #[ORM\ManyToMany(targetEntity: ResourceName::class, mappedBy: 'resourceFamilies')]
     private Collection $resourceNames;
 
     public function __construct()
@@ -46,30 +46,28 @@ class ResourceFamily
     /**
      * @return Collection<int, ResourceName>
      */
-    public function getResourceNames(): Collection
+    public function getResourceNamesUsingThisFamily(): Collection
     {
         return $this->resourceNames;
     }
 
-    public function addResourceName(ResourceName $resourceName): static
+    public function addResourceNamesUsingThisFamily(ResourceName $resourceNamesUsingThisFamily): static
     {
-        if (!$this->resourceNames->contains($resourceName)) {
-            $this->resourceNames->add($resourceName);
-            $resourceName->setFamily($this);
+        if (!$this->resourceNames->contains($resourceNamesUsingThisFamily)) {
+            $this->resourceNames->add($resourceNamesUsingThisFamily);
+            $resourceNamesUsingThisFamily->addResourceFamily($this);
         }
 
         return $this;
     }
 
-    public function removeResourceName(ResourceName $resourceName): static
+    public function removeResourceNamesUsingThisFamily(ResourceName $resourceNamesUsingThisFamily): static
     {
-        if ($this->resourceNames->removeElement($resourceName)) {
-            // set the owning side to null (unless already changed)
-            if ($resourceName->getFamily() === $this) {
-                $resourceName->setFamily(null);
-            }
+        if ($this->resourceNames->removeElement($resourceNamesUsingThisFamily)) {
+            $resourceNamesUsingThisFamily->removeResourceFamily($this);
         }
 
         return $this;
     }
+
 }

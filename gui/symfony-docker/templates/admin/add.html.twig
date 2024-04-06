@@ -36,10 +36,7 @@
             label: 'Prix en euros'
         })
         }}
-        {{ form_row(form.description, {
-            label: 'Description'
-        })
-        }}
+
         <label> NFC des Composants :
             {% for i in 0..5 %}
             <input class="ml-3" type="number" name="{{ field_name(form.components) }}">
