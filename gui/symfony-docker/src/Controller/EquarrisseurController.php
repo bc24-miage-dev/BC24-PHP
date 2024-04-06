@@ -100,7 +100,7 @@ class EquarrisseurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $rN = $resourceNameRepo->findByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
+            $rN = $resourceNameRepo->findOneByCategoryAndFamily('CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
             // Since the $resource is an animal, we can assume that it has only one family (vache, porc, etc.)
             $newCarcasse->setResourceName($rN);
             $resource->setIsLifeCycleOver(true);
@@ -130,7 +130,7 @@ class EquarrisseurController extends AbstractController
             return $this->redirectToRoute('app_equarrisseur_list');
         }
 
-        $demiCarcasse = $resourceNameRepo->findByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
+        $demiCarcasse = $resourceNameRepo->findOneByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
         //Same here, we can assume that a carcasse has only one family
 
         $newHalfCarcasse = $handler->createChildResource($resource, $this->getUser());
