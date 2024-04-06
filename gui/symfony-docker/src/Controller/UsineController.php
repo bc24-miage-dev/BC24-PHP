@@ -58,7 +58,19 @@ class UsineController extends AbstractController
     #[Route('/list', name: 'app_usine_list')]
     public function list(ResourceRepository $resourceRepo): Response
     {
-        $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
+        if ($request->isMethod('POST')) {
+            $NFC = $request->request->get('NFC');
+            $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
+            if($resources == null){
+                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+                return $this->redirectToRoute('app_usine_list');
+            }
+        }
+        else{
+        $resources = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+        // $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
+        }
+        // $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
         return $this->render('pro/usine/list.html.twig', [
             'resources' => $resources
         ]);

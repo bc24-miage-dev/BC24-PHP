@@ -2,18 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\Resource;
 use App\Form\EleveurBirthType;
 use App\Form\EleveurWeightType;
-use App\Form\ResourceModifierType;
 use App\Form\ResourceOwnerChangerType;
-use App\Form\ResourceType;
 use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
-use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Entity;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,15 +19,18 @@ use Symfony\Component\Routing\Attribute\Route;
 class EleveurController extends AbstractController
 {
     #[Route('/', name: 'app_eleveur_index')]
-    public function index(): Response
+    public function index(ResourceRepository $resourceRepo): Response
     {
-        return $this->render('pro/eleveur/index.html.twig');
+        $resource = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+
+        return $this->render('pro/eleveur/index.html.twig', [
+            'resource' => $resource,
+        ]);
     }
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
-                              EntityManagerInterface $entityManager): Response
-    {
+        EntityManagerInterface $entityManager): Response {
         $handler = new ResourceHandler();
         $resource = $handler->createDefaultNewResource($this->getUser());
 
@@ -46,15 +44,26 @@ class EleveurController extends AbstractController
             return $this->redirectToRoute('app_eleveur_index');
         }
         return $this->render('pro/eleveur/naissance.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
 
     }
 
     #[Route('/list', name: 'app_eleveur_list')]
-    public function list(ResourceRepository $resourceRepo) : Response
+    public function list(ResourceRepository $resourceRepo, Request $request): Response
     {
-        $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
+        if ($request->isMethod('POST')) {
+            $NFC = $request->request->get('NFC');
+            $animaux = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
+            if($animaux == null){
+                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+                return $this->redirectToRoute('app_eleveur_list');
+            }
+        }
+        else{
+        $animaux = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+        // $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
+        }
         return $this->render('pro/eleveur/list.html.twig',
             ['animaux' => $animaux]
         );
@@ -62,15 +71,14 @@ class EleveurController extends AbstractController
 
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
     public function acquisition(Request $request,
-                                ManagerRegistry $doctrine): Response
-    {
+        ManagerRegistry $doctrine): Response {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $proAcquireHandler = new proAcquireHandler();
 
-            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'ANIMAL')){
+            if ($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'ANIMAL')) {
                 $this->addFlash('success', 'L\'animal a bien été enregistré');
             } else {
                 $this->addFlash('error', 'Ce tag NFC ne correspond pas à un animal');
@@ -79,16 +87,15 @@ class EleveurController extends AbstractController
         }
 
         return $this->render('pro/eleveur/acquire.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
     #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
     public function weight(Request $request,
-                           EntityManagerInterface $entityManager,
-                           ResourceRepository $resourceRepo,
-                           $id): Response
-    {
+        EntityManagerInterface $entityManager,
+        ResourceRepository $resourceRepo,
+        $id): Response {
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
 
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
@@ -106,15 +113,15 @@ class EleveurController extends AbstractController
             return $this->redirectToRoute('app_eleveur_list');
         }
         return $this->render('pro/eleveur/weight.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
     public function vaccine(Request $request,
-                            EntityManagerInterface $entityManager,
-                            ResourceRepository $resourceRepo,
-                            $id): Response{
+        EntityManagerInterface $entityManager,
+        ResourceRepository $resourceRepo,
+        $id): Response {
 
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
 
@@ -138,9 +145,9 @@ class EleveurController extends AbstractController
 
     #[Route('/nutrition/{id}', name: 'app_eleveur_nutrition')]
     public function nutrition(Request $request,
-                            EntityManagerInterface $entityManager,
-                            ResourceRepository $resourceRepo,
-        $id): Response{
+        EntityManagerInterface $entityManager,
+        ResourceRepository $resourceRepo,
+        $id): Response {
 
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
 
@@ -160,13 +167,11 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/nutrition.html.twig', ['id' => $id]);
     }
 
-
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request,
-                            EntityManagerInterface $entityManager,
-                            ResourceRepository $resourceRepo,
-                            $id): Response
-    {
+        EntityManagerInterface $entityManager,
+        ResourceRepository $resourceRepo,
+        $id): Response {
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');

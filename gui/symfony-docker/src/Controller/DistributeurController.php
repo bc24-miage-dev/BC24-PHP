@@ -48,8 +48,17 @@ class DistributeurController extends AbstractController
     #[Route('/list', name: 'app_distributeur_list')]
     public function list(ResourceRepository $resourceRepo) : Response
     {
-
-        $produits = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'PRODUIT');
+        if ($request->isMethod('POST')) {
+            $NFC = $request->request->get('NFC');
+            $produits = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
+            if($produits == null){
+                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+                return $this->redirectToRoute('app_distributeur_list');
+            }
+        }
+        else{
+        $produits = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+        }
         return $this->render('pro/distributeur/list.html.twig',
             ['resources' => $produits]
         );

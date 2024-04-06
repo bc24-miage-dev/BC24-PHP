@@ -38,7 +38,7 @@ final class Version20240406183555 extends AbstractMigration
         $this->addSql('DROP TABLE __temp__resource_name');
         $this->addSql('CREATE INDEX IDX_5103DEBCE88D63C7 ON resource_name (production_site_owner_id)');
         $this->addSql('CREATE INDEX IDX_5103DEBC16FDA3B0 ON resource_name (resource_category_id)');
-        $this->addSql('ALTER TABLE user_role_request ADD COLUMN wallet_address VARCHAR(255) DEFAULT NULL');
+        // $this->addSql('ALTER TABLE user_role_request ADD COLUMN wallet_address VARCHAR(255) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void

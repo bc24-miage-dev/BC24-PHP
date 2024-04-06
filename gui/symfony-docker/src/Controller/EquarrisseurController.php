@@ -53,7 +53,19 @@ class EquarrisseurController extends AbstractController
     public function list(ResourceRepository $resourceRepo,
                          String $category) : Response
     {
-        $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), strtoupper($category));
+        if ($request->isMethod('POST')) {
+            $NFC = $request->request->get('NFC');
+            $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
+            if($resources == null){
+                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+                return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category]);
+            }
+        }
+        else{
+        $resources = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+        }
+
+        // $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), strtoupper($category));
         return $this->render('pro/equarrisseur/list.html.twig',
             ['resources' => $resources ]
         );

@@ -3,6 +3,13 @@
 {% block body %}
     <div class="container-fluid">
         <h1 class="mt-4">Liste de vos animaux</h1>
+        
+        <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+        </form>
+
     {% if animaux %}
 
         {% for animal in animaux %}

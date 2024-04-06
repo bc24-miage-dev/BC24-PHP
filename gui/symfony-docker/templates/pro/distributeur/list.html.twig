@@ -2,6 +2,11 @@
 
 {%  block body %}
     <div class="container-fluid">
+    <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+        </form>
         {% if resources %}
             {% for product in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
