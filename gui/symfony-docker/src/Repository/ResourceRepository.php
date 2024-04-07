@@ -85,4 +85,37 @@ class ResourceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByWalletAddressCategory(String $walletAddress, String $category): array
+    {   
+        $category = strtoupper($category);
+
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'u')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('rc.category = :category')
+            ->andWhere('u.WalletAddress = :WalletAddress')
+            ->setParameter('category', $category)
+            ->setParameter('WalletAddress', $walletAddress)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function findByWalletAddressNFC(String $walletAddress, int $NFC): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'u')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('u.WalletAddress = :WalletAddress')
+            ->andWhere('r.id = :NFC')
+            ->setParameter('WalletAddress', $walletAddress)
+            ->setParameter('NFC', $NFC)
+            ->getQuery()
+            ->getResult();
+    }
 }

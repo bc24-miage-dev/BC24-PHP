@@ -51,18 +51,19 @@ class EquarrisseurController extends AbstractController
 
     #[Route('/list/{category}', name: 'app_equarrisseur_list')] // An 'Equarrisseur' have access to the list of his animals and carcasses
     public function list(ResourceRepository $resourceRepo,
-                         String $category) : Response
+                         String $category,
+                         Request $request) : Response
     {
         if ($request->isMethod('POST')) {
             $NFC = $request->request->get('NFC');
-            $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
+            $resources = $resourceRepo->findByWalletAddressNFC($this->getUser()->getWalletAddress(),$NFC);
             if($resources == null){
                 $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
                 return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category]);
             }
         }
         else{
-        $resources = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+        $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(),$category);
         }
 
         // $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), strtoupper($category));
@@ -75,6 +76,7 @@ class EquarrisseurController extends AbstractController
     public function job(ResourceRepository $resourceRepo,
                         $id): Response
     {
+        
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
         if (!$resource) {
             $this->addFlash('error', 'Ressource introuvable');

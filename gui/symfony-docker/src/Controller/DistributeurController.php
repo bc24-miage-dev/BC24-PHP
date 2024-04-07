@@ -46,7 +46,7 @@ class DistributeurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_distributeur_list')]
-    public function list(ResourceRepository $resourceRepo) : Response
+    public function list(ResourceRepository $resourceRepo, Request $request) : Response
     {
         if ($request->isMethod('POST')) {
             $NFC = $request->request->get('NFC');
