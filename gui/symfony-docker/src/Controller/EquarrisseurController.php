@@ -77,10 +77,11 @@ class EquarrisseurController extends AbstractController
                         $id): Response
     {
         
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]); //change ici faut get vy wallet address
+
         if (!$resource) {
             $this->addFlash('error', 'Ressource introuvable');
-            return $this->redirectToRoute('app_equarrisseur_list');
+            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
         }
         if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'ANIMAL'){
             return $this->render('pro/equarrisseur/job.html.twig', [
@@ -105,7 +106,7 @@ class EquarrisseurController extends AbstractController
         $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'){
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
-            return $this->redirectToRoute('app_equarrisseur_list');
+            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
         }
 
         $handler = new ResourceHandler();
@@ -141,7 +142,7 @@ class EquarrisseurController extends AbstractController
         $resource = $resourceRepo->findOneBy(['id'=> $id, 'currentOwner' => $this->getUser()]);
         if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'CARCASSE'){
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
-            return $this->redirectToRoute('app_equarrisseur_list');
+            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
         }
 
         $demiCarcasse = $resourceNameRepo->findOneByCategoryAndFamily('DEMI-CARCASSE', $resource->getResourceName()->getResourceFamilies()[0]->getName());
