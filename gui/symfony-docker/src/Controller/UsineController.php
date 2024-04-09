@@ -77,6 +77,20 @@ class UsineController extends AbstractController
         ]);
     }
 
+    #[Route('/specific/{id}', name: 'app_usine_specific')]
+    public function specific(ResourceRepository $resourceRepo,
+                             $id): Response
+    {
+        $resource = $resourceRepo->find($id);
+        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+            $this->addFlash('error', 'Cette ressource ne vous appartient pas');
+            return $this->redirectToRoute('app_usine_list');
+        }
+        return $this->render('pro/usine/specific.html.twig', [
+            'resource' => $resource
+        ]);
+    }
+
     #[Route('/decoupe/{id}', name: 'app_usine_decoupe')]
     public function decoupe(Request $request,
                             EntityManagerInterface $entityManager,

@@ -201,4 +201,17 @@ class EleveurController extends AbstractController
         }
         return $this->render('pro/eleveur/disease.html.twig', ['id' => $id]);
     }
+
+    #[Route('/specific/{id}', name: 'app_eleveur_specific')]
+    public function specific(ResourceRepository $resourceRepository, $id) : Response
+    {
+        $animal = $resourceRepository->findOneBy(['id' => $id]);
+        if (!$animal || $animal->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+            $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
+            return $this->redirectToRoute('app_eleveur_list');
+        }
+
+        return $this->render('pro/eleveur/specific.html.twig', ['animal' => $animal ]);
+    }
+
 }

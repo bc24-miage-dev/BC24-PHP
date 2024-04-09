@@ -65,5 +65,19 @@ class TransporteurController extends AbstractController
         );
     }
 
+    #[Route('/specific/{id}', name: 'app_transporteur_specific')]
+    public function specific(ResourceRepository $resourceRepository,
+                             $id): Response
+    {
+        $resource = $resourceRepository->find($id);
+        if (!$resource || $this->getUser()->getWalletAddress() != $resource->getCurrentOwner()->getWalletAddress()){
+            $this->addFlash('error', 'Cette ressource ne vous appartient pas');
+            return $this->redirectToRoute('app_transporteur_list');
+        }
+
+        return $this->render('pro/transporteur/specific.html.twig', [
+            'resource' => $resource
+        ]);
+    }
 
 }

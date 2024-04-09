@@ -64,6 +64,19 @@ class DistributeurController extends AbstractController
         );
     }
 
+    #[Route('/specific/{id}', name: 'app_distributeur_specific')]
+    public function specific(ResourceRepository $resourceRepo, $id) : Response
+    {
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
+        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()) {
+            $this->addFlash('error', 'Aucun produit vous appartenant avec cet id n\'a été trouvé');
+            return $this->redirectToRoute('app_distributeur_list');
+        }
+        return $this->render('pro/distributeur/specific.html.twig',
+            ['resource' => $resource]
+        );
+    }
+
 
 
     #[Route('/vente', name: 'app_distributeur_vendu')]
