@@ -18,6 +18,7 @@ use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -56,7 +57,7 @@ class UsineController extends AbstractController
     }
 
     #[Route('/list', name: 'app_usine_list')]
-    public function list(ResourceRepository $resourceRepo): Response
+    public function list(ResourceRepository $resourceRepo, Request $request): Response
     {
         if ($request->isMethod('POST')) {
             $NFC = $request->request->get('NFC');
@@ -85,7 +86,7 @@ class UsineController extends AbstractController
     {
         $resource = $resourceRepository->find($id);
 
-        if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
+        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress() ||
             $resource->getResourceName()->getResourceCategory()->getCategory() != 'DEMI-CARCASSE') {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demi-carcasse');
             return $this->redirectToRoute('app_usine_list');
@@ -121,45 +122,61 @@ class UsineController extends AbstractController
     }
 
     #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName')]
-    public function creationRecetteName(Request $request,
-                                        ResourceFamilyRepository $repoFamily): Response
+    public function creationRecetteName(ResourceFamilyRepository $repoFamily): Response
     {
-        if ($request->isMethod('POST')) {
-            $name = $request->request->get('name');
-            $family = $request->request->get('family');
-
-            return $this->redirectToRoute('app_usine_creationRecetteIngredients', ['name' => $name, 'family' => $family]);
-        }
-
         $families = $repoFamily->findAll();
-
         return $this->render('pro/usine/creationRecetteName.html.twig',
         [
             'families' => $families
         ]);
     }
 
-    #[Route('/creationRecette/ingredients/{name}/{family}', name: 'app_usine_creationRecetteIngredients')]
-    public function creationRecette(Request $request,
-                                    $name, $family,
-                                    ResourceNameRepository $nameRepo,
-                                    ResourceFamilyRepository $familyRepo,
-                                    ResourceCategoryRepository $categoryRepo,
-                                    EntityManagerInterface $entityManager): Response
+    #[Route('/creationRecette/ingredients', name: 'app_usine_creationRecetteIngredients')]
+    public function creationRecetteIngredients(Request $request,
+                                              ResourceNameRepository $nameRepo): Response
+    {
+        if ($request->isMethod('POST')) {
+            $name = $request->request->get('name');
+            $families = $request->request->all()['families'];
+            $ingredients = [];
+            foreach($families as $family){
+                foreach($nameRepo->findByCategoryAndFamily('MORCEAU', $family) as $ingredient){
+                    $ingredients[] = $ingredient;
+                }
+            }
+            return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
+                'name' => $name,
+                'ingredients' => $ingredients,
+                'families' => $families
+            ]);
+        }
+        return $this->redirectToRoute('app_usine_creationRecetteName');
+    }
 
+    #[Route('/creationRecette/process', name: 'app_usine_creationRecetteProcess')]
+    public function creationRecetteProcess(Request $request,
+                                           EntityManagerInterface $entityManager,
+                                           ResourceFamilyRepository $familyRepo,
+                                           ResourceCategoryRepository $categoryRepo,
+                                           ResourceNameRepository $nameRepo, ResourceNameHandler $nameHandler) : RedirectResponse
     {
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
-            $nameHandler = new ResourceNameHandler();
+            $name = $request->request->get('name');
+            $familiesBrut = $request->request->all()['families'];
+            $families = [];
+            foreach ($familiesBrut as $familyBrut) {
+                $families[] = $familyRepo->findOneBy(['name' => $familyBrut]);
+            }
             $newProduct = $nameHandler->createResourceName(
                 $name,
-                $familyRepo->findOneBy(['name' => $family]),
+                $families,
                 $categoryRepo->findOneBy(['category' => 'PRODUIT']),
                 $this->getUser()->getProductionSite()
             );
             $entityManager->persist($newProduct);
             $entityManager->flush();
-            foreach ($list as $element){
+            foreach ($list as $element) {
                 $recipe = new Recipe();
                 $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
                 $recipe->setIngredientNumber(intval($element['quantity']));
@@ -170,11 +187,7 @@ class UsineController extends AbstractController
             $this->addFlash('success', 'La recette a bien été enregistrée');
             return $this->redirectToRoute('app_usine_index');
         }
-        $ingredients = $nameRepo->findByCategoryAndFamily('MORCEAU', $family);
-        return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
-            'name' => $name,
-            'ingredients' => $ingredients
-        ]);
+        return $this->redirectToRoute('app_usine_creationRecetteName');
     }
 
     #[Route('/choixRecette', name: 'app_usine_choixRecette')]

@@ -13,6 +13,7 @@
            {% for i in 1..ingredient.ingredientNumber %}
                <label for="prod_{{ loop.index0 }}">{{ ingredient.ingredient.name }} : </label>
                <input type="number" id="prod_{{ loop.index0 }}" name="morceaux[]">
+               <button class="btn-primary">Scanner</button>
                <br>
            {% endfor %}
         {% endfor %}

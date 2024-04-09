@@ -45,7 +45,8 @@ class TransporteurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_transporteur_list')]
-    public function list(ResourceRepository $resourceRepo) : Response
+    public function list(ResourceRepository $resourceRepo,
+                         Request $request) : Response
     {
         if ($request->isMethod('POST')) {
             $NFC = $request->request->get('NFC');
@@ -57,10 +58,8 @@ class TransporteurController extends AbstractController
         }
         else{
         $resources = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
-        // $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
         }
 
-        // $resources = $resourceRepo->findBy(['currentOwner' => $this->getUser()]); //No limitation on what a transporteur can own
         return $this->render('pro/transporteur/list.html.twig',
             ['resources' => $resources]
         );

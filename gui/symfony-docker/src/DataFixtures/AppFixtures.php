@@ -89,6 +89,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $pS->setProductionSiteName($productionSite);
             $pS->setAddress('22 rue Nationale');
             $pS->setProductionSiteTel('0123456789');
+            $pS->setValidate(true);
             $manager->persist($pS);
             $manager->flush();
         }
@@ -98,6 +99,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $pS->setProductionSiteName('Production Site ' . $i);
             $pS->setAddress('23 rue Nationale');
             $pS->setProductionSiteTel('0123456789');
+            $pS->setValidate(true);
             $manager->persist($pS);
             $manager->flush();
         }

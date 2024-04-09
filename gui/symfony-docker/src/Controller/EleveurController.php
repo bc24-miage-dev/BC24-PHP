@@ -96,9 +96,12 @@ class EleveurController extends AbstractController
         EntityManagerInterface $entityManager,
         ResourceRepository $resourceRepo,
         $id): Response {
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
 
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+        if (!$resource ||
+            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress())
+        {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -123,9 +126,11 @@ class EleveurController extends AbstractController
         ResourceRepository $resourceRepo,
         $id): Response {
 
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
 
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+        if (!$resource ||
+            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -149,9 +154,11 @@ class EleveurController extends AbstractController
         ResourceRepository $resourceRepo,
         $id): Response {
 
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
 
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+        if (!$resource ||
+            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -172,8 +179,10 @@ class EleveurController extends AbstractController
         EntityManagerInterface $entityManager,
         ResourceRepository $resourceRepo,
         $id): Response {
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL') {
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
+        if (!$resource ||
+            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
+            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }

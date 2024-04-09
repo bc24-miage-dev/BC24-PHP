@@ -75,9 +75,12 @@ class DistributeurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $nfcTag = $form->get('id')->getData();
-            $resource = $resourceRepo->findOneBy(['id' => $nfcTag, 'currentOwner' => $this->getUser()]);
+            $resource = $resourceRepo->findOneBy(['id' => $nfcTag]);
 
-            if (!$resource || $resource->isIsLifeCycleOver()){
+            if (!$resource ||
+                $resource->isIsLifeCycleOver() ||
+                $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress())
+            {
                 $this->addFlash('error', 'Aucun produit vous appartenant avec ce tag NFC n\'a été trouvé');
                 return $this->redirectToRoute('app_distributeur_vendu');
             }

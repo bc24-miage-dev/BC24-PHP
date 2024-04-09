@@ -76,12 +76,13 @@ class EquarrisseurController extends AbstractController
     public function job(ResourceRepository $resourceRepo,
                         $id): Response
     {
-        
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]); //change ici faut get vy wallet address
 
-        if (!$resource) {
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
+
+        if (!$resource ||
+            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
             $this->addFlash('error', 'Ressource introuvable');
-            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
+            return $this->redirectToRoute('app_equarrisseur_index');
         }
         if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'ANIMAL'){
             return $this->render('pro/equarrisseur/job.html.twig', [
@@ -103,8 +104,10 @@ class EquarrisseurController extends AbstractController
                              Request $request,
                              $id)
     {
-        $resource = $resourceRepo->findOneBy(['id' => $id, 'currentOwner' => $this->getUser()]);
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'){
+        $resource = $resourceRepo->findOneBy(['id' => $id]);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL'
+            || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress())
+        {
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
         }
@@ -139,8 +142,10 @@ class EquarrisseurController extends AbstractController
                             ResourceHandler $handler,
                             $id) : Response
     {
-        $resource = $resourceRepo->findOneBy(['id'=> $id, 'currentOwner' => $this->getUser()]);
-        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'CARCASSE'){
+        $resource = $resourceRepo->findOneBy(['id'=> $id]);
+        if (!$resource || $resource->getResourceName()->getResourceCategory()->getCategory() != 'CARCASSE'
+        || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress())
+        {
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
         }

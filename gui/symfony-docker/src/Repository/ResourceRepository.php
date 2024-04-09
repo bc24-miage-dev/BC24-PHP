@@ -47,21 +47,6 @@ class ResourceRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-
-    public function findByOwnerAndResourceCategory(UserInterface $owner, String $resourceCategory): array
-    {
-        return $this->createQueryBuilder('r')
-                ->join('r.ResourceName', 'rn')
-                ->join('rn.resourceCategory', 'rc')
-            ->andWhere('r.currentOwner = :owner')
-            ->andWhere('r.IsLifeCycleOver = false')
-            ->andWhere('rc.category = :category')
-            ->setParameter('category', $resourceCategory)
-            ->setParameter('owner', $owner)
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findByWalletAddress(String $walletAddress): array
     {
         return $this->createQueryBuilder('r')
@@ -87,7 +72,7 @@ class ResourceRepository extends ServiceEntityRepository
     }
 
     public function findByWalletAddressCategory(String $walletAddress, String $category): array
-    {   
+    {
         $category = strtoupper($category);
 
         return $this->createQueryBuilder('r')
