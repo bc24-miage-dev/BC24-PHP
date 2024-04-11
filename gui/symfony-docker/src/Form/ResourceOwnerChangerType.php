@@ -19,7 +19,7 @@ class ResourceOwnerChangerType extends AbstractType
         $builder
             ->add('id')
             ->add('submit', SubmitType::class, [
-                'label' => 'Récupérer la propriété'
+                'label' => 'Demander la propriété'
             ])
         ;
     }

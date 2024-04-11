@@ -55,11 +55,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deletedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'requester', targetEntity: OwnershipAcquisitionRequest::class)]
+    private Collection $ownershipAcquisitionRequestsSent;
+
+    #[ORM\OneToMany(mappedBy: 'initialOwner', targetEntity: OwnershipAcquisitionRequest::class)]
+    private Collection $ownershipAcquisitionRequestsReceived;
+
     public function __construct()
     {
         $this->reports = new ArrayCollection();
         $this->userResearch = new ArrayCollection();
         $this->ownedResources = new ArrayCollection();
+        $this->ownershipAcquisitionRequestsSent = new ArrayCollection();
+        $this->ownershipAcquisitionRequestsReceived = new ArrayCollection();
     }
 
     // #[ORM\Column(type: 'boolean')]
@@ -300,6 +308,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeletedAt(?\DateTimeImmutable $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OwnershipAcquisitionRequest>
+     */
+    public function getOwnershipAcquisitionRequestsSent(): Collection
+    {
+        return $this->ownershipAcquisitionRequestsSent;
+    }
+
+    public function addOwnershipAcquisitionRequestsSent(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsSent): static
+    {
+        if (!$this->ownershipAcquisitionRequestsSent->contains($ownershipAcquisitionRequestsSent)) {
+            $this->ownershipAcquisitionRequestsSent->add($ownershipAcquisitionRequestsSent);
+            $ownershipAcquisitionRequestsSent->setRequester($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnershipAcquisitionRequestsSent(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsSent): static
+    {
+        if ($this->ownershipAcquisitionRequestsSent->removeElement($ownershipAcquisitionRequestsSent)) {
+            // set the owning side to null (unless already changed)
+            if ($ownershipAcquisitionRequestsSent->getRequester() === $this) {
+                $ownershipAcquisitionRequestsSent->setRequester(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OwnershipAcquisitionRequest>
+     */
+    public function getOwnershipAcquisitionRequestsReceived(): Collection
+    {
+        return $this->ownershipAcquisitionRequestsReceived;
+    }
+
+    public function addOwnershipAcquisitionRequestsReceived(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsReceived): static
+    {
+        if (!$this->ownershipAcquisitionRequestsReceived->contains($ownershipAcquisitionRequestsReceived)) {
+            $this->ownershipAcquisitionRequestsReceived->add($ownershipAcquisitionRequestsReceived);
+            $ownershipAcquisitionRequestsReceived->setInitialOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnershipAcquisitionRequestsReceived(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsReceived): static
+    {
+        if ($this->ownershipAcquisitionRequestsReceived->removeElement($ownershipAcquisitionRequestsReceived)) {
+            // set the owning side to null (unless already changed)
+            if ($ownershipAcquisitionRequestsReceived->getInitialOwner() === $this) {
+                $ownershipAcquisitionRequestsReceived->setInitialOwner(null);
+            }
+        }
 
         return $this;
     }

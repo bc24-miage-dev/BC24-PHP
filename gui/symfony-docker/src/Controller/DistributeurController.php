@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Handlers\OwnershipHandler;
 use App\Handlers\proAcquireHandler;
+use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ResourceOwnerChangerType;
@@ -24,24 +27,33 @@ class DistributeurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_distributeur_acquire')]
     public function acquisition(Request $request,
-                                ManagerRegistry $doctrine): Response
+                                ResourceRepository $resourceRepo,
+                                OwnershipAcquisitionRequestRepository $ownershipRepo,
+                                OwnershipHandler $ownershipHandler,
+                                EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $proAcquireHandler = new proAcquireHandler();
+            $resource =$resourceRepo->find($form->getData()->getId());
+            if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $this->getUser()->getWalletAddress()) {
+                $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
+                return $this->redirectToRoute('app_distributeur_acquire');
+            }
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])){
+                $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
+                return $this->redirectToRoute('app_distributeur_acquire');
+            }
 
-            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'PRODUIT')){
-                $this->addFlash('success', 'Le produit a bien été enregistré');
-            }
-            else{
-                $this->addFlash('error', 'Ce tag NFC ne correspond pas à un produit');
-            }
+            $ownershipHandler->ownershipRequestCreate($this->getUser(), $entityManager, $resource);
+            $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             return $this->redirectToRoute('app_distributeur_acquire');
         }
+
+        $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/distributeur/acquire.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'requests' => $requests
         ]);
     }
 

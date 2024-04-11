@@ -7,9 +7,11 @@ use App\Entity\Resource;
 use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
+use App\Handlers\OwnershipHandler;
 use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourceNameHandler;
+use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\RecipeRepository;
 use App\Repository\ResourceCategoryRepository;
 use App\Repository\ResourceFamilyRepository;
@@ -34,25 +36,35 @@ class UsineController extends AbstractController
     }
 
     #[Route('/arrivage', name:'app_usine_acquire')]
-    public function acquire(Request $request, ManagerRegistry $doctrine): Response
+    public function acquire(Request $request,
+                            ResourceRepository $resourceRepo,
+                            OwnershipAcquisitionRequestRepository $ownershipRepo,
+                            EntityManagerInterface $entityManager,
+                            OwnershipHandler $ownershipHandler): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $proAcquireHandler = new proAcquireHandler();
-
-            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'DEMI-CARCASSE')){
-                $this->addFlash('success', 'La demie-carcasse a bien été enregistré');
-            } else {
-                $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demie-carcasse');
+            $resource =$resourceRepo->find($form->getData()->getId());
+            if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $this->getUser()->getWalletAddress()) {
+                $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
+                return $this->redirectToRoute('app_usine_acquire');
             }
-            return $this->redirectToRoute('app_usine_acquire');
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])){
+                $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
+                return $this->redirectToRoute('app_usine_acquire');
+            }
 
+            $ownershipHandler->ownershipRequestCreate($this->getUser(), $entityManager, $resource);
+            $this->addFlash('success', 'La demande de propriété a bien été envoyée');
+            return $this->redirectToRoute('app_usine_acquire');
         }
+
+        $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/usine/acquire.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'requests' => $requests
         ]);
     }
 
@@ -258,6 +270,58 @@ class UsineController extends AbstractController
                 'ingredients' => $ingredients,
                 'product' => $nameRepo->find($id)
             ]);
+    }
+
+    #[Route('/transaction', name: 'app_usine_transferList')]
+    public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
+    {
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        return $this->render('pro/usine/transferList.html.twig',
+            ['requests' => $requests]
+        );
+    }
+
+    #[Route('/transaction/{id}', name: 'app_usine_transfer', requirements: ['id' => '\d+'])]
+    public function transfer($id,
+                             OwnershipAcquisitionRequestRepository $requestRepository,
+                             EntityManagerInterface $entityManager ): RedirectResponse
+    {
+        $request = $requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $this->getUser()){
+            $this->addFlash('error', 'Erreur lors de la transaction');
+            return $this->redirectToRoute('app_usine_transferList');
+        }
+        $resource = $request->getResource();
+        $resource->setCurrentOwner($request->getRequester());
+        $request->setValidated(true);
+        $entityManager->persist($resource);
+        $entityManager->persist($request);
+        $entityManager->flush();
+        $this->addFlash('success', 'Transaction effectuée');
+
+        return $this->redirectToRoute('app_usine_transferList');
+    }
+
+    #[Route('/transaction/all' , name: 'app_usine_transferAll')]
+    public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
+                                EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        if (!$requests){
+            $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
+            return $this->redirectToRoute('app_usine_transferList');
+        }
+        foreach ($requests as $request){
+            $resource = $request->getResource();
+            $resource->setCurrentOwner($request->getRequester());
+            $request->setValidated(true);
+            $entityManager->persist($resource);
+            $entityManager->persist($request);
+        }
+        $entityManager->flush();
+        $this->addFlash('success', 'Toutes les transactions ont été effectuées');
+
+        return $this->redirectToRoute('app_usine_transferList');
     }
 
     private function searchInArrayByName($array, $nameString): ?ResourceName
