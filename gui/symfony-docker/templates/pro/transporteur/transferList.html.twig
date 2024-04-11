@@ -22,7 +22,8 @@
 
                 </div>
                 <div class="card-footer">
-                <a class="card-link" href="{{ path('app_transporteur_transfer', {'id': request.id}) }}">Accepter la requête</a>
+                    <a class="card-link" href="{{ path('app_transporteur_transfer', {'id': request.id}) }}">Accepter la requête</a>
+                    <a class="card-link" href="{{ path('app_transporteur_transferRefused', {'id': request.id}) }}">Refuser la requête</a>
                 </div>
             </div>
         {% endfor %}

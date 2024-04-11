@@ -42,7 +42,7 @@ class TransporteurController extends AbstractController
                 $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
                 return $this->redirectToRoute('app_transporteur_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])) {
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])) {
                 $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
                 return $this->redirectToRoute('app_transporteur_acquire');
             }
@@ -96,7 +96,7 @@ class TransporteurController extends AbstractController
     #[Route('/transaction', name: 'app_transporteur_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         return $this->render('pro/transporteur/transferList.html.twig',
             ['requests' => $requests]
         );
@@ -114,7 +114,7 @@ class TransporteurController extends AbstractController
         }
         $resource = $request->getResource();
         $resource->setCurrentOwner($request->getRequester());
-        $request->setValidated(true);
+        $request->setState('Validé');
         $entityManager->persist($resource);
         $entityManager->persist($request);
         $entityManager->flush();
@@ -123,11 +123,29 @@ class TransporteurController extends AbstractController
         return $this->redirectToRoute('app_transporteur_transferList');
     }
 
+    #[Route('/transactionRefused/{id}', name: 'app_transporteur_transferRefused', requirements: ['id' => '\d+'])]
+    public function transferRefused($id,
+                                    OwnershipAcquisitionRequestRepository $requestRepository,
+                                    EntityManagerInterface $entityManager ): RedirectResponse
+    {
+        $request = $requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $this->getUser()){
+            $this->addFlash('error', 'Erreur lors de la transaction');
+            return $this->redirectToRoute('app_transporteur_transferList');
+        }
+        $request->setState('Refusé');
+        $entityManager->persist($request);
+        $entityManager->flush();
+        $this->addFlash('success', 'Transaction refusée avec succès');
+
+        return $this->redirectToRoute('app_transporteur_transferList');
+    }
+
     #[Route('/transaction/all' , name: 'app_transporteur_transferAll')]
     public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
                                 EntityManagerInterface $entityManager): RedirectResponse
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         if (!$requests){
             $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
             return $this->redirectToRoute('app_transporteur_transferList');
@@ -135,7 +153,7 @@ class TransporteurController extends AbstractController
         foreach ($requests as $request){
             $resource = $request->getResource();
             $resource->setCurrentOwner($request->getRequester());
-            $request->setValidated(true);
+            $request->setState('Validé');
             $entityManager->persist($resource);
             $entityManager->persist($request);
         }

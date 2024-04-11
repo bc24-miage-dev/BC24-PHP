@@ -40,7 +40,7 @@ class DistributeurController extends AbstractController
                 $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
                 return $this->redirectToRoute('app_distributeur_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])){
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
                 $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
                 return $this->redirectToRoute('app_distributeur_acquire');
             }

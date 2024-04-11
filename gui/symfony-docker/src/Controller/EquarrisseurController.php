@@ -45,7 +45,7 @@ class EquarrisseurController extends AbstractController
                 $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
                 return $this->redirectToRoute('app_equarrisseur_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])){
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
                 $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
                 return $this->redirectToRoute('app_equarrisseur_acquire');
             }
@@ -192,7 +192,7 @@ class EquarrisseurController extends AbstractController
     #[Route('/transaction', name: 'app_equarrisseur_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         return $this->render('pro/equarrisseur/transferList.html.twig',
             ['requests' => $requests]
         );
@@ -210,7 +210,7 @@ class EquarrisseurController extends AbstractController
         }
         $resource = $request->getResource();
         $resource->setCurrentOwner($request->getRequester());
-        $request->setValidated(true);
+        $request->setState('Validé');
         $entityManager->persist($resource);
         $entityManager->persist($request);
         $entityManager->flush();
@@ -219,11 +219,29 @@ class EquarrisseurController extends AbstractController
         return $this->redirectToRoute('app_equarrisseur_transferList');
     }
 
+    #[Route('/transactionRefused/{id}', name: 'app_equarrisseur_transferRefused', requirements: ['id' => '\d+'])]
+    public function transferRefused($id,
+                                    OwnershipAcquisitionRequestRepository $requestRepository,
+                                    EntityManagerInterface $entityManager ): RedirectResponse
+    {
+        $request = $requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $this->getUser()){
+            $this->addFlash('error', 'Erreur lors de la transaction');
+            return $this->redirectToRoute('app_equarrisseur_transferList');
+        }
+        $request->setState('Refusé');
+        $entityManager->persist($request);
+        $entityManager->flush();
+        $this->addFlash('success', 'Transaction refusée avec succès');
+
+        return $this->redirectToRoute('app_equarrisseur_transferList');
+    }
+
     #[Route('/transaction/all' , name: 'app_equarrisseur_transferAll')]
     public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
                                 EntityManagerInterface $entityManager): RedirectResponse
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         if (!$requests){
             $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
             return $this->redirectToRoute('app_equarrisseur_transferList');
@@ -231,7 +249,7 @@ class EquarrisseurController extends AbstractController
         foreach ($requests as $request){
             $resource = $request->getResource();
             $resource->setCurrentOwner($request->getRequester());
-            $request->setValidated(true);
+            $request->setState('Validé');
             $entityManager->persist($resource);
             $entityManager->persist($request);
         }

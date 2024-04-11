@@ -29,8 +29,8 @@ class OwnershipAcquisitionRequest
     #[ORM\JoinColumn(nullable: false)]
     private ?Resource $resource = null;
 
-    #[ORM\Column]
-    private ?bool $validated = null;
+    #[ORM\Column(length: 15)]
+    private ?string $state = null;
 
     public function getId(): ?int
     {
@@ -85,14 +85,14 @@ class OwnershipAcquisitionRequest
         return $this;
     }
 
-    public function isValidated(): ?bool
+    public function getState(): ?string
     {
-        return $this->validated;
+        return $this->state;
     }
 
-    public function setValidated(bool $validated): static
+    public function setState(string $state): static
     {
-        $this->validated = $validated;
+        $this->state = $state;
 
         return $this;
     }

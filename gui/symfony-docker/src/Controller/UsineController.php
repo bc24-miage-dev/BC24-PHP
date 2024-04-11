@@ -3,12 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Recipe;
-use App\Entity\Resource;
-use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
 use App\Handlers\OwnershipHandler;
-use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourceNameHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
@@ -18,13 +15,11 @@ use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 
 #[Route('/pro/usine')]
 class UsineController extends AbstractController
@@ -51,7 +46,7 @@ class UsineController extends AbstractController
                 $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
                 return $this->redirectToRoute('app_usine_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])){
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
                 $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
                 return $this->redirectToRoute('app_usine_acquire');
             }
@@ -275,7 +270,7 @@ class UsineController extends AbstractController
     #[Route('/transaction', name: 'app_usine_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         return $this->render('pro/usine/transferList.html.twig',
             ['requests' => $requests]
         );
@@ -293,7 +288,7 @@ class UsineController extends AbstractController
         }
         $resource = $request->getResource();
         $resource->setCurrentOwner($request->getRequester());
-        $request->setValidated(true);
+        $request->setState('Validé');
         $entityManager->persist($resource);
         $entityManager->persist($request);
         $entityManager->flush();
@@ -302,11 +297,29 @@ class UsineController extends AbstractController
         return $this->redirectToRoute('app_usine_transferList');
     }
 
+    #[Route('/transactionRefused/{id}', name: 'app_usine_transferRefused', requirements: ['id' => '\d+'])]
+    public function transferRefused($id,
+                                    OwnershipAcquisitionRequestRepository $requestRepository,
+                                    EntityManagerInterface $entityManager ): RedirectResponse
+    {
+        $request = $requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $this->getUser()){
+            $this->addFlash('error', 'Erreur lors de la transaction');
+            return $this->redirectToRoute('app_usine_transferList');
+        }
+        $request->setState('Refusé');
+        $entityManager->persist($request);
+        $entityManager->flush();
+        $this->addFlash('success', 'Transaction refusée avec succès');
+
+        return $this->redirectToRoute('app_usine_transferList');
+    }
+
     #[Route('/transaction/all' , name: 'app_usine_transferAll')]
     public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
                                 EntityManagerInterface $entityManager): RedirectResponse
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() , 'state' => 'En attente']);
         if (!$requests){
             $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
             return $this->redirectToRoute('app_usine_transferList');
@@ -314,7 +327,7 @@ class UsineController extends AbstractController
         foreach ($requests as $request){
             $resource = $request->getResource();
             $resource->setCurrentOwner($request->getRequester());
-            $request->setValidated(true);
+            $request->setState('Validé');
             $entityManager->persist($resource);
             $entityManager->persist($request);
         }

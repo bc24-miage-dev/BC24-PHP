@@ -88,7 +88,7 @@ class EleveurController extends AbstractController
                 $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
                 return $this->redirectToRoute('app_eleveur_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'validated' => false])){
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
                 $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
                 return $this->redirectToRoute('app_eleveur_acquire');
             }
@@ -231,7 +231,7 @@ class EleveurController extends AbstractController
     #[Route('/transaction', name: 'app_eleveur_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         return $this->render('pro/eleveur/transferList.html.twig',
             ['requests' => $requests]
         );
@@ -249,7 +249,7 @@ class EleveurController extends AbstractController
         }
         $resource = $request->getResource();
         $resource->setCurrentOwner($request->getRequester());
-        $request->setValidated(true);
+        $request->setState('Validé');
         $entityManager->persist($resource);
         $entityManager->persist($request);
         $entityManager->flush();
@@ -258,7 +258,7 @@ class EleveurController extends AbstractController
         return $this->redirectToRoute('app_eleveur_transferList');
     }
 
-    /*
+
     #[Route('/transactionRefused/{id}', name: 'app_eleveur_transferRefused', requirements: ['id' => '\d+'])]
     public function transferRefused($id,
                              OwnershipAcquisitionRequestRepository $requestRepository,
@@ -269,20 +269,19 @@ class EleveurController extends AbstractController
             $this->addFlash('error', 'Erreur lors de la transaction');
             return $this->redirectToRoute('app_eleveur_transferList');
         }
-        $request->setValidated(true);
+        $request->setState('Refusé');
         $entityManager->persist($request);
         $entityManager->flush();
         $this->addFlash('success', 'Transaction refusée avec succès');
 
         return $this->redirectToRoute('app_eleveur_transferList');
     }
-    */
 
     #[Route('/transaction/all' , name: 'app_eleveur_transferAll')]
     public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
                                 EntityManagerInterface $entityManager): RedirectResponse
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'validated' => false]);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
         if (!$requests){
             $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
             return $this->redirectToRoute('app_eleveur_transferList');
@@ -290,7 +289,7 @@ class EleveurController extends AbstractController
         foreach ($requests as $request){
             $resource = $request->getResource();
             $resource->setCurrentOwner($request->getRequester());
-            $request->setValidated(true);
+            $request->setState('Validé');
             $entityManager->persist($resource);
             $entityManager->persist($request);
         }

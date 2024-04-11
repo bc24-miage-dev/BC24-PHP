@@ -4,7 +4,6 @@ namespace App\Handlers;
 
 use App\Entity\OwnershipAcquisitionRequest;
 use App\Entity\Resource;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -19,7 +18,7 @@ class OwnershipHandler
         $request->setRequester($requester);
         $request->setInitialOwner($resource->getCurrentOwner());
         $request->setResource($resource);
-        $request->setValidated(false);
+        $request->setState('En attente');
         $entityManager->persist($request);
         $entityManager->flush();
     }
