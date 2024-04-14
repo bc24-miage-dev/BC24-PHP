@@ -7,9 +7,10 @@
     {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
 
     {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Entrez le Tag NFC'}}) }}<br>
-    {{ form_end(form) }}
 
-    <br>
+    {{ form_end(form) }}
+    <button class="btn btn-primary" id="scan">Scanner</button>
+    <br><br>
 
     <h1>Requêtes envoyées</h1>
     {% if requests %}
