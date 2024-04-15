@@ -20,7 +20,7 @@
                 <br>
                 <p class="card-text ml-3">Envoyée le {{ request.requestDate|date('d/m/Y') }} à {{ request.requestDate|date('H:i') }}</p>
                 <p class="card-text ml-3">Propriétaire : {{ request.initialOwner.firstName }} {{ request.initialOwner.lastName }} (Wallet Address : {{ request.initialOwner.walletAddress }})</p>
-                <p class="card-footer">Statut : {% if request.validated == 0 %}En attente{% else %}Terminée{% endif %}</p>
+                <p class="card-footer">Statut : {{ request.state }}</p>
             </div>
             <br>
         {% endfor %}

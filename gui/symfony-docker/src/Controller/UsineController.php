@@ -75,7 +75,7 @@ class UsineController extends AbstractController
             }
         }
         else{
-        $resources = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+        $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(), 'DEMI-CARCASSE');
         // $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
         }
         // $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
@@ -253,7 +253,7 @@ class UsineController extends AbstractController
             foreach ($morceaux as $morceau){
                 $resource = $resourceRepo->find($morceau);
                 $resource->setIsLifeCycleOver(true);
-                $resource->addComponent($newProduct);
+                $resource->addResource($newProduct);
                 $entityManager->persist($resource);
                 $entityManager->flush();
             }
