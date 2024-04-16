@@ -76,7 +76,7 @@ Pour les distributeurs :
 ## Gestion du projet
 
 Le projet a été géré sur un Notion, regroupant tous les différents groupes de travail.
-Il est possible de le consulter [ici]().
+Il est possible de le consulter [ici](https://www.notion.so/Trace-Connect-c2a66d9a711c458db7d66cd94dd77e4a).
 
 Vous retrouverez un agenda avec les tâches à réaliser, les tâches en cours, les tâches terminées, semaine par semaine,
 ainsi que les réunions, les documents importants, etc.
