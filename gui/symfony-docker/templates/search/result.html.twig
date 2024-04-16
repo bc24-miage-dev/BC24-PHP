@@ -13,7 +13,7 @@
 {# Le formulaire de recherche #}
 {{ parent() }}
 
-<div class="resource-details">
+    <div class="resource-details {{ resource.isIsContamined ? 'contaminated' : 'not-contaminated' }}">
     <div class="banner-wrapper">
         <div class="banner">
             <div class ="box container">
@@ -36,8 +36,8 @@
                             <p>Heure de production : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p>
                         {% endif %}
                     </div>
-                    <div class="col-5 col-25-medium">
-                        <img src="{{ asset(imagePath) }}" alt="Image description" width="120%">
+                    <div class="col-5 col-25-medium {{ resource.isIsContamined ? 'contaminated' : 'not-contaminated' }}">
+                        <img src="{{ asset(imagePath) }}" alt="Image description" style="width: 120%;">
                     </div>
 
                     <div class="col-25 col-25-medium">
