@@ -18,6 +18,8 @@
                     {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
                     <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
                     {{ form_end(form) }}
+                    <br>
+                    <button>Scanner pour rechercher</button>
                 </div>
             </div>
         </div>
@@ -58,7 +60,7 @@
                 <div class="col-4 col-12-medium">
                     <section class="box feature" style="display: flex; flex-direction: column; justify-content: space-between;">
                         <a href="{{ path('app_recent') }}" class="image featured">
-                            <img src="{{ asset('images/consulter.jpg') }}" alt="" style="width: 100%; height: 200px; object-fit: cover;"/>
+                            <img src="{{ asset('images/Consulter.jpg') }}" alt="" style="width: 100%; height: 200px; object-fit: cover;"/>
                         </a>
                         <div class="inner" style="padding: 10px;">
                             <header>
