@@ -8,13 +8,25 @@
     <li class="nav-item">
         <a class="nav-link" href="{{ path('app_usine_acquire') }}">
             <i class="fas fa-fw fa-box-open"></i>
-            <span>Signaler une réception</span></a>
+            <span>Réception de Demi-Carcasses</span></a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="{{ path('app_usine_list') }}">
+        <a class="nav-link" href="{{ path('app_usine_transferList') }}">
+            <i class="fas fa-fw fa-truck"></i>
+            <span>Transactions</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_usine_list', {'category': 'demi-carcasse'}) }}">
             <i class="fas fa-fw fa-list"></i>
-            <span>Liste des Carcasses</span></a>
+            <span>Liste des demi-carcasses</span></a>
+    </li>
+
+   <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_usine_list', {'category': 'morceau'}) }}">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Liste des morceaux</span></a>
     </li>
 
     <li class="nav-item">
@@ -23,10 +35,17 @@
             <span>Créer une recette</span></a>
     </li>
 
+
     <li class="nav-item">
         <a class="nav-link" href="{{ path('app_usine_choixRecette') }}">
             <i class="fas fa-fw fa-cogs"></i>
             <span>Réaliser un produit</span></a>
+    </li>
+
+        <li class="nav-item">
+        <a class="nav-link" href="{{ path('app_usine_list', {'category': 'produit'}) }}">
+            <i class="fas fa-fw fa-list"></i>
+            <span>Liste des produit</span></a>
     </li>
 
 {% endblock %}

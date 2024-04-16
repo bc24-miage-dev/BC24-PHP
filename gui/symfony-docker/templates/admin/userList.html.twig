@@ -20,10 +20,13 @@
                                     <th>Donner un rôle</th>
                                     <th>Site associé</th>
                                     <th>Associer un site</th>
+                                    <th>Wallet Address (enter to validate)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for user in users %}
+                                    {% if user.deletedAt == null %}
+                                    
                                     <tr>
                                         <td>{{ user.lastname }}</td>
                                         <td>{{ user.firstname }}</td>
@@ -93,7 +96,13 @@
                                                 <p> Aucune action possible </p>
                                             {% endif %}
                                         </td>
+                                        <td>
+                                            <form method="post" action="{{ path('app_admin_userWalletAddressEdit', {'id': user.id}) }}">
+                                                <input type="text" name="walletAddress" value= {{user.walletAddress}}>
+                                            </form>
+                                        </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>

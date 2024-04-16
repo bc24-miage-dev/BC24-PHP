@@ -7,20 +7,42 @@
 
         <br>
 
-        <form method="post">
+        <form id="recipeNameForm" method="post" action="{{ path('app_usine_creationRecetteIngredients') }}">
             <div class="form-group">
                 <label for="name">Nom de la recette</label>
                 <input type="text" class="form-control" id="name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="family">Type de viande</label>
-                <select class="form-control" id="family" name="family" required>
-                    {% for family in families %}
-                        <option value="{{ family.name }}">{{ family.name }}</option>
-                    {% endfor %}
-                </select>
+                <p>Choisissez les différentes viandes utilisées pour la recette</p>
+                {% for family in families %}
+                    <label>{{ family.name }}
+                    <input type="checkbox" value="{{ family.name }}" name="families[]">
+                    </label>
+                    <br>
+                {% endfor %}
             </div>
             <button type="submit" class="btn btn-primary">Étape suivante</button>
         </form>
     </div>
 {% endblock %}
+
+{% block script %}
+<script>
+    document.getElementById('recipeNameForm').addEventListener('submit', function(event) {
+        var checkboxes = document.querySelectorAll('input[name="families[]"]');
+        var isChecked = false;
+
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+
+        if (!isChecked) {
+            event.preventDefault();
+            alert('Veuillez cocher au moins une case.');
+        }
+    });
+</script>
+{% endblock %}
+

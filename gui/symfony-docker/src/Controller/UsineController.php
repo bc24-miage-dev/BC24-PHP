@@ -3,25 +3,23 @@
 namespace App\Controller;
 
 use App\Entity\Recipe;
-use App\Entity\Resource;
-use App\Entity\ResourceCategory;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
-use App\Handlers\proAcquireHandler;
+use App\Handlers\OwnershipHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourceNameHandler;
+use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\RecipeRepository;
 use App\Repository\ResourceCategoryRepository;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\abstract_arg;
 
 #[Route('/pro/usine')]
 class UsineController extends AbstractController
@@ -33,34 +31,75 @@ class UsineController extends AbstractController
     }
 
     #[Route('/arrivage', name:'app_usine_acquire')]
-    public function acquire(Request $request, ManagerRegistry $doctrine): Response
+    public function acquire(Request $request,
+                            ResourceRepository $resourceRepo,
+                            OwnershipAcquisitionRequestRepository $ownershipRepo,
+                            EntityManagerInterface $entityManager,
+                            OwnershipHandler $ownershipHandler): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $proAcquireHandler = new proAcquireHandler();
-
-            if($proAcquireHandler->acquireStrict($form, $doctrine, $this->getUser(), 'DEMI-CARCASSE')){
-                $this->addFlash('success', 'La demie-carcasse a bien été enregistré');
-            } else {
-                $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demie-carcasse');
+            $resource =$resourceRepo->find($form->getData()->getId());
+            if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $this->getUser()->getWalletAddress()) {
+                $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
+                return $this->redirectToRoute('app_usine_acquire');
             }
-            return $this->redirectToRoute('app_usine_acquire');
+            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
+                $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
+                return $this->redirectToRoute('app_usine_acquire');
+            }
 
+            $ownershipHandler->ownershipRequestCreate($this->getUser(), $entityManager, $resource);
+            $this->addFlash('success', 'La demande de propriété a bien été envoyée');
+            return $this->redirectToRoute('app_usine_acquire');
         }
+
+        $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/usine/acquire.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'requests' => $requests
         ]);
     }
 
-    #[Route('/list', name: 'app_usine_list')]
-    public function list(ResourceRepository $resourceRepo): Response
+    #[Route('/list/{category}', name: 'app_usine_list')]
+    public function list(ResourceRepository $resourceRepo, Request $request, $category): Response
     {
-        $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
+        if ($request->isMethod('POST')) {
+            $NFC = $request->request->get('NFC');
+            $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
+            if($resources == null){
+                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+                return $this->redirectToRoute('app_usine_list');
+            }
+        }
+        else if ($category == "produit"){
+            $resources = $resourceRepo->findProductByWalletAddress($this->getUser()->getWalletAddress());
+        }
+
+        else{
+        $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(), $category);
+        }
+
         return $this->render('pro/usine/list.html.twig', [
             'resources' => $resources
+        ]);
+    }
+
+    #[Route('/specific/{id}', name: 'app_usine_specific')]
+    public function specific(ResourceRepository $resourceRepo,
+                             $id): Response
+    {
+        $resource = $resourceRepo->find($id);
+        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+            $this->addFlash('error', 'Cette ressource ne vous appartient pas');
+            return $this->redirectToRoute('app_usine_list');
+        }
+        $category = $resource->getResourceName()->getResourceCategory()->getCategory();
+        return $this->render('pro/usine/specific.html.twig', [
+            'resource' => $resource,
+            'category' => $category
         ]);
     }
 
@@ -73,14 +112,15 @@ class UsineController extends AbstractController
     {
         $resource = $resourceRepository->find($id);
 
-        if (!$resource || $resource->getCurrentOwner() != $this->getUser() ||
+        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress() ||
             $resource->getResourceName()->getResourceCategory()->getCategory() != 'DEMI-CARCASSE') {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demi-carcasse');
             return $this->redirectToRoute('app_usine_list');
         }
 
         $resources = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
-            family: $resourceRepository->find($id)->getResourceName()->getFamily()->getName());
+            family: $resourceRepository->find($id)->getResourceName()->getResourceFamilies()[0]->getName());
+            // Only products can have multiple families
 
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list'];
@@ -98,7 +138,7 @@ class UsineController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'La demi-carcasse a bien été découpée');
-            return $this->redirectToRoute('app_usine_list');
+            return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
         }
 
         return $this->render('pro/usine/decoupe.html.twig', [
@@ -108,60 +148,72 @@ class UsineController extends AbstractController
     }
 
     #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName')]
-    public function creationRecetteName(Request $request,
-                                        ResourceFamilyRepository $repoFamily): Response
+    public function creationRecetteName(ResourceFamilyRepository $repoFamily): Response
     {
-        if ($request->isMethod('POST')) {
-            $name = $request->request->get('name');
-            $family = $request->request->get('family');
-
-            return $this->redirectToRoute('app_usine_creationRecetteIngredients', ['name' => $name, 'family' => $family]);
-        }
-
         $families = $repoFamily->findAll();
-
         return $this->render('pro/usine/creationRecetteName.html.twig',
         [
             'families' => $families
         ]);
     }
 
-    #[Route('/creationRecette/ingredients/{name}/{family}', name: 'app_usine_creationRecetteIngredients')]
-    public function creationRecette(Request $request,
-                                    $name, $family,
-                                    ResourceNameRepository $nameRepo,
-                                    ResourceFamilyRepository $familyRepo,
-                                    ResourceCategoryRepository $categoryRepo,
-                                    EntityManagerInterface $entityManager): Response
+    #[Route('/creationRecette/ingredients', name: 'app_usine_creationRecetteIngredients')]
+    public function creationRecetteIngredients(Request $request,
+                                              ResourceNameRepository $nameRepo): Response
+    {
+        if ($request->isMethod('POST')) {
+            $name = $request->request->get('name');
+            $families = $request->request->all()['families'];
+            $ingredients = [];
+            foreach($families as $family){
+                foreach($nameRepo->findByCategoryAndFamily('MORCEAU', $family) as $ingredient){
+                    $ingredients[] = $ingredient;
+                }
+            }
+            return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
+                'name' => $name,
+                'ingredients' => $ingredients,
+                'families' => $families
+            ]);
+        }
+        return $this->redirectToRoute('app_usine_creationRecetteName');
+    }
 
+    #[Route('/creationRecette/process', name: 'app_usine_creationRecetteProcess')]
+    public function creationRecetteProcess(Request $request,
+                                           EntityManagerInterface $entityManager,
+                                           ResourceFamilyRepository $familyRepo,
+                                           ResourceCategoryRepository $categoryRepo,
+                                           ResourceNameRepository $nameRepo, ResourceNameHandler $nameHandler) : RedirectResponse
     {
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
-            $nameHandler = new ResourceNameHandler();
+            $name = $request->request->get('name');
+            $familiesBrut = $request->request->all()['families'];
+            $families = [];
+            foreach ($familiesBrut as $familyBrut) {
+                $families[] = $familyRepo->findOneBy(['name' => $familyBrut]);
+            }
             $newProduct = $nameHandler->createResourceName(
                 $name,
-                $familyRepo->findOneBy(['name' => $family]),
+                $families,
                 $categoryRepo->findOneBy(['category' => 'PRODUIT']),
                 $this->getUser()->getProductionSite()
             );
             $entityManager->persist($newProduct);
             $entityManager->flush();
-            foreach ($list as $element){
+            foreach ($list as $element) {
                 $recipe = new Recipe();
                 $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
                 $recipe->setIngredientNumber(intval($element['quantity']));
-                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'family' => $familyRepo->findOneBy(['name' => $family]), 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
+                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
                 $entityManager->persist($recipe);
                 $entityManager->flush();
             }
             $this->addFlash('success', 'La recette a bien été enregistrée');
             return $this->redirectToRoute('app_usine_index');
         }
-        $ingredients = $nameRepo->findByCategoryAndFamily('MORCEAU', $family);
-        return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
-            'name' => $name,
-            'ingredients' => $ingredients
-        ]);
+        return $this->redirectToRoute('app_usine_creationRecetteName');
     }
 
     #[Route('/choixRecette', name: 'app_usine_choixRecette')]
@@ -206,7 +258,7 @@ class UsineController extends AbstractController
             foreach ($morceaux as $morceau){
                 $resource = $resourceRepo->find($morceau);
                 $resource->setIsLifeCycleOver(true);
-                $resource->addComponent($newProduct);
+                $resource->addResource($newProduct);
                 $entityManager->persist($resource);
                 $entityManager->flush();
             }
@@ -218,6 +270,76 @@ class UsineController extends AbstractController
                 'ingredients' => $ingredients,
                 'product' => $nameRepo->find($id)
             ]);
+    }
+
+    #[Route('/transaction', name: 'app_usine_transferList')]
+    public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
+    {
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
+        return $this->render('pro/usine/transferList.html.twig',
+            ['requests' => $requests]
+        );
+    }
+
+    #[Route('/transaction/{id}', name: 'app_usine_transfer', requirements: ['id' => '\d+'])]
+    public function transfer($id,
+                             OwnershipAcquisitionRequestRepository $requestRepository,
+                             EntityManagerInterface $entityManager ): RedirectResponse
+    {
+        $request = $requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $this->getUser()){
+            $this->addFlash('error', 'Erreur lors de la transaction');
+            return $this->redirectToRoute('app_usine_transferList');
+        }
+        $resource = $request->getResource();
+        $resource->setCurrentOwner($request->getRequester());
+        $request->setState('Validé');
+        $entityManager->persist($resource);
+        $entityManager->persist($request);
+        $entityManager->flush();
+        $this->addFlash('success', 'Transaction effectuée');
+
+        return $this->redirectToRoute('app_usine_transferList');
+    }
+
+    #[Route('/transactionRefused/{id}', name: 'app_usine_transferRefused', requirements: ['id' => '\d+'])]
+    public function transferRefused($id,
+                                    OwnershipAcquisitionRequestRepository $requestRepository,
+                                    EntityManagerInterface $entityManager ): RedirectResponse
+    {
+        $request = $requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $this->getUser()){
+            $this->addFlash('error', 'Erreur lors de la transaction');
+            return $this->redirectToRoute('app_usine_transferList');
+        }
+        $request->setState('Refusé');
+        $entityManager->persist($request);
+        $entityManager->flush();
+        $this->addFlash('success', 'Transaction refusée avec succès');
+
+        return $this->redirectToRoute('app_usine_transferList');
+    }
+
+    #[Route('/transaction/all' , name: 'app_usine_transferAll')]
+    public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
+                                EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() , 'state' => 'En attente']);
+        if (!$requests){
+            $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
+            return $this->redirectToRoute('app_usine_transferList');
+        }
+        foreach ($requests as $request){
+            $resource = $request->getResource();
+            $resource->setCurrentOwner($request->getRequester());
+            $request->setState('Validé');
+            $entityManager->persist($resource);
+            $entityManager->persist($request);
+        }
+        $entityManager->flush();
+        $this->addFlash('success', 'Toutes les transactions ont été effectuées');
+
+        return $this->redirectToRoute('app_usine_transferList');
     }
 
     private function searchInArrayByName($array, $nameString): ?ResourceName

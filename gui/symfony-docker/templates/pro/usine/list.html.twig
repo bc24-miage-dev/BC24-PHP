@@ -1,13 +1,20 @@
 {% extends 'pro/usine/index.html.twig' %}
 
 {%  block body %}
+
     <div class="container-fluid">
+    <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+                <button href="" class="btn btn-primary">Scanner</button>
+        </form>
         {% if resources %}
             {% for demiCarcasse in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
                         <h5 class="card-title">{{ demiCarcasse.ResourceName.name }} - {{ demiCarcasse.id }}</h5>
-                        <a href="{{ path('app_usine_decoupe', {'id' : demiCarcasse.id}) }}" class="card-link">Plus de détails</a>
+                        <a href="{{ path('app_usine_specific', {'id' : demiCarcasse.id}) }}" class="card-link">Plus de détails</a>
                     </div>
                 </div>
             {% endfor %}

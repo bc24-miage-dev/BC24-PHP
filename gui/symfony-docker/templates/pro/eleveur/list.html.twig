@@ -3,16 +3,20 @@
 {% block body %}
     <div class="container-fluid">
         <h1 class="mt-4">Liste de vos animaux</h1>
+        <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+                <button href="" class="btn btn-primary">Scanner</button>
+        </form>
+
     {% if animaux %}
 
         {% for animal in animaux %}
             <div class="card mr-2 mb-2" style="width: 100%;">
                 <div class="card-body ">
                     <h5 class="card-title">{{ animal.ResourceName.name }} - {{ animal.id }}</h5>
-                    <a href="{{ path('app_eleveur_weight', {'id' : animal.id}) }}" class="card-link">Peser</a>
-                    <a href="{{ path('app_eleveur_vaccine', {'id' : animal.id }) }}" class="card-link">Vacciner</a>
-                    <a href="{{ path('app_eleveur_disease', {'id' : animal.id }) }}" class="card-link">Signaler une maladie</a>
-                    <a href="{{ path('app_eleveur_nutrition', {'id' : animal.id }) }}" class="card-link">Nutrition</a>
+                    <a href="{{ path('app_eleveur_specific', {'id' : animal.id}) }}" class="card-link">Informations et actions</a>
                 </div>
             </div>
         {% endfor %}

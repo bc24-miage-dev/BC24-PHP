@@ -210,6 +210,7 @@ class AdminController extends AbstractController
 
         if ($validation == "true") {
             $user = $userRepo->find($userRoleRequest->getUser());
+            $user->setWalletAddress($userRoleRequest->getWalletAddress());
             $entityManager->persist($user->setSpecificRole("$role"));
             $user->setProductionSite($productionSiteRepo->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
         }
@@ -219,6 +220,27 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_userList');
     }
+
+    #[Route('/request/roleEdit/WalletAdress/{id}', name: 'app_admin_userWalletAddressEdit')]
+    public function userWalletAddressEdit(EntityManagerInterface $entityManager,
+                                          UserRoleRequestRepository $roleRequestRepo,
+                                          UserRepository $userRepo,
+                                          Request $request,
+                                          $id,): Response
+    {
+        if($request->isMethod('POST')) {
+        $walletAddress = $request->request->get('walletAddress');
+        $user = $userRepo->find($id);
+        $user->setWalletAddress($walletAddress);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        }
+        else{
+            flash('error', 'Erreur lors de la modification de l\'adresse de portefeuille');
+        }
+        return $this->redirectToRoute('app_admin_userList');
+    }
+
 
     #[Route('/request/productionSiteRequest', name: 'app_admin_request_productionSiteRequest')]
     public function usineRequest(UserRoleRequestRepository $roleRequestRepo): Response

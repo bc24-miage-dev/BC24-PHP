@@ -55,9 +55,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $carcasse->setName('Carcasse de ' . $familyName);
             $demiCarcasse->setName('Demi-carcasse de ' . $familyName);
 
-            $animal->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
-            $carcasse->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
-            $demiCarcasse->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+            $animal->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+            $carcasse->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+            $demiCarcasse->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
 
             $animal->setResourceCategory($manager->getRepository(ResourceCategory::class)->findOneBy(['category' => 'ANIMAL']));
             $carcasse->setResourceCategory($manager->getRepository(ResourceCategory::class)->findOneBy(['category' => 'CARCASSE']));
@@ -74,7 +74,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             foreach ($morceauxNames as $morceauName) {
                 $morceau = new ResourceName();
                 $morceau->setName($morceauName . ' de ' . $familyName);
-                $morceau->setFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
+                $morceau->addResourceFamily($manager->getRepository(ResourceFamily::class)->findOneBy(['name' => $familyName]));
                 $morceau->setResourceCategory($manager->getRepository(ResourceCategory::class)->findOneBy(['category' => 'MORCEAU']));
                 $manager->persist($morceau);
                 $manager->flush();
@@ -89,6 +89,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $pS->setProductionSiteName($productionSite);
             $pS->setAddress('22 rue Nationale');
             $pS->setProductionSiteTel('0123456789');
+            $pS->setValidate(true);
             $manager->persist($pS);
             $manager->flush();
         }
@@ -98,6 +99,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $pS->setProductionSiteName('Production Site ' . $i);
             $pS->setAddress('23 rue Nationale');
             $pS->setProductionSiteTel('0123456789');
+            $pS->setValidate(true);
             $manager->persist($pS);
             $manager->flush();
         }
@@ -112,6 +114,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $newUser->setRoles(["ROLE_" . strtoupper($userName), "ROLE_PRO"]);
             $newUser->setFirstname(ucfirst($userName));
             $newUser->setLastname("The" . ucfirst($userName));
+            $newUser->setWalletAddress('Wallet'. $userName);
 
             if (isset($productionSites[$userName])) { // If the user is a professional with a production site
                 $newUser->setProductionSite($manager->getRepository(ProductionSite::class)->findOneBy(['ProductionSiteName' => $productionSites[$userName]]));

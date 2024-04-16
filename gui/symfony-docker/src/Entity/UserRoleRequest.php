@@ -33,6 +33,9 @@ class UserRoleRequest
     #[ORM\ManyToOne(inversedBy: 'userRoleRequests')]
     private ?ProductionSite $ProductionSite = null;
 
+    #[ORM\Column(length: 255 , nullable: true)]
+    private ?string $WalletAddress = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -106,6 +109,18 @@ class UserRoleRequest
     public function setProductionSite(?ProductionSite $ProductionSite): static
     {
         $this->ProductionSite = $ProductionSite;
+
+        return $this;
+    }
+
+    public function getWalletAddress(): ?string
+    {
+        return $this->WalletAddress;
+    }
+
+    public function setWalletAddress(string $WalletAddress): static
+    {
+        $this->WalletAddress = $WalletAddress;
 
         return $this;
     }

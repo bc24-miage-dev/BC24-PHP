@@ -2,11 +2,31 @@
 
 {% block body %}
 <div class="container-fluid">
-    <h1>Tag NFC de l'animal récupéré</h1>
+    <h1>Tag NFC de l'animal à demander</h1>
     <br>
     {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
 
     {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Entrez le Tag NFC'}}) }}<br>
+
     {{ form_end(form) }}
+    <button class="btn btn-primary" id="scan">Scanner</button>
+    <br><br>
+
+    <h1>Requêtes envoyées</h1>
+    {% if requests %}
+        {% for request in requests %}
+            <div class="card">
+                <p class="card-header">Requête pour la ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}</p>
+                <br>
+                <p class="card-text ml-3">Envoyée le {{ request.requestDate|date('d/m/Y') }} à {{ request.requestDate|date('H:i') }}</p>
+                <p class="card-text ml-3">Propriétaire : {{ request.initialOwner.firstName }} {{ request.initialOwner.lastName }} (Wallet Address : {{ request.initialOwner.walletAddress }})</p>
+                <p class="card-footer">Statut : {{ request.state }}</p>
+            </div>
+            <br>
+        {% endfor %}
+    {% else %}
+        <p>Aucune requête en attente</p>
+    {% endif %}
+
 </div>
 {% endblock %}

@@ -45,12 +45,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/delete', name: 'app_user_delete_process')]
-    public function deleteUserProcess(ManagerRegistry $doctrine): RedirectResponse
+    public function deleteUserProcess(EntityManagerInterface$entityManager): RedirectResponse
     {
         $user = $this->getUser();
         if ($user) {
-            $entityManager = $doctrine->getManager();
-            $entityManager->remove($user);
+            $user->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+            $entityManager->persist($user);
             $entityManager->flush();
             //Kill la session
             $this->tokenStorage->setToken(null);

@@ -2,36 +2,56 @@
 
 {% block body %}
     <div class="container-fluid">
-        <div class="banner">
     {% if category == 'ANIMAL' %}
         <h1>Informations sur cet animal</h1>
         <br>
 
         <ul class="list-group">
-            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
             <li class="list-group-item">NFC : {{ resource.id }}</li>
+            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
+            <li class="list-group-item">Genre : {{ resource.Genre }}</li>
+            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
+            <li class="list-group-item">Date et heure de naissance : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
         <a href="{{ path('app_equarrisseur_equarrir', {'id' : resource.id}) }}">
             <button class="btn btn-primary">Équarrir</button>
         </a>
-    {% else %}
+
+
+    {% elseif category == 'CARCASSE' %}
         <h1>Informations sur cette carcasse</h1>
         <br>
         <ul class="list-group">
-            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
             <li class="list-group-item">NFC : {{ resource.id }}</li>
+            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
+            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
+            <li class="list-group-item">Date et heure d'abattage : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
-
         <a href="{{ path('app_equarrisseur_decoupe', {'id' : resource.id}) }}">
             <button class="btn btn-primary">Découper</button>
         </a>
+    {% else %}
+    <h1>Informations sur cette demi-carcasse</h1>
+        <br>
+        <ul class="list-group">
+            <li class="list-group-item">NFC : {{ resource.id }}</li>
+            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
+            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
+            <li class="list-group-item">Date et heure de découpe : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+        </ul>
+
     {% endif %}
-        </div>
+        <br><br>
+        <a href="{{ path('app_equarrisseur_list', {'category': category}) }}"><button class="btn btn-primary">Retour à la liste</button></a>
+
     </div>
+
+
 {% endblock %}
 
 

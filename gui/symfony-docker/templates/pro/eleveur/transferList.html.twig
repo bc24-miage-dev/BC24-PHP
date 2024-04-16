@@ -1,0 +1,33 @@
+{% extends 'pro/eleveur/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>
+            Demandes d'acquisition :
+        </h1>
+        <a class="btn btn-primary" href="{{ path('app_eleveur_transferAll') }}">Tout accepter</a>
+        <br><br>
+        {% for request in requests %}
+            <div class="card">
+                <p class="card-header">
+                    Ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}
+                <p>
+                <div class="card-body">
+                    <p class="card-text">
+                        Demandeur : {{ request.requester.firstName }} {{ request.requester.lastName }}
+                    </p>
+                    <p class="card-text">
+                        Date de la demande : {{ request.requestDate|date('d/m/Y') }}
+                    </p>
+
+                </div>
+                <div class="card-footer">
+                    <a class="card-link" href="{{ path('app_eleveur_transfer', {'id': request.id}) }}">Accepter la requête</a>
+                    <a class="card-link" href="{{ path('app_eleveur_transferRefused', {'id': request.id}) }}">Refuser la requête</a>
+                </div>
+            </div>
+            <br>
+        {% endfor %}
+    </div>
+
+{% endblock %}

@@ -62,12 +62,16 @@ class Resource
     #[ORM\Column(length: 8, nullable: true)]
     private ?string $Genre = null;
 
+    #[ORM\OneToMany(mappedBy: 'resource', targetEntity: OwnershipAcquisitionRequest::class)]
+    private Collection $ownershipAcquisitionRequestsRelated;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
         $this->resources = new ArrayCollection();
         $this->reports = new ArrayCollection();
         $this->userResearch = new ArrayCollection();
+        $this->ownershipAcquisitionRequestsRelated = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -309,6 +313,36 @@ class Resource
     public function setGenre(?string $Genre): static
     {
         $this->Genre = $Genre;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OwnershipAcquisitionRequest>
+     */
+    public function getOwnershipAcquisitionRequestsRelated(): Collection
+    {
+        return $this->ownershipAcquisitionRequestsRelated;
+    }
+
+    public function addOwnershipAcquisitionRequestsRelated(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsRelated): static
+    {
+        if (!$this->ownershipAcquisitionRequestsRelated->contains($ownershipAcquisitionRequestsRelated)) {
+            $this->ownershipAcquisitionRequestsRelated->add($ownershipAcquisitionRequestsRelated);
+            $ownershipAcquisitionRequestsRelated->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnershipAcquisitionRequestsRelated(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsRelated): static
+    {
+        if ($this->ownershipAcquisitionRequestsRelated->removeElement($ownershipAcquisitionRequestsRelated)) {
+            // set the owning side to null (unless already changed)
+            if ($ownershipAcquisitionRequestsRelated->getResource() === $this) {
+                $ownershipAcquisitionRequestsRelated->setResource(null);
+            }
+        }
 
         return $this;
     }

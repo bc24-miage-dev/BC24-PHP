@@ -4,12 +4,20 @@
     <div class="container-fluid">
         <h1 class="mt-4">Votre cargaison :</h1>
         <br>
+        <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+                <button href="" class="btn btn-primary">Scanner</button>
+        </form>
+        <br>
         {% if resources %}
 
             {% for resource in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
                         <h5 class="card-title">{{ resource.ResourceName.name }} - {{ resource.id }}</h5>
+                        <a class="card-link" href="{{ path('app_transporteur_specific', {'id': resource.id}) }}">Informations</a>
                     </div>
                 </div>
             {% endfor %}
