@@ -89,6 +89,8 @@ class ResourceRepository extends ServiceEntityRepository
     }
 
 
+
+
     public function findByWalletAddressNFC(String $walletAddress, int $NFC): array
     {
         return $this->createQueryBuilder('r')
@@ -100,6 +102,21 @@ class ResourceRepository extends ServiceEntityRepository
             ->andWhere('r.id = :NFC')
             ->setParameter('WalletAddress', $walletAddress)
             ->setParameter('NFC', $NFC)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findProductByWalletAddress(String $walletAddress): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'u')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('rn.productionSiteOwner != :productionSiteOwner')
+            ->andWhere('u.WalletAddress = :WalletAddress')
+            ->setParameter('WalletAddress', $walletAddress)
+            ->setParameter('productionSiteOwner', false)
             ->getQuery()
             ->getResult();
     }

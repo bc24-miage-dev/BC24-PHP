@@ -67,7 +67,6 @@ class EleveurController extends AbstractController
         }
         else{
         $animaux = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
-        // $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
         }
         return $this->render('pro/eleveur/list.html.twig',
             ['animaux' => $animaux]

@@ -230,7 +230,6 @@ class AdminController extends AbstractController
     {
         if($request->isMethod('POST')) {
         $walletAddress = $request->request->get('walletAddress');
-        // $userRoleRequest = $roleRequestRepo->findBy(['user' => $id]);
         $user = $userRepo->find($id);
         $user->setWalletAddress($walletAddress);
         $entityManager->persist($user);

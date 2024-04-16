@@ -78,10 +78,8 @@ class EquarrisseurController extends AbstractController
         else{
         $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(),$category);
         }
-
-        // $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), strtoupper($category));
         return $this->render('pro/equarrisseur/list.html.twig',
-            ['resources' => $resources ]
+            ['resources' => $resources,]
         );
     }
 
@@ -97,17 +95,11 @@ class EquarrisseurController extends AbstractController
             $this->addFlash('error', 'Ressource introuvable');
             return $this->redirectToRoute('app_equarrisseur_index');
         }
-        if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'ANIMAL'){
+        $category = $resource->getResourceName()->getResourceCategory()->getCategory();
             return $this->render('pro/equarrisseur/job.html.twig', [
                 'resource' => $resource,
-                'category' => 'ANIMAL'
+                'category' => $category
             ]);
-        } else {
-            return $this->render('pro/equarrisseur/job.html.twig', [
-                'resource' => $resource,
-                'category' => 'CARCASSE'
-            ]);
-        }
     }
 
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]

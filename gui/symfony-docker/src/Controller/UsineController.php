@@ -63,8 +63,8 @@ class UsineController extends AbstractController
         ]);
     }
 
-    #[Route('/list', name: 'app_usine_list')]
-    public function list(ResourceRepository $resourceRepo, Request $request): Response
+    #[Route('/list/{category}', name: 'app_usine_list')]
+    public function list(ResourceRepository $resourceRepo, Request $request, $category): Response
     {
         if ($request->isMethod('POST')) {
             $NFC = $request->request->get('NFC');
@@ -74,11 +74,14 @@ class UsineController extends AbstractController
                 return $this->redirectToRoute('app_usine_list');
             }
         }
-        else{
-        $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(), 'DEMI-CARCASSE');
-        // $animaux = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'ANIMAL');
+        else if ($category == "produit"){
+            $resources = $resourceRepo->findProductByWalletAddress($this->getUser()->getWalletAddress());
         }
-        // $resources = $resourceRepo->findByOwnerAndResourceCategory($this->getUser(), 'DEMI-CARCASSE');
+
+        else{
+        $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(), $category);
+        }
+
         return $this->render('pro/usine/list.html.twig', [
             'resources' => $resources
         ]);
@@ -93,8 +96,10 @@ class UsineController extends AbstractController
             $this->addFlash('error', 'Cette ressource ne vous appartient pas');
             return $this->redirectToRoute('app_usine_list');
         }
+        $category = $resource->getResourceName()->getResourceCategory()->getCategory();
         return $this->render('pro/usine/specific.html.twig', [
-            'resource' => $resource
+            'resource' => $resource,
+            'category' => $category
         ]);
     }
 
@@ -133,7 +138,7 @@ class UsineController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'La demi-carcasse a bien été découpée');
-            return $this->redirectToRoute('app_usine_list');
+            return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
         }
 
         return $this->render('pro/usine/decoupe.html.twig', [
