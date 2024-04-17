@@ -5,25 +5,22 @@
 
 {% block body %}
     {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/search.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css/index.css') }}" />
     {% endblock %}
 
     <!-- Banner -->
-    <div id="main-wrapper" style="background-image: url('{{ asset('images/ferme.jpg') }}'); background-size: cover; background-position: center;">
-        <div class="search-container">
-            <div class="row">
-                <div class="col-12">
-                    <h1 style="color: #3CD4E7; font-weight: bold; text-shadow: 2px 2px 4px #000000;">Rechercher un produit</h1>
-                    {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-                    {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
-                    <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
-                    {{ form_end(form) }}
-                    <br>
-                    <button>Scanner pour rechercher</button>
-                </div>
-            </div>
+    <div id="hero-wrapper">
+        <div class="hero-content">
+            <h1>Rechercher un produit</h1>
+            {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+            {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
+            <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
+            {{ form_end(form) }}
+            <br>
+            <button type="button" class="scanner-button">Scanner pour rechercher</button>
         </div>
     </div>
+
 
     <div id="banner-wrapper">
         <div id="banner" class="box container">

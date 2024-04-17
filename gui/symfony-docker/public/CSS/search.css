@@ -74,3 +74,16 @@
     background-size: cover;
     background-position: center;
 }
+
+.scanner-button {
+    border-radius: 25px; /* Rounded corners */
+    cursor: pointer; /* Indicates the button is clickable */
+    border: none; /* Removes default border */
+    padding: 10px 20px; /* Adds padding */
+    font-size: 1rem; /* Sets font size */
+    background-color: #017BFE; /* Your button background color */
+    color: white; /* Button text color */
+    margin-bottom: 30px; /* Space below the button */
+    display: inline-block; /* Allows setting margins and makes the element inline for layout */
+    text-decoration: none; /* Removes underline from text if it's an anchor */
+}
