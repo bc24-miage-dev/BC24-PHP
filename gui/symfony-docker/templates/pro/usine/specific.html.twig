@@ -12,7 +12,7 @@
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
-        {% if category == 'CARCASSE' %}
+        {% if category == 'DEMI-CARCASSE' %}
         <a href="{{ path('app_usine_decoupe', {'id' : resource.id}) }}"> <button class="btn btn-primary">Découper en morceaux</button> </a>
         {% endif %}
 
