@@ -134,6 +134,6 @@ Ainsi, on peut déduire de cette instance de vache que si elle venait à être �
 En résumé, un RESOURCE NAME est un moule qui donne toutes les informations, tandis qu'une RESOURCE est une instance.
 
 ### Schéma :
-![Schema de la BDD](./BC24.png)
+![Schema de la BDD](BC24.png)
 
 

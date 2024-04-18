@@ -8,20 +8,6 @@
         <link rel="stylesheet" href="{{ asset('css/index.css') }}" />
     {% endblock %}
 
-    <!-- Banner -->
-    <div id="hero-wrapper">
-        <div class="hero-content">
-            <h1>Rechercher un produit</h1>
-            {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-            {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
-            <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
-            {{ form_end(form) }}
-            <br>
-            <button type="button" class="scanner-button">Scanner pour rechercher</button>
-        </div>
-    </div>
-
-
     <div id="banner-wrapper">
         <div id="banner" class="box container">
             <div class="row">
@@ -36,6 +22,24 @@
             </div>
         </div>
     </div>
+    <br><br>
+
+    <!-- Banner -->
+    <div id="hero-wrapper">
+
+        <div class="hero-content">
+            <h1>Rechercher un produit</h1>
+            {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+            {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
+            <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
+            {{ form_end(form) }}
+            <br>
+            <button type="button" class="scanner-button">Scanner pour rechercher</button>
+        </div>
+    </div>
+
+
+
     <!-- Features -->
     <div id="features-wrapper">
         <div class="container">
