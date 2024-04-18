@@ -46,17 +46,4 @@ class ReportRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    public function findallReportedRessource(): array
-    {
-        return $this->createQueryBuilder('r')
-            ->setMaxResults(10)
-            ->orderBy('r.date','DESC')
-            ->where('r.read = 0')
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-
- 
-
 }

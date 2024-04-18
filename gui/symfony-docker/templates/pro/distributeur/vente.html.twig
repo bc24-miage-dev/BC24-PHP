@@ -1,0 +1,19 @@
+{% extends 'pro/distributeur/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>Vente</h1>
+        <p>Scannez le code du produit vendu</p>
+        <br>
+
+        {{ form_start(form) }}
+        <label> Tag NFC :
+            <input type="number" name="{{ field_name(form.id) }}" class="form-control" >
+        </label>
+
+            <button class="btn btn-primary">Scanner</button>
+            <button class="btn btn-primary" type="submit">Vente</button>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

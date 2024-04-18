@@ -1,0 +1,28 @@
+{% extends 'pro/eleveur/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="mt-4">Liste de vos animaux</h1>
+        <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+                <button href="" class="btn btn-primary">Scanner</button>
+        </form>
+
+    {% if animaux %}
+
+        {% for animal in animaux %}
+            <div class="card mr-2 mb-2" style="width: 100%;">
+                <div class="card-body ">
+                    <h5 class="card-title">{{ animal.ResourceName.name }} - {{ animal.id }}</h5>
+                    <a href="{{ path('app_eleveur_specific', {'id' : animal.id}) }}" class="card-link">Informations et actions</a>
+                </div>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <p>Vous n'avez pas encore d'animaux</p>
+    {% endif %}
+    </div>
+{% endblock %}

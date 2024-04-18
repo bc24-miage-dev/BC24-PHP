@@ -1,0 +1,28 @@
+{% extends 'pro/equarrisseur/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="mt-4">Vos ressources :</h1>
+        <form action="" method="post">
+                <label for="NFC">Tag NFC de la ressource</label>
+                <input type="text" class="form-control" id="NFC" name="NFC">
+                <button type="submit" class="btn btn-primary">Chercher</button>
+                <button href="" class="btn btn-primary">Scanner</button>  
+        </form>
+        {% if resources %}
+
+            {% for resource in resources %}
+                <div class="card mr-2 mb-2" style="width: 100%;">
+                    <div class="card-body ">
+                        <h5 class="card-title">{{ resource.ResourceName.name }} - {{ resource.id }}</h5>
+                        <a href="{{ path('app_equarrisseur_job', {'id' : resource.id}) }}" class="card-link">Plus de détails</a>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <br>
+            <p>Vous n'avez aucune resource</p>
+        {% endif %}
+    </div>
+{% endblock %}

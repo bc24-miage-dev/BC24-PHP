@@ -9,49 +9,72 @@
 
 {% block body %}
 
+
 {# Le formulaire de recherche #}
 {{ parent() }}
 
-<div class="resource-details">
-    <h2>Resource Details: {{ resource.getResourceName }}</h2>
-    <p>ID: {{ resource.getId }}</p>
-    <p>Is Final Product: {{ resource.isIsFinalProduct ? 'Yes' : 'No' }}</p>
-    <p>Is Contaminated: {{ resource.isIsContamined ? 'Yes' : 'No' }}</p>
-    <p>Weight: {{ resource.getWeight }}</p>
-    <p>Price: ${{ resource.getPrice }}</p>
-    <p>Description: {{ resource.getDescription }}</p>
-    <p>Date: {{ resource.getDate ? resource.getDate|date('Y-m-d H:i:s') : 'Not available' }}</p>
+    <div class="resource-details {{ resource.isIsContamined ? 'contaminated' : 'not-contaminated' }}">
+    <div class="banner-wrapper">
+        <div class="banner">
+            <div class ="box container">
+                <div class="row">
+                    <div class="col-6 col-25-medium">
+                        <h1>{{ resource.ResourceName.name }}</h1><hr>
+                        {% if resource.isIsContamined %}
+                        <h2 style="color:red"> Attention Produit Contaminé </h2><hr>
+                        {% endif %}
+                        <p>Poids : {{ resource.getWeight }} g</p>
+                        {% if resource.ResourceName.ResourceCategory.category == 'PRODUIT' %}
+                        <p>Prix : {{ resource.getPrice }} €</p>
+                        {% endif %}
 
-    <h3>Origin Production Site</h3>
-    <p>Name: {{ resource.getOrigin.getProductionSiteName }}</p>
-    <p>Address: {{ resource.getOrigin.getAddress }}</p>
-    <p>Telephone: {{ resource.getOrigin.getProductionSiteTel }}</p>
+                        {% if resource.ResourceName.ResourceCategory.category == 'ANIMAL' %}
+                            <p>Date de naissance : {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Non disponible' }}</p>
+                            <p>Heure de naissance : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p>
+                        {% else %}
+                            <p>Date de production : {{ resource.getDate ? resource.getDate|date('d/m/Y') : 'Non disponible' }}</p>
+                            <p>Heure de production : {{ resource.getDate ? resource.getDate|date('H:i:s') : 'Non disponible' }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-5 col-25-medium {{ resource.isIsContamined ? 'contaminated' : 'not-contaminated' }}">
+                        <img src="{{ asset(imagePath) }}" alt="Image description" style="width: 120%;">
+                    </div>
 
-    <h3>Components</h3>
-    {% if resource.getComponents|length > 0 %}
-        <ul>
-            {% for component in resource.getComponents %}
-            <li>
-                <a href="{{ path('app_search_result', {'id': component.getId}) }}">
-                    {{ component.getResourceName }} (ID: {{ component.getId }})
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>This resource has no components.</p>
-    {% endif %}
+                    <div class="col-25 col-25-medium">
+                        <h3>Origine de la Resource :</h3><hr>
+                        <p>Lieu de production : {{ resource.getOrigin.getProductionSiteName }}</p>
+                        <p>Adresse : {{ resource.getOrigin.getAddress }}</p>
+                    </div>
 
-    <h3>Reports</h3>
-    {% if resource.getReports|length > 0 %}
-        <ul>
-            {% for report in resource.getReports %}
-                <li>Report ID: {{ report.getId }}, Description: {{ report.getDescription }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>There are no reports for this resource.</p>
-    {% endif %}
+                    {% if resource.components|length > 0 %}
+                    <div class="col-25 col-25-medium">
+                        <h3>Composants :</h3><hr>
+                            <ul>
+                                {% for component in resource.components %}
+                                    <li>
+                                        <a href="{{ path('app_search_result', {'id': component.getId}) }}">
+                                            {{ component.ResourceName.name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="col-25 col-25-medium">
+                        <h3>Signalements :</h3><hr>
+                        {% if resource.getReports|length > 0 %}
+                                <p>Nombre de signalements pour cette ressource : {{ resource.getReports|length }}</p>
+                        {% else %}
+                            <p>Il n'y a eu aucun signalement pour cette ressource.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

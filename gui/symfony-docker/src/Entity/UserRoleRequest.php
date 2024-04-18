@@ -16,7 +16,7 @@ class UserRoleRequest
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $idUser = null;
+    private ?User $User = null;
 
     #[ORM\Column(length: 255)]
     private ?string $roleRequest = null;
@@ -30,19 +30,25 @@ class UserRoleRequest
     #[ORM\Column(type: Types::TEXT)]
     private ?string $Description = null;
 
+    #[ORM\ManyToOne(inversedBy: 'userRoleRequests')]
+    private ?ProductionSite $ProductionSite = null;
+
+    #[ORM\Column(length: 255 , nullable: true)]
+    private ?string $WalletAddress = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIdUser(): ?User
+    public function getUser(): ?User
     {
-        return $this->idUser;
+        return $this->User;
     }
 
-    public function setIdUser(User $idUser): static
+    public function setUser(User $User): static
     {
-        $this->idUser = $idUser;
+        $this->User = $User;
 
         return $this;
     }
@@ -91,6 +97,30 @@ class UserRoleRequest
     public function setDescription(string $Description): static
     {
         $this->Description = $Description;
+
+        return $this;
+    }
+
+    public function getProductionSite(): ?ProductionSite
+    {
+        return $this->ProductionSite;
+    }
+
+    public function setProductionSite(?ProductionSite $ProductionSite): static
+    {
+        $this->ProductionSite = $ProductionSite;
+
+        return $this;
+    }
+
+    public function getWalletAddress(): ?string
+    {
+        return $this->WalletAddress;
+    }
+
+    public function setWalletAddress(string $WalletAddress): static
+    {
+        $this->WalletAddress = $WalletAddress;
 
         return $this;
     }

@@ -4,7 +4,7 @@
 
 {% block stylesheet %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('CSS/user.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/user.css') }}" />
 {% endblock %}
 
 {% block body %}
@@ -20,6 +20,13 @@
             <img src="{{ asset('images/ModifyAccount.png') }}" alt="Modify Account" />
         </div>
         <p>Modify Account</p>
+    </a>
+
+    <a href="{{ path('app_admin_user_request') }}" class="box">
+        <div class="icon-box">
+            <img src="{{ asset('images/RoleRequest.png') }}" alt="Role Request" />
+        </div>
+        <p>Demander un rôle</p>
     </a>
 </div>
 {% endblock %}

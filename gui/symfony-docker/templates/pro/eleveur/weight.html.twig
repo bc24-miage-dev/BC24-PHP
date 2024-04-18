@@ -1,0 +1,13 @@
+{% extends 'pro/eleveur/index.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+
+    <h1>Modifier le poids de l'animal</h1><br>
+
+        {{ form_start(form) }}
+            <label> Nouveau poids de l'animal (en grammes) :
+                <input type="number" name="{{ field_name(form.weight) }}" class="form-control">
+            </label>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

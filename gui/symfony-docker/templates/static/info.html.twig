@@ -4,30 +4,66 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/howItsWorks.css') }}">
 {% endblock %}
 
 {% block body %}
-    {# TODO : Réanimer cette page #}
-<div class="content-wrapper">
-    <h1>Comment fonctionne BC24 ?</h1>
-
-    <div class="steps">
-        <div class="step">
-            <img src="{{ asset('images/acheter.jpg') }}" alt="Achetez vos produits"><br><br>
-            <p>Achetez vos produits</p>
-        </div>
-        <div class="step">
-            <img src="{{ asset('images/scanner.jpg') }}" alt="Scannez le code"><br><br>
-            <p>Scannez le code</p>
-        </div>
-        <div class="step">
-            <img src="{{ asset('images/verify.jpg') }}" alt="Vérifiez la qualité de votre produit"><br><br>
-            <p>Vérifiez la qualité de votre produit</p>
+    {{ parent() }}
+    <div id="banner-wrapper">
+        <div id="banner" class="box container">
+            <h1>Comment fonctionne BC24 ?</h1><br><br>
+            <h6>BC24 est une application qui vous permet de vérifier la qualité de vos produits en scannant le code-barres.</h6>
+            <h6>Il suffit de suivre les étapes ci-dessous :</h6>
         </div>
     </div>
+    <div id="features-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-4 col-12-medium">
+                    <section class="box feature">
+                        <a class="image featured"><img src="{{ asset('images/acheter.jpg') }}" alt="Achetez vos produits" /></a>
+                        <div class="inner">
+                            <header>
+                                <h2>1. Achetez vos produits</h2>
+                            </header>
+                            <p>Trouvez les meilleurs produits pour vos besoins.</p>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-4 col-12-medium">
+                    <section class="box feature">
+                        <a class="image featured"><img src="{{ asset('images/scanner.jpg') }}" alt="Scannez le code" /></a>
+                        <div class="inner">
+                            <header>
+                                <h2>2. Scannez le tag NFC du produit</h2>
+                            </header>
+                            <p>Scannez facilement pour obtenir des informations en temps réel.</p>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-4 col-12-medium">
+                    <section class="box feature">
+                        <a class="image featured"><img src="{{ asset('images/verify.jpg') }}" alt="Vérifiez la qualité de votre produit" /></a>
+                        <div class="inner">
+                            <header>
+                                <h2>3. Vérifiez la qualité du produit</h2>
+                            </header>
+                            <p>Assurez-vous que le produit répond aux normes alimentaires.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" align ="center">
+            <a href="{{ path('app_about') }}"><button class="button">À propos de nous</button></a>
 
-    <h2>Comment ça marche</h2>
-    <p>Ca fait bim bam boom ! Ca fait vroum et ça fait boom !</p>
-</div>
+    </div>
+    <div id="main-wrapper">
+        <div class="container" align ="center">
+            <section class="last">
+                <h4>Des questions ?</h4><br>
+                <p>Contactez-nous à l'adresse suivante : BC24@gmail.com</p>
+            </section>
+        </div>
+    </div>
 {% endblock %}

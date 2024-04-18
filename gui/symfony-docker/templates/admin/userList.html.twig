@@ -17,11 +17,16 @@
                                     <th>Prénom</th>
                                     <th>ID</th>
                                     <th>Rôles</th>
-                                    <th>Action</th>
+                                    <th>Donner un rôle</th>
+                                    <th>Site associé</th>
+                                    <th>Associer un site</th>
+                                    <th>Wallet Address (enter to validate)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for user in users %}
+                                    {% if user.deletedAt == null %}
+                                    
                                     <tr>
                                         <td>{{ user.lastname }}</td>
                                         <td>{{ user.firstname }}</td>
@@ -49,7 +54,7 @@
                                                 <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_TRANSPORTEUR'}) }}">Transporteur</a></li>
                                                 <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_EQUARRISSEUR'}) }}">Équarrisseur</a></li>
                                                 <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USINE'}) }}">Usine</a></li>
-                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_COMMERCANT'}) }}">Commerçant</a></li>
+                                                <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_DISTRIBUTEUR'}) }}">Distributeur</a></li>
                                                 <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_ADMIN'}) }}">Admin</a></li>
                                                 <li><a href="{{ path('app_admin_userEdit', {'id': user.id, 'role': 'ROLE_USER'})  }}">User Classique</a></li>
                                             </ul>
@@ -57,7 +62,47 @@
                                         {% endif %}
                                         </td>
 
+                                        <td>
+                                            {% if user.productionSite is null %}
+                                                {% if "ROLE_PRO" in user.roles and "ROLE_ADMIN" not in user.roles and "ROLE_TRANSPORTEUR" not in user.roles %}
+                                                    <i class="fa fa-exclamation-triangle" style="color: red"></i>
+                                                {% endif %}
+                                                    <p> Aucun site associé </p>
+                                            {% else %}
+                                                {{ user.productionSite.productionSiteName }}
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            {% if "ROLE_PRO" in user.roles and "ROLE_ADMIN" not in user.roles and "ROLE_TRANSPORTEUR" not in user.roles %}
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Assigner Site
+                                                    <span class="caret"></span></button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a href="{{ path('app_admin_userProdSiteEdit', {'id': user.id, 'productionSiteId': -1}) }}">
+                                                                Annuler l'association
+                                                                </a>
+                                                            </li>
+                                                            {% for productionSite in pSites %}
+                                                            <li>
+                                                                <a href="{{ path('app_admin_userProdSiteEdit', {'id': user.id, 'productionSiteId': productionSite.id}) }}">
+                                                                    {{ productionSite.productionSiteName }}
+                                                                </a>
+                                                            </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                            </div>
+                                            {% else %}
+                                                <p> Aucune action possible </p>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <form method="post" action="{{ path('app_admin_userWalletAddressEdit', {'id': user.id}) }}">
+                                                <input type="text" name="walletAddress" value= {{user.walletAddress}}>
+                                            </form>
+                                        </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>

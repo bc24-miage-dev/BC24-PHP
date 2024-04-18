@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\EntityManagerInterface;
 
 #[ORM\Entity(repositoryClass: ResourceRepository::class)]
 class Resource
@@ -15,12 +16,6 @@ class Resource
     //#[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $ResourceName = null;
-
-    #[ORM\Column]
-    private ?bool $isFinalProduct = null;
 
     #[ORM\Column]
     private ?bool $isContamined = null;
@@ -50,11 +45,33 @@ class Resource
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\OneToMany(mappedBy: 'Resource', targetEntity: UserResearch::class)]
+    private Collection $userResearch;
+
+    #[ORM\ManyToOne(inversedBy: 'ownedResources')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $currentOwner = null;
+
+    #[ORM\Column]
+    private ?bool $IsLifeCycleOver = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ResourcesUsingThisName')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ResourceName $ResourceName = null;
+
+    #[ORM\Column(length: 8, nullable: true)]
+    private ?string $Genre = null;
+
+    #[ORM\OneToMany(mappedBy: 'resource', targetEntity: OwnershipAcquisitionRequest::class)]
+    private Collection $ownershipAcquisitionRequestsRelated;
+
     public function __construct()
     {
         $this->components = new ArrayCollection();
         $this->resources = new ArrayCollection();
         $this->reports = new ArrayCollection();
+        $this->userResearch = new ArrayCollection();
+        $this->ownershipAcquisitionRequestsRelated = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -65,30 +82,6 @@ class Resource
     public function setId(int $id): static
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    public function getResourceName(): ?string
-    {
-        return $this->ResourceName;
-    }
-
-    public function setResourceName(string $ResourceName): static
-    {
-        $this->ResourceName = $ResourceName;
-
-        return $this;
-    }
-
-    public function isIsFinalProduct(): ?bool
-    {
-        return $this->isFinalProduct;
-    }
-
-    public function setIsFinalProduct(bool $isFinalProduct): static
-    {
-        $this->isFinalProduct = $isFinalProduct;
 
         return $this;
     }
@@ -245,4 +238,113 @@ class Resource
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, UserResearch>
+     */
+    public function getUserResearch(): Collection
+    {
+        return $this->userResearch;
+    }
+
+    public function addUserResearch(UserResearch $userResearch): static
+    {
+        if (!$this->userResearch->contains($userResearch)) {
+            $this->userResearch->add($userResearch);
+            $userResearch->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserResearch(UserResearch $userResearch): static
+    {
+        if ($this->userResearch->removeElement($userResearch)) {
+            // set the owning side to null (unless already changed)
+            if ($userResearch->getResource() === $this) {
+                $userResearch->setResource(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCurrentOwner(): ?User
+    {
+        return $this->currentOwner;
+    }
+
+    public function setCurrentOwner(?User $currentOwner): static
+    {
+        $this->currentOwner = $currentOwner;
+
+        return $this;
+    }
+
+    public function isIsLifeCycleOver(): ?bool
+    {
+        return $this->IsLifeCycleOver;
+    }
+
+    public function setIsLifeCycleOver(bool $IsLifeCycleOver): static
+    {
+        $this->IsLifeCycleOver = $IsLifeCycleOver;
+
+        return $this;
+    }
+
+    public function getResourceName(): ?ResourceName
+    {
+        return $this->ResourceName;
+    }
+
+    public function setResourceName(?ResourceName $name): static
+    {
+        $this->ResourceName = $name;
+
+        return $this;
+    }
+
+    public function getGenre(): ?string
+    {
+        return $this->Genre;
+    }
+
+    public function setGenre(?string $Genre): static
+    {
+        $this->Genre = $Genre;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, OwnershipAcquisitionRequest>
+     */
+    public function getOwnershipAcquisitionRequestsRelated(): Collection
+    {
+        return $this->ownershipAcquisitionRequestsRelated;
+    }
+
+    public function addOwnershipAcquisitionRequestsRelated(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsRelated): static
+    {
+        if (!$this->ownershipAcquisitionRequestsRelated->contains($ownershipAcquisitionRequestsRelated)) {
+            $this->ownershipAcquisitionRequestsRelated->add($ownershipAcquisitionRequestsRelated);
+            $ownershipAcquisitionRequestsRelated->setResource($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOwnershipAcquisitionRequestsRelated(OwnershipAcquisitionRequest $ownershipAcquisitionRequestsRelated): static
+    {
+        if ($this->ownershipAcquisitionRequestsRelated->removeElement($ownershipAcquisitionRequestsRelated)) {
+            // set the owning side to null (unless already changed)
+            if ($ownershipAcquisitionRequestsRelated->getResource() === $this) {
+                $ownershipAcquisitionRequestsRelated->setResource(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

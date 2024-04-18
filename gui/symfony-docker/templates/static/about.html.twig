@@ -2,37 +2,45 @@
 
 {% block title %}BC24-À propos de nous{% endblock %}
 
+
+
 {% block body %}
 
 
 <div class="content">
-    <h1>À propos de nous</h1><hr>
-    <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna
-        aliqua. Le lorem ipsum (également appelé faux-texte, lipsum,
-        ou bolo bolo1)est, en imprimerie, une suite de mots sans
-        signification utilisée à titre provisoire pour calibrer une
-        mise en page, le texte définitif venant remplacer le
-        faux-texte dès qu'il est prêt ou que la mise en page est
-        achevée.
-        Généralement, on utilise un texte en faux latin (le texte
-        ne veut rien dire, il a été modifié), le Lorem ipsum ou
-        Lipsum. L'avantage du latin est que l'opérateur sait au
-        premier coup d'œil que la page contenant ces lignes n'est
-        pas valide et que l'attention du lecteur n'est pas dérangée
-        par le contenu, lui permettant de demeurer concentré sur
-        le seul aspect graphique.
 
-        Il circule des centaines de versions différentes du lorem
-        ipsum, mais ce texte aurait originellement été tiré de
-        l'ouvrage écrit par Cicéron en 45 av. J.-C., De finibus
-        bonorum et malorum (Liber Primus, 32), texte populaire
-        à cette époque, dont l'une des premières phrases est :
-        « Neque porro quisquam est qui dolorem ipsum quia dolor
-        sit amet, consectetur, adipisci velit… » (« Il n'existe
-        personne qui aime la souffrance pour elle-même, ni qui
-        la recherche ni qui la veuille pour ce qu'elle est… »).
-    </p>
+    <div id="main-wrapper">
+        <div class="container">
+                <div class="content">
+                    <article>
+                    <h3>À propos de nous</h3>
+                    <br>
+                    <p>
+                        <b>Trace</b> propose un service complet de supply-chain utilisant la technologie <b>blockchain</b> pour
+                        l'industrie de la viande qui permettra de tracer l’origine de la viande dès l’élevage et toutes les
+                        transformations qu’elle aura subi, en passant par son transport.
+                        Notre solution permet d’améliorer le suivi des produits de viande pour accroître la confiance des
+                        consommateurs et assurer la fiabilité des données collectées par les producteurs, transporteurs et
+                        distributeurs. <b>Trace</b> a pour but d’améliorer l’efficacité opérationnelle de <b>tous les acteurs de la
+                            chaîne de traçabilité</b> en automatisant le maximum de tâches.
+                    </p>
+                    <p>
+                        Donner l’accès des données de traçages des produits accroît l’intention d’achat des
+                        consommateurs, les entreprises adoptant notre solution pourraient alors voir leurs ventes
+                        augmenter. C’est pourquoi nous proposons également une application à destination <b>des
+                            consommateurs </b> qui leur permet de scanner les produits pour accéder à toutes les informations
+                        de la chaîne d’approvisionnement. L’application est connectée à l’API RappelConso pour envoyer
+                        une notification au consommateur si un produit fait l’objet d’un rappel.
+                    </p>
+                    </article>
+                </div>
+                <div class="row">
+                    <div class="col-3 col-3-medium">
+                        <a href="{{ path('app_index') }}" class="button medium icon solid fa-arrow-circle-right">Accueil</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

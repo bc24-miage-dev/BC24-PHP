@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRoleRequestRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -13,6 +15,8 @@ use App\Form\ModifierUserType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\UserRoleRequest;
 use App\Form\UserRoleRequestType;
+use App\Entity\ProductionSite;
+use App\Form\ProductionSiteType;
 
 #[Route('/user')]
 class UserController extends AbstractController
@@ -27,13 +31,11 @@ class UserController extends AbstractController
     #[Route('/', name: 'app_user_account')]
     public function myAccount(): Response
     {
-        return $this->render('user/MyAccount.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
+        return $this->render('user/MyAccount.html.twig');
     }
 
     #[Route('/deleteAccount', name: 'app_user_delete')]
-    public function deleteUser(ManagerRegistry $doctrine): Response
+    public function deleteUser(): Response
     {
         $user = $this->getUser();
         if ($user) {
@@ -43,12 +45,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/delete', name: 'app_user_delete_process')]
-    public function deleteUserProcess(ManagerRegistry $doctrine): RedirectResponse
+    public function deleteUserProcess(EntityManagerInterface$entityManager): RedirectResponse
     {
         $user = $this->getUser();
         if ($user) {
-            $entityManager = $doctrine->getManager();
-            $entityManager->remove($user);
+            $user->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
+            $entityManager->persist($user);
             $entityManager->flush();
             //Kill la session
             $this->tokenStorage->setToken(null);
@@ -59,7 +61,8 @@ class UserController extends AbstractController
     }
 
     #[Route('/update', name: 'app_user_update')]
-    public function modifUser(Request $request, ManagerRegistry $doctrine): Response
+    public function modifUser(Request $request,
+                              EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         if ($user) {
@@ -67,29 +70,25 @@ class UserController extends AbstractController
             $form->handleRequest($request);
 
             if($form -> isSubmitted() && $form -> isValid()){
-
-                $entityManager = $doctrine->getManager();
                 $entityManager->persist($user);
                 $entityManager->flush();
                 return $this->redirectToRoute('app_user_account');
             }
             $form = $this->createForm(ModifierUserType::class, $user);
 
-            return $this->render('user/ModifAccount.html.twig', ['form' => $form->createView()
-        ]);
+            return $this->render('user/ModifAccount.html.twig', ['form' => $form->createView()]);
         }
-        return $this->render('user/CompteSupprime.html.twig', [
-            'information' => 'Compte inexistant',
-        ]);
+        return $this->redirectToRoute('app_index');
     }
 
     #[Route('/request', name: 'app_admin_user_request')]
-    public function userRequestRole(Request $request, ManagerRegistry $doctrine): Response
+    public function userRequestRole(Request $request,
+                                    EntityManagerInterface $entityManager,
+                                    UserRoleRequestRepository $requestRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $UserRoleRequest = new UserRoleRequest();
-        $user = $this->getUser();
-        $repository = $doctrine->getRepository(UserRoleRequest::class);
-        $repoRequest = $repository->findRoleRequestByUserId($user->getId());
+        $repoRequest = $requestRepository->findBy(['User' => $this->getUser()]);
 
         if (count($repoRequest) > 0) {
             $UserRoleRequest = $repoRequest[0];
@@ -98,8 +97,8 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $doctrine->getManager();
-            $UserRoleRequest->setIdUser($user);
+            $UserRoleRequest = $form->getData();
+            $UserRoleRequest->setUser($this->getUser());
             $UserRoleRequest->setRead(false);
             $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
             $entityManager->persist($UserRoleRequest);
@@ -108,10 +107,31 @@ class UserController extends AbstractController
             $this->addFlash('success', 'Votre demande à bien été envoyée');
             return $this->redirectToRoute('app_index');
         }
-
         return $this->render('user/UserRequest.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
+    #[Route('/productionSiteRequest', name: 'app_user_productionSiteRequest')]
+
+    public function createProductionSite(EntityManagerInterface $entityManager,
+                                         Request $request): Response
+    {
+        $productionSite = new ProductionSite();
+        $form = $this->createForm(ProductionSiteType::class, $productionSite);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $productionSite->setValidate(false);
+            $entityManager->persist($productionSite);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Demande de création de site de production enregistrée');
+            return $this->redirectToRoute('app_admin_user_request');
+        }
+
+        return $this->render('user/productionSite.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 }

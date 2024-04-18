@@ -1,7 +1,36 @@
 {% extends 'pro/proTemplate.html.twig' %}
 
-{% block title %}BC24 PRO-TRANSPORTEUR{% endblock %}
+{% block title %}BC24 PRO-Transporteur{% endblock %}
+
+{% block sidebar %}
+    <div class="sidebar-heading"> Opérations </div>
+
+    <li class="nav-item">
+        <a class="nav-link" href= {{ path('app_transporteur_list')}}>
+            <i class="fas fa-fw fa-list"></i>
+            <span>Votre cargaison actuelle</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href= {{path('app_transporteur_acquire')}}>
+            <i class="fas fa-fw fa-box-open"></i>
+            <span>Acquisition de Ressource</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href= {{path('app_transporteur_transferList')}}>
+            <i class="fas fa-fw fa-truck"></i>
+            <span>Transactions</span></a>
+    </li>
+
+{% endblock %}
+
+{% block titrePro %}Transporteur{% endblock %}
+
 
 {% block body %}
-    Vue transporteur
+    <div class="container-fluid">
+        <h1 class="h3 mb-4 text-gray-800">Bienvenue sur la vue Transporteur de BC24</h1>
+        <p>Vous pouvez naviguer dans le menu de gauche pour accéder aux différentes fonctionnalités de l'application.</p>
+    </div>
 {% endblock %}

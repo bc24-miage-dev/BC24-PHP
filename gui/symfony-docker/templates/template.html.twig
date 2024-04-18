@@ -2,13 +2,15 @@
 
 <html>
 <head>
-    <title>{% block title %}BC24-Accueil{% endblock %}</title>
+    <title>{% block title %}BC24{% endblock %}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}" />
+    <link href="{{ asset('proAssets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     {% block stylesheet %}
+
     {% endblock %}
 
     {% block icon %}
@@ -40,14 +42,18 @@
                                 <li><a href="{{ path('app_register') }}">Création de Compte</a></li>
                             {% else %}
                                 <li><a href="{{ path('app_user_account') }}">Mon Compte</a></li>
-                                <li><a href="{{ path('app_history') }}">Historique de recherche</a></li>
+                                <li><a href="{{ path('app_history', {'page': 1}) }}">Historique de recherche</a></li>
                                 <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
                             {% endif %}
                         </ul>
                     </li>
-                    <li><a href="{{ path('app_contact') }}">Nous Contacter</a></li>
+                    {% if app.user %}
+                        {% if "ROLE_PRO" in app.user.roles %}
+                            <li><a href="{{ path('app_pro') }}">Vue Pro</a> </li>
+                        {% endif %}
+                    {% endif %}
                     <li><a href={{ path('app_report_reportAliment') }}>Signaler un produit</a></li>
-                    <li><a href="{{ path('app_recent') }}">Produits dangereux récents</a></li>
+                    <li><a href="{{ path('app_recent') }}">Produits dangereux</a></li>
                 </ul>
 
             </nav>
@@ -76,11 +82,6 @@
     <!-- body -->
 
     {% block body %}
-        {% if app.user %}
-            {% if "ROLE_PRO" in app.user.roles %}
-        <a href="{{ path('app_pro') }}">Passer à la vue Professionnelle</a>
-            {% endif %}
-        {% endif %}
     {% endblock %}
 
     <!-- Footer -->
@@ -95,9 +96,11 @@
                     <section class="widget links">
                         <h3>Professionnels :</h3>
                         <ul class="style2">
-                            <li><a href="#">Producteur</a></li>
-                            <li><a href="#">Équarrisseur</a></li>
-                            <li><a href="#">Usine</a></li>
+                            <li><a href="{{ path('app_admin_user_request') }}">Éleveur</a></li>
+                            <li><a href="{{ path('app_admin_user_request') }}">Transporteur</a></li>
+                            <li><a href="{{ path('app_admin_user_request') }}">Équarrisseur</a></li>
+                            <li><a href="{{ path('app_admin_user_request') }}">Usine</a></li>
+                            <li><a href="{{ path('app_admin_user_request') }}">Distributeur</a></li>
                         </ul>
                     </section>
 
@@ -108,7 +111,6 @@
                     <section class="widget links">
                         <h3>Nous contacter</h3>
                         <ul class="style2">
-                            <li><a href="{{ path('app_contact') }}">Formulaire de contact</a></li>
                             <li>90 rue de Tolbiac</li>
                             <li>Paris, 75013</li>
                             <li>+33 7 98 14 92 18</li>
@@ -132,6 +134,18 @@
 
                     </section>
 
+                </div>
+                <div class="col-3 col-6-medium col-12-small">
+                    <section>
+                        <h3>Liens utiles</h3>
+                        <ul>
+                            <li><a href="{{ path('app_index') }}">Accueil</a></li>
+                            <li><a href="{{ path('app_about') }}">À propos de nous</a></li>
+                            <li><a href="{{ path('app_recent') }}">Produits dangereux</a></li>
+                            <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                            <li><a href="{{ path('app_register') }}">Création de Compte</a></li>
+                        </ul>
+                    </section>
                 </div>
 
             </div>

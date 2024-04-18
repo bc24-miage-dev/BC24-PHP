@@ -1,0 +1,54 @@
+{% extends 'pro/usine/index.html.twig' %}
+
+
+{% block title %}
+    Découpe du produit {{ demiCarcasse.resourceName.name }}
+{% endblock %}
+
+{% block body %}
+
+
+    <h1>Découpe du produit {{ demiCarcasse.resourceName.name }} </h1>
+        <div class="row col-md-12 card card-body">
+            <form method="post" action="{{ path('app_usine_decoupe', {'id': demiCarcasse.id}) }}">
+
+            <table class="table table-striped" id="table">
+                <div id="copy">
+                <thead>
+                    <tr>
+                        <th>TagNFC</th>
+                        <th>Morceau de viande</th>
+                        <th>Poids</th>
+                    </tr>
+                </thead>
+                    <tbody id="table-body">
+                        <tr class="copy-row">
+                            <td>
+                                <input type="number" name="list[1][NFC]" id="tag1">
+                            </td>
+                            <td>
+                                <select name="list[1][name]" id="name1">
+                                    {% for i in range (0,morceauxPossibles|length -1) %}
+                                        {% set morceau = morceauxPossibles[i]%}
+                                        <option value="{{ morceau.name }}">{{ morceau.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="list[1][weight]" id="weight1">
+                            </td>
+                        </tr>
+                    </tbody>
+                </div>
+            </table>
+            <input type="button" onclick="ajouterLigne()" value="Ajouter ligne">
+            <button type="submit">Valider</button>
+        </div>
+
+
+    
+{% endblock %}
+
+{% block script %}
+    <script src="{{ asset('assets/js/decoupe.js') }}" defer  ></script>
+{% endblock %}

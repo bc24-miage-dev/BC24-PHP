@@ -7,17 +7,16 @@
     <div class="container-fluid">
     <h1>Liste des signalements récents : </h1><br>
         {% if report %}
-        {% for reportElement in report %}
-
-            <div class="card mr-2 mb-2" style="width: 80%;">
-                <div class="card-body ">
-                    <h5 class="card-title">{{ reportElement.resource.id }} - {{ reportElement.resource.ResourceName }}</h5>
-                    <h6 class="card-subtitle mb-2 text-body-secondary">Date : {{ reportElement.date|date('d/m/Y') }}</h6>
-                    <p class="card-text">{{ reportElement.description }}</p>
-                    <a href="{{ path('app_admin_checkReport', {'id': reportElement.id}) }}" class="card-link">Check Report</a>
+            {% for reportElement in report %}
+                <div class="card mr-2 mb-2" style="width: 100%;">
+                    <div class="card-body ">
+                        <h5 class="card-title">{{ reportElement.resource.id }} - {{ reportElement.resource.ResourceName.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-body-secondary">Date : {{ reportElement.date|date('d/m/Y') }}</h6>
+                        <p class="card-text">{{ reportElement.description }}</p>
+                        <a href="{{ path('app_admin_checkReport', {'id': reportElement.id}) }}" class="card-link">Check Report</a>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
         {% else %}
             <p>Il n'y a pas de signalements récents</p>
         {% endif %}

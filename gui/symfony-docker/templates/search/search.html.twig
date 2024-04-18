@@ -8,10 +8,14 @@
 
 {% block body %}
 <div class="search-container">
-    <h1>Tag NFC</h1>
+    <h1>Rechercher un produit</h1>
     {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Search by Tag NFC'}}) }}
+        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
         <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
     {{ form_end(form) }}
+    <br>
+    <button type="button" class="scanner-button">Scanner pour rechercher</button>
 </div>
+
+
 {% endblock %}

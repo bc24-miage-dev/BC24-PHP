@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Entity\ProductionSite;
 use App\Entity\UserRoleRequest;
 use Doctrine\DBAL\Types\StringType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -17,17 +18,22 @@ class UserRoleRequestType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-                        ->add('roleRequest', ChoiceType::class , [
+            ->add('roleRequest', ChoiceType::class , [
                 'label' => 'Role Request',
                 'choices' => [
-                    'éleveur' => 'ROLE_ELEVEUR',
-                    'transporteur' => 'ROLE_TRANSPORTEUR',
-                    'équarrisseur' => 'ROLE_EQUARRISSEUR',
-                    'usine' => 'ROLE_USINE',
-                    'commerçant' => 'ROLE_COMMERCANT',
-                    'admin' => 'ROLE_ADMIN',
+                    'Éleveur' => 'ROLE_ELEVEUR',
+                    'Transporteur' => 'ROLE_TRANSPORTEUR',
+                    'Équarrisseur' => 'ROLE_EQUARRISSEUR',
+                    'Usine' => 'ROLE_USINE',
+                    'Distributeur' => 'ROLE_DISTRIBUTEUR',
+                    'Admin' => 'ROLE_ADMIN',
                 ],])
+                ->add('ProductionSite', EntityType::class, [
+                    'class' => ProductionSite::class,
+                    'choice_label' => 'ProductionSiteName',
+                ])
                 ->add('Description', null, ['label' => 'Description'])
+                ->add('WalletAddress', null, ['label' => 'Wallet Address'])
                     ->add('Envoyer', SubmitType::class)
                 ;
     }

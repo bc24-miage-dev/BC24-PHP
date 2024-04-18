@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Resource;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @extends ServiceEntityRepository<Resource>
@@ -45,4 +47,77 @@ class ResourceRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    public function findByWalletAddress(String $walletAddress): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'c')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('c.WalletAddress = :WalletAddress')
+            ->setParameter('WalletAddress', $walletAddress)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByWalletAddressAndNFC(String $walletAddress, int $NFC): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'c')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('c.WalletAddress = :WalletAddress')
+            ->andWhere('r.id = :NFC')
+            ->setParameter('WalletAddress', $walletAddress)
+            ->setParameter('NFC', $NFC)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByWalletAddressCategory(String $walletAddress, String $category): array
+    {
+        $category = strtoupper($category);
+
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'u')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('rc.category = :category')
+            ->andWhere('u.WalletAddress = :WalletAddress')
+            ->setParameter('category', $category)
+            ->setParameter('WalletAddress', $walletAddress)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+
+
+    public function findByWalletAddressNFC(String $walletAddress, int $NFC): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'u')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('u.WalletAddress = :WalletAddress')
+            ->andWhere('r.id = :NFC')
+            ->setParameter('WalletAddress', $walletAddress)
+            ->setParameter('NFC', $NFC)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findProductByWalletAddress(String $walletAddress): array
+    {
+        return $this->createQueryBuilder('r')
+                ->join('r.currentOwner', 'u')
+                ->join('r.ResourceName', 'rn')
+                ->join('rn.resourceCategory', 'rc')
+            ->andWhere('r.IsLifeCycleOver = false')
+            ->andWhere('rn.productionSiteOwner != :productionSiteOwner')
+            ->andWhere('u.WalletAddress = :WalletAddress')
+            ->setParameter('WalletAddress', $walletAddress)
+            ->setParameter('productionSiteOwner', false)
+            ->getQuery()
+            ->getResult();
+    }
 }

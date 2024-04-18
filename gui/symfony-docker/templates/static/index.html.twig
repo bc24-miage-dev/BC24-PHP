@@ -1,14 +1,13 @@
 {% extends 'template.html.twig' %}
 
 {% block title %}BC24 - Traçabilité{% endblock %}
-{% block stylesheets %}
-    {{ parent() }}
 
-{% endblock %}
 
 {% block body %}
-    {{ parent()}}
-    <!-- Banner -->
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/index.css') }}" />
+    {% endblock %}
+
     <div id="banner-wrapper">
         <div id="banner" class="box container">
             <div class="row">
@@ -23,17 +22,34 @@
             </div>
         </div>
     </div>
+    <br><br>
+
+    <!-- Banner -->
+    <div id="hero-wrapper">
+
+        <div class="hero-content">
+            <h1>Rechercher un produit</h1>
+            {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+            {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
+            <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
+            {{ form_end(form) }}
+            <br>
+            <button type="button" class="scanner-button">Scanner pour rechercher</button>
+        </div>
+    </div>
+
+
 
     <!-- Features -->
     <div id="features-wrapper">
         <div class="container">
             <div class="row">
                 <div class="col-4 col-12-medium">
-
-                    <!-- Box -->
-                    <section class="box feature">
-                        <a href="{{ path('app_search') }}" class="image featured"><img src="{{ asset('images/pic01.jpg') }}" alt="" /></a>
-                        <div class="inner">
+                    <section class="box feature" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <a href="{{ path('app_search') }}" class="image featured">
+                            <img src="{{ asset('images/research.jpg') }}" alt="" style="width: 100%; height: 200px; object-fit: cover;"/>
+                        </a>
+                        <div class="inner" style="padding: 10px;">
                             <header>
                                 <h2>Recherche</h2>
                                 <p>Consulter la trace d'un produit</p>
@@ -41,14 +57,13 @@
                             <p>Scannez simplement votre produit et consultez l'intégralité de son parcours grâce à la technologie de la Blockchain !</p>
                         </div>
                     </section>
-
                 </div>
                 <div class="col-4 col-12-medium">
-
-                    <!-- Box -->
-                    <section class="box feature">
-                        <a href="{{ path('app_recent') }}" class="image featured"><img src="{{ asset('images/pic02.jpg') }}" alt="" /></a>
-                        <div class="inner">
+                    <section class="box feature" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <a href="{{ path('app_recent') }}" class="image featured">
+                            <img src="{{ asset('images/Consulter.jpg') }}" alt="" style="width: 100%; height: 200px; object-fit: cover;"/>
+                        </a>
+                        <div class="inner" style="padding: 10px;">
                             <header>
                                 <h2>Consultation</h2>
                                 <p>Consulter les derniers produits dangereux</p>
@@ -56,22 +71,20 @@
                             <p>Nos équipes veillent à votre santé ! Retrouvez ici tous les produits récemment déclarés impropres à la consommation.</p>
                         </div>
                     </section>
-
                 </div>
                 <div class="col-4 col-12-medium">
-
-                    <!-- Box -->
-                    <section class="box feature">
-                        <a href="{{ path('app_report_reportAliment') }}" class="image featured"><img src="{{  asset('images/pic03.jpg') }}" alt="" /></a>
-                        <div class="inner">
+                    <section class="box feature" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <a href="{{ path('app_report_reportAliment') }}" class="image featured">
+                            <img src="{{ asset('images/signaler.png') }}" alt="" style="width: 100%; height: 200px; object-fit: cover;"/>
+                        </a>
+                        <div class="inner" style="padding: 10px;">
                             <header>
                                 <h2>Signalement</h2>
                                 <p>Signaler un produit</p>
                             </header>
-                            <p>Votre article acheté récemment semble étrange ? Signalez-le nous, nous étudierons le problème et reviendrons vers vous</p>
+                            <p>Votre article acheté récemment semble étrange ? Signalez-le-nous, nous étudierons le problème et reviendrons vers vous</p>
                         </div>
                     </section>
-
                 </div>
             </div>
         </div>
@@ -81,7 +94,7 @@
     <div id="main-wrapper">
         <div class="container">
             <div class="row gtr-200">
-                <div class="col-4 col-12-medium">
+                <div class="col-3 col-12-medium">
 
                     <!-- Sidebar -->
                     <div id="sidebar">
@@ -89,10 +102,10 @@
                             <h3>Votre métier</h3>
                             <div class="grid">
                                 <div class="row gtr-50">
-                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic04.jpg') }}" alt="" /></a></div>
-                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic05.jpg') }}" alt="" /></a></div>
-                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic06.jpg') }}" alt="" /></a></div>
-                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/pic07.jpg') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/distribution.png') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/equarrisseur.webp') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/usine.png') }}" alt="" /></a></div>
+                                    <div class="col-6"><a href="#" class="image fit"><img src="{{ asset('images/eleveur.jpg') }}" alt="" /></a></div>
                                 </div>
                             </div>
 
@@ -109,7 +122,7 @@
                             <p>Vous êtes <b>Producteur</b>, <b>Équarrisseur</b> ou vous travaillez dans une <b>Usine de production</b> ? Vous pouvez réaliser ici toutes les tâches
                                 liées à la traçabilité de vos produits.</p>
                             <p>Notre site propose des services pour faciliter ces tâches, et rassurer les consommateurs sur ce qu'il se trouve dans leurs assiettes. <br>
-                                Interessé(e) ? Enregistrez vous ici !</p>
+                                Interessé(e) ? Enregistrez vous ici !</p><br><br>
                             {# TODO : Page création de compte pro + Rôles + Pages différentes #}
                             <a href="{{ path('app_admin_user_request') }}" class="button icon solid fa-arrow-circle-right">Création de compte Professionnel</a>
                         </section>
@@ -119,5 +132,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

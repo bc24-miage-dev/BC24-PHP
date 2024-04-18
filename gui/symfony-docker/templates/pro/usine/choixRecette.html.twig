@@ -1,0 +1,16 @@
+{% extends 'pro/usine/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+    <h1>Choix d'une recette à appliquer</h1>
+    <br>
+    <p>Choisissez une recette à appliquer :</p>
+    <ul>
+        {% for title in titles %}
+            <li>
+                <a href="{{ path('app_usine_recette', {'id': title.id}) }}">{{ title.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    </div>
+{% endblock %}

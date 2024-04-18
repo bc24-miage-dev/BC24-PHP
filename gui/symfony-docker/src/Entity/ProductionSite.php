@@ -26,10 +26,24 @@ class ProductionSite
 
     #[ORM\OneToMany(mappedBy: 'origin', targetEntity: Resource::class)]
     private Collection $resources;
+    #[ORM\OneToMany(mappedBy: 'productionSite', targetEntity: User::class)]
+    private Collection $userRelated;
+
+    #[ORM\OneToMany(mappedBy: 'ProductionSite', targetEntity: UserRoleRequest::class)]
+    private Collection $userRoleRequests;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $Validate = false;
+
+    #[ORM\OneToMany(mappedBy: 'productionSiteOwner', targetEntity: ResourceName::class)]
+    private Collection $resourceNamesOwned;
 
     public function __construct()
     {
         $this->resources = new ArrayCollection();
+        $this->userRelated = new ArrayCollection();
+        $this->userRoleRequests = new ArrayCollection();
+        $this->resourceNamesOwned = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,6 +111,108 @@ class ProductionSite
             // set the owning side to null (unless already changed)
             if ($resource->getOrigin() === $this) {
                 $resource->setOrigin(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUserRelated(): Collection
+    {
+        return $this->userRelated;
+    }
+
+    public function addUserRelated(User $userRelated): static
+    {
+        if (!$this->userRelated->contains($userRelated)) {
+            $this->userRelated->add($userRelated);
+            $userRelated->setProductionSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRelated(User $userRelated): static
+    {
+        if ($this->userRelated->removeElement($userRelated)) {
+            // set the owning side to null (unless already changed)
+            if ($userRelated->getProductionSite() === $this) {
+                $userRelated->setProductionSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserRoleRequest>
+     */
+    public function getUserRoleRequests(): Collection
+    {
+        return $this->userRoleRequests;
+    }
+
+    public function addUserRoleRequest(UserRoleRequest $userRoleRequest): static
+    {
+        if (!$this->userRoleRequests->contains($userRoleRequest)) {
+            $this->userRoleRequests->add($userRoleRequest);
+            $userRoleRequest->setProductionSite($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserRoleRequest(UserRoleRequest $userRoleRequest): static
+    {
+        if ($this->userRoleRequests->removeElement($userRoleRequest)) {
+            // set the owning side to null (unless already changed)
+            if ($userRoleRequest->getProductionSite() === $this) {
+                $userRoleRequest->setProductionSite(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function isValidate(): ?bool
+    {
+        return $this->Validate;
+    }
+
+    public function setValidate(?bool $Validate): static
+    {
+        $this->Validate = $Validate;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ResourceName>
+     */
+    public function getResourceNamesOwned(): Collection
+    {
+        return $this->resourceNamesOwned;
+    }
+
+    public function addResourceNamesOwned(ResourceName $resourceNamesOwned): static
+    {
+        if (!$this->resourceNamesOwned->contains($resourceNamesOwned)) {
+            $this->resourceNamesOwned->add($resourceNamesOwned);
+            $resourceNamesOwned->setProductionSiteOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResourceNamesOwned(ResourceName $resourceNamesOwned): static
+    {
+        if ($this->resourceNamesOwned->removeElement($resourceNamesOwned)) {
+            // set the owning side to null (unless already changed)
+            if ($resourceNamesOwned->getProductionSiteOwner() === $this) {
+                $resourceNamesOwned->setProductionSiteOwner(null);
             }
         }
 

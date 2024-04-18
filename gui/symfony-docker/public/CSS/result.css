@@ -4,11 +4,12 @@
     padding: 2rem; /* Add some padding around the content */
     background: #f8f8f8; /* A light grey background */
     border-radius: 8px; /* Rounded corners for the container */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* A subtle shadow for depth */
     font-family: 'Arial', sans-serif; /* Optional: Change the font */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
-.resource-details h2, 
+
+.resource-details h2,
 .resource-details h3 {
     color: #333; /* Darker color for headings for contrast */
     margin-bottom: 0.5rem; /* Space below headings */
@@ -37,6 +38,20 @@
 .resource-details li {
     padding: 0.2rem 0; /* Space out list items */
 }
+
+.resource-details.contaminated {
+    background-color: rgba(222, 70, 66, 0.9); /* Deep crimson with transparency */
+
+}
+
+.not-contaminated img {
+    box-shadow: 0 0  15px 5px rgba(86, 204, 48, 0.9);
+
+}
+.contaminated img {
+    box-shadow: 0 0  15px 5px rgba(255, 0, 0, 0.5); /* Adjusts the red shadow's blur and spread */
+}
+
 
 @media (max-width: 768px) {
     .resource-details {
