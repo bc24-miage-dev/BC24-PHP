@@ -10,7 +10,6 @@ use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Report;
-use App\Form\ReportType;
 
 class ReportController extends AbstractController
 {

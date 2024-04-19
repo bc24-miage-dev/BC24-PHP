@@ -13,7 +13,7 @@
             {% for product in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
-                        <h5 class="card-title">{{ product.ResourceName.name }}</h5>
+                        <h5 class="card-title">{{ product.ResourceName.name }}- {{ product.id }}</h5>
                         <a class="card-link" href="{{ path('app_distributeur_specific', {'id': product.id}) }}">Informations</a>
                     </div>
                 </div>

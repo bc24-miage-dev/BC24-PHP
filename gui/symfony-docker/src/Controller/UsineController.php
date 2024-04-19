@@ -71,7 +71,7 @@ class UsineController extends AbstractController
             $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
             if($resources == null){
                 $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
-                return $this->redirectToRoute('app_usine_list');
+                return $this->redirectToRoute('app_usine_index');
             }
         }
         else if ($category == "produit"){
