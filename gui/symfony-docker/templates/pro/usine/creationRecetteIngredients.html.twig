@@ -10,10 +10,6 @@
             <form method="post" action="{{ path('app_usine_creationRecetteProcess') }}">
             <input type="hidden" name="name" value="{{ name }}">
 
-                {% for family in families %}
-                    <input type="hidden" name="families[]" value="{{ family }}">
-                {% endfor %}
-
             <table class="table table-striped" id="table">
                 <div id="copy">
                 <thead>

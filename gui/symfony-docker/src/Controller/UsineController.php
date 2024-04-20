@@ -172,8 +172,7 @@ class UsineController extends AbstractController
             }
             return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
                 'name' => $name,
-                'ingredients' => $ingredients,
-                'families' => $families
+                'ingredients' => $ingredients
             ]);
         }
         return $this->redirectToRoute('app_usine_creationRecetteName');
@@ -189,27 +188,29 @@ class UsineController extends AbstractController
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
             $name = $request->request->get('name');
-            $familiesBrut = $request->request->all()['families'];
             $families = [];
-            foreach ($familiesBrut as $familyBrut) {
-                $families[] = $familyRepo->findOneBy(['name' => $familyBrut]);
-            }
+
             $newProduct = $nameHandler->createResourceName(
                 $name,
-                $families,
                 $categoryRepo->findOneBy(['category' => 'PRODUIT']),
                 $this->getUser()->getProductionSite()
             );
-            $entityManager->persist($newProduct);
-            $entityManager->flush();
             foreach ($list as $element) {
                 $recipe = new Recipe();
                 $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
                 $recipe->setIngredientNumber(intval($element['quantity']));
-                $recipe->setRecipeTitle($nameRepo->findOneBy(['name' => $name, 'productionSiteOwner' => $this->getUser()->getProductionSite()]));
+                $recipe->setRecipeTitle($newProduct);
+
+                if (! isset($families[$recipe->getIngredient()->getResourceFamilies()[0]->getName()])) {
+                    // Set simulation; get a set of ResourceFamilies used in the recipe
+                    $families[$recipe->getIngredient()->getResourceFamilies()[0]->getName()] = $recipe->getIngredient()->getResourceFamilies()[0];
+                }
                 $entityManager->persist($recipe);
-                $entityManager->flush();
             }
+            $newProduct->setResourceFamilies($families);
+            $entityManager->persist($newProduct);
+            $entityManager->flush();
+
             $this->addFlash('success', 'La recette a bien été enregistrée');
             return $this->redirectToRoute('app_usine_index');
         }
