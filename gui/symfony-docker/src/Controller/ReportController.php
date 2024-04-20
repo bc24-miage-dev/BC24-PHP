@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Resource;
+use App\Handlers\ReportHandler;
 use App\Repository\ResourceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,25 +17,19 @@ class ReportController extends AbstractController
     #[Route('/report/reportAliment', name: 'app_report_reportAliment')]
     public function report(Request $request,
                            ResourceRepository $resourceRepository,
-                           EntityManagerInterface $entityManager): Response
+                           EntityManagerInterface $entityManager,
+                           ReportHandler $handler): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
-
-        $report = new Report();
-        $report->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-        $report->setUser($this->getUser());
-        $report->setRead(false);
-        //Classic form because id must be handwritten (not selected)
         if ($request->isMethod('POST')) {
             $resource = $resourceRepository->find($request->request->get('tag'));
             if (! $resource){ // Check if the resource exists
                 $this->addFlash('error', 'La ressource n\'existe pas');
                 return $this->redirectToRoute('app_report_reportAliment');
             }
-            $report->setResource($resource);
-            $report->setDescription($request->request->get('description'));
+            $report = $handler->createReport($this->getUser(), $resource, $request->request->get('description'));
             $entityManager->persist($report);
             $entityManager->flush();
 

@@ -36,11 +36,10 @@ class AdminController extends AbstractController
 
     #[Route('/add', name: 'app_admin_add')] // Resource creation
     public function add(Request $request,
-                        EntityManagerInterface $entityManager): Response
+                        EntityManagerInterface $entityManager,
+                        ResourceHandler $handler): Response
     {
-        $handler = new ResourceHandler();
         $resource = $handler->createDefaultNewResource($this->getUser());
-
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
 
@@ -77,10 +76,10 @@ class AdminController extends AbstractController
             $this->addFlash('error', 'Ressource introuvable');
             return $this->redirectToRoute('app_admin_modify');
         }
-        $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $form = $this->createForm(ResourceModifierType::class, $resource);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $resource->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
             if ($form->get('isContamined')->getData()) {
                 $resourceHandler->contaminateChildren($entityManager, $resource);
             }
@@ -88,7 +87,10 @@ class AdminController extends AbstractController
             $entityManager->flush();
             return $this->redirectToRoute('app_admin_modify');
         }
-        return $this->render('admin/modifySpecific.html.twig', ['form' => $form->createView(), 'resource' => $resource, 'composants' => $resource->getComponents()]);
+        return $this->render('admin/modifySpecific.html.twig',
+            [   'form' => $form->createView(),
+                'resource' => $resource,
+                'composants' => $resource->getComponents()]);
     }
 
     #[Route('/reportList', name: 'app_admin_reportList')]
@@ -223,7 +225,6 @@ class AdminController extends AbstractController
 
     #[Route('/request/roleEdit/WalletAdress/{id}', name: 'app_admin_userWalletAddressEdit')]
     public function userWalletAddressEdit(EntityManagerInterface $entityManager,
-                                          UserRoleRequestRepository $roleRequestRepo,
                                           UserRepository $userRepo,
                                           Request $request,
                                           $id,): Response
@@ -236,7 +237,7 @@ class AdminController extends AbstractController
         $entityManager->flush();
         }
         else{
-            flash('error', 'Erreur lors de la modification de l\'adresse de portefeuille');
+            $this->addFlash('error', 'Erreur lors de la modification de l\'adresse de portefeuille');
         }
         return $this->redirectToRoute('app_admin_userList');
     }

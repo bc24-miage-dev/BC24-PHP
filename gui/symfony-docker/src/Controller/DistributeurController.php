@@ -64,7 +64,7 @@ class DistributeurController extends AbstractController
             $NFC = $request->request->get('NFC');
             $produits = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
             if($produits == null){
-                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+                $this->addFlash('error', 'Cette ressource ne vous appartient pas');
                 return $this->redirectToRoute('app_distributeur_list');
             }
         }

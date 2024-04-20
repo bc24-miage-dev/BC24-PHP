@@ -3,13 +3,9 @@
 namespace App\Controller;
 
 use App\Form\SearchType;
-use App\Repository\ResourceRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Resource;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class StaticController extends AbstractController
@@ -39,18 +35,5 @@ class StaticController extends AbstractController
     public function info(): Response
     {
         return $this->render('static/info.html.twig');
-    }
-
-    #[Route('/recent', name: 'app_recent')]
-    public function recentReport(ResourceRepository $resourceRepository): Response
-    {
-        $resourcesC = $resourceRepository->findBy(['isContamined' => true], ['date' => 'DESC'], 10);
-        $productsC = [];
-        foreach ($resourcesC as $resource){
-            if ($resource->getResourceName()->getResourceCategory()->getCategory() == 'PRODUIT'){
-                $productsC[] = $resource;
-            }
-        }
-        return $this->render('static/recent.html.twig', ['resourcesC' => $productsC]);
     }
 }
