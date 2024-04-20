@@ -3,10 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\ProductionSite;
-use App\Entity\Report;
-use App\Entity\Resource;
-use App\Entity\User;
-use App\Entity\UserRoleRequest;
 use App\Form\ProductionSiteType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceType;
@@ -17,8 +13,6 @@ use App\Repository\ResourceRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserRoleRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

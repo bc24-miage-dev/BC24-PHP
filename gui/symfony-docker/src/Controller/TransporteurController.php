@@ -2,13 +2,11 @@
 
 namespace App\Controller;
 
-use App\Handlers\OwnershipHandler;
 use App\Handlers\ProHandler;
 use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;

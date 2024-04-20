@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-
-use App\Entity\Resource;
 use App\Form\EleveurBirthType;
 use App\Form\EleveurWeightType;
 use App\Form\ResourceOwnerChangerType;

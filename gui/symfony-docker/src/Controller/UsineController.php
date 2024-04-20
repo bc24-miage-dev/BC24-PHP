@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Recipe;
 use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
-use App\Handlers\OwnershipHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourceNameHandler;
 use App\Handlers\ResourcesListHandler;

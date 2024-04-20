@@ -2,12 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Resource;
-use App\Entity\ResourceName;
 use App\Form\EquarrisseurAnimalAbattageFormType;
 use App\Form\ResourceOwnerChangerType;
-use App\Handlers\OwnershipHandler;
-use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
@@ -15,7 +11,6 @@ use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
