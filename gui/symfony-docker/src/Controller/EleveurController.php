@@ -116,7 +116,7 @@ class EleveurController extends AbstractController
                            $id): Response {
 
         $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser()))
+        if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser()))
         {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
@@ -142,7 +142,7 @@ class EleveurController extends AbstractController
 
         $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 
-        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser())){
+        if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -161,7 +161,7 @@ class EleveurController extends AbstractController
     {
         $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 
-        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser())){
+        if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -178,7 +178,7 @@ class EleveurController extends AbstractController
                             $id): Response
     {
         $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser())){
+        if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -197,7 +197,7 @@ class EleveurController extends AbstractController
                              $id) : Response
     {
         $animal = $resourceRepository->findOneBy(['id' => $id]);
-        if (!$this->eleveurHandler->isAllowedToTouch($animal, $this->getUser())){
+        if (!$this->eleveurHandler->canHaveAccess($animal, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }

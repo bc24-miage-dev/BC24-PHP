@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 
+use App\Handlers\DistributeurHandler;
+use App\Handlers\ProHandler;
 use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
@@ -21,9 +23,12 @@ class DistributeurController extends AbstractController
 
     private TransactionHandler $transactionHandler;
 
-    public function __construct(TransactionHandler $transactionHandler)
+    private DistributeurHandler $distributeurHandler;
+
+    public function __construct(TransactionHandler $transactionHandler, DistributeurHandler $distributeurHandler)
     {
         $this->transactionHandler = $transactionHandler;
+        $this->distributeurHandler = $distributeurHandler;
     }
 
     #[Route('/', name: 'app_distributeur_index')]
@@ -80,7 +85,7 @@ class DistributeurController extends AbstractController
     public function specific(ResourceRepository $resourceRepo, $id) : Response
     {
         $resource = $resourceRepo->findOneBy(['id' => $id]);
-        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()) {
+        if (!$this->distributeurHandler->canHaveAccess($resource, $this->getUser())) {
             $this->addFlash('error', 'Aucun produit vous appartenant avec cet id n\'a été trouvé');
             return $this->redirectToRoute('app_distributeur_list');
         }
@@ -92,36 +97,25 @@ class DistributeurController extends AbstractController
 
 
     #[Route('/vente', name: 'app_distributeur_vendu')]
-    public function vendre(Request $request,
-                           ResourceRepository $resourceRepo,
-                           EntityManagerInterface $entityManager): Response
+    public function vendre(Request $request): Response
     {
         $form = $this->createForm(ResourceNfcType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $nfcTag = $form->get('id')->getData();
-            $resource = $resourceRepo->findOneBy(['id' => $nfcTag]);
+            try{
+                $this->distributeurHandler->saleProcess($form->getData()->getId(), $this->getUser());
+                $this->addFlash('success', 'La ressource a bien été vendue');
+            }
+            catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
 
-            if (!$resource ||
-                $resource->isIsLifeCycleOver() ||
-                $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress())
-            {
-                $this->addFlash('error', 'Aucun produit vous appartenant avec ce tag NFC n\'a été trouvé');
+            } finally {
                 return $this->redirectToRoute('app_distributeur_vendu');
             }
-
-            $resource->setIsLifeCycleOver(true);
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'La ressource a bien été vendue');
-            return $this->redirectToRoute('app_distributeur_vendu');
         }
-
-        $resources = $resourceRepo->findBy(['currentOwner' => $this->getUser(), 'IsLifeCycleOver' => true], ['date' => 'DESC'], limit: 30);
-
         return $this->render('pro/distributeur/vente.html.twig', [
             'form' => $form->createView(),
-            'resources' => $resources
+            'resources' => $this->distributeurHandler->getRecentSalesHistory($this->getUser())
         ]);
     }
 }

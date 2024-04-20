@@ -6,19 +6,17 @@ use App\Entity\Resource;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class EleveurHandler
+class EleveurHandler extends ProHandler
 {
-    private EntityManagerInterface $entityManager;
     public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
+        parent::__construct($entityManager);
     }
 
-    public function isAllowedToTouch(?Resource $resource, UserInterface $user) : bool
+    public function canHaveAccess(?Resource $resource, UserInterface $user): bool
     {
-        return $resource
-            && $resource->getResourceName()->getResourceCategory()->getCategory() == 'ANIMAL'
-            && $resource->getCurrentOwner()->getWalletAddress() == $user->getWalletAddress();
+        return parent::canHaveAccess($resource, $user)
+            && $resource->getResourceName()->getResourceCategory()->getCategory() == 'ANIMAL';
     }
 
     public function vaccineAnimal(String $vaccine, Resource $resource) : void
