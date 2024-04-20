@@ -8,6 +8,7 @@ use App\Form\ResourceOwnerChangerType;
 use App\Handlers\OwnershipHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourceNameHandler;
+use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\RecipeRepository;
 use App\Repository\ResourceCategoryRepository;
@@ -24,6 +25,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/pro/usine')]
 class UsineController extends AbstractController
 {
+
+    private TransactionHandler $transactionHandler;
+
+    public function __construct(TransactionHandler $transactionHandler)
+    {
+        $this->transactionHandler = $transactionHandler;
+    }
+
     #[Route('/', name: 'app_usine_index')]
     public function index(): Response
     {
@@ -284,64 +293,43 @@ class UsineController extends AbstractController
     }
 
     #[Route('/transaction/{id}', name: 'app_usine_transfer', requirements: ['id' => '\d+'])]
-    public function transfer($id,
-                             OwnershipAcquisitionRequestRepository $requestRepository,
-                             EntityManagerInterface $entityManager ): RedirectResponse
+    public function transfer($id): RedirectResponse
     {
-        $request = $requestRepository->find($id);
-        if (!$request || $request->getInitialOwner() != $this->getUser()){
-            $this->addFlash('error', 'Erreur lors de la transaction');
+        try {
+            $this->transactionHandler->acceptTransaction($id, $this->getUser());
+            $this->addFlash('success', 'Transaction effectuée');
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
             return $this->redirectToRoute('app_usine_transferList');
         }
-        $resource = $request->getResource();
-        $resource->setCurrentOwner($request->getRequester());
-        $request->setState('Validé');
-        $entityManager->persist($resource);
-        $entityManager->persist($request);
-        $entityManager->flush();
-        $this->addFlash('success', 'Transaction effectuée');
-
-        return $this->redirectToRoute('app_usine_transferList');
     }
 
     #[Route('/transactionRefused/{id}', name: 'app_usine_transferRefused', requirements: ['id' => '\d+'])]
-    public function transferRefused($id,
-                                    OwnershipAcquisitionRequestRepository $requestRepository,
-                                    EntityManagerInterface $entityManager ): RedirectResponse
+    public function transferRefused($id): RedirectResponse
     {
-        $request = $requestRepository->find($id);
-        if (!$request || $request->getInitialOwner() != $this->getUser()){
-            $this->addFlash('error', 'Erreur lors de la transaction');
+        try {
+            $this->transactionHandler->refuseTransaction($id, $this->getUser());
+            $this->addFlash('success', 'Transaction refusée avec succès');
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
             return $this->redirectToRoute('app_usine_transferList');
         }
-        $request->setState('Refusé');
-        $entityManager->persist($request);
-        $entityManager->flush();
-        $this->addFlash('success', 'Transaction refusée avec succès');
-
-        return $this->redirectToRoute('app_usine_transferList');
     }
 
     #[Route('/transaction/all' , name: 'app_usine_transferAll')]
-    public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
-                                EntityManagerInterface $entityManager): RedirectResponse
+    public function transferAll(): RedirectResponse
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() , 'state' => 'En attente']);
-        if (!$requests){
-            $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
+        try {
+            $this->transactionHandler->acceptAllTransactions($this->getUser());
+            $this->addFlash('success', 'Toutes les transactions ont été effectuées');
+        }
+        catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
             return $this->redirectToRoute('app_usine_transferList');
         }
-        foreach ($requests as $request){
-            $resource = $request->getResource();
-            $resource->setCurrentOwner($request->getRequester());
-            $request->setState('Validé');
-            $entityManager->persist($resource);
-            $entityManager->persist($request);
-        }
-        $entityManager->flush();
-        $this->addFlash('success', 'Toutes les transactions ont été effectuées');
-
-        return $this->redirectToRoute('app_usine_transferList');
     }
 
     private function searchInArrayByName($array, $nameString): ?ResourceName

@@ -9,6 +9,7 @@ use App\Form\ResourceOwnerChangerType;
 use App\Handlers\OwnershipHandler;
 use App\Handlers\proAcquireHandler;
 use App\Handlers\ResourceHandler;
+use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
@@ -23,6 +24,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/pro/equarrisseur')]
 class EquarrisseurController extends AbstractController
 {
+
+    private TransactionHandler $transactionHandler;
+
+    public function __construct(TransactionHandler $transactionHandler)
+    {
+        $this->transactionHandler = $transactionHandler;
+    }
+
     #[Route('/', name: 'app_equarrisseur_index')]
     public function index(): Response
     {
@@ -192,63 +201,43 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/transaction/{id}', name: 'app_equarrisseur_transfer', requirements: ['id' => '\d+'])]
-    public function transfer($id,
-                             OwnershipAcquisitionRequestRepository $requestRepository,
-                             EntityManagerInterface $entityManager ): RedirectResponse
+    public function transfer($id): RedirectResponse
     {
-        $request = $requestRepository->find($id);
-        if (!$request || $request->getInitialOwner() != $this->getUser()){
-            $this->addFlash('error', 'Erreur lors de la transaction');
+        try {
+            $this->transactionHandler->acceptTransaction($id, $this->getUser());
+            $this->addFlash('success', 'Transaction effectuée');
+        }
+        catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
             return $this->redirectToRoute('app_equarrisseur_transferList');
         }
-        $resource = $request->getResource();
-        $resource->setCurrentOwner($request->getRequester());
-        $request->setState('Validé');
-        $entityManager->persist($resource);
-        $entityManager->persist($request);
-        $entityManager->flush();
-        $this->addFlash('success', 'Transaction effectuée');
-
-        return $this->redirectToRoute('app_equarrisseur_transferList');
     }
 
     #[Route('/transactionRefused/{id}', name: 'app_equarrisseur_transferRefused', requirements: ['id' => '\d+'])]
-    public function transferRefused($id,
-                                    OwnershipAcquisitionRequestRepository $requestRepository,
-                                    EntityManagerInterface $entityManager ): RedirectResponse
+    public function transferRefused($id): RedirectResponse
     {
-        $request = $requestRepository->find($id);
-        if (!$request || $request->getInitialOwner() != $this->getUser()){
-            $this->addFlash('error', 'Erreur lors de la transaction');
+        try {
+            $this->transactionHandler->refuseTransaction($id, $this->getUser());
+            $this->addFlash('success', 'Transaction refusée avec succès');
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
             return $this->redirectToRoute('app_equarrisseur_transferList');
         }
-        $request->setState('Refusé');
-        $entityManager->persist($request);
-        $entityManager->flush();
-        $this->addFlash('success', 'Transaction refusée avec succès');
-
-        return $this->redirectToRoute('app_equarrisseur_transferList');
     }
 
     #[Route('/transaction/all' , name: 'app_equarrisseur_transferAll')]
-    public function transferAll(OwnershipAcquisitionRequestRepository $requestRepository,
-                                EntityManagerInterface $entityManager): RedirectResponse
+    public function transferAll(): RedirectResponse
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
-        if (!$requests){
-            $this->addFlash('error', 'Il n\'y a pas de transaction à effectuer');
+        try {
+            $this->transactionHandler->acceptAllTransactions($this->getUser());
+            $this->addFlash('success', 'Toutes les transactions ont été effectuées');
+        }
+        catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
             return $this->redirectToRoute('app_equarrisseur_transferList');
         }
-        foreach ($requests as $request){
-            $resource = $request->getResource();
-            $resource->setCurrentOwner($request->getRequester());
-            $request->setState('Validé');
-            $entityManager->persist($resource);
-            $entityManager->persist($request);
-        }
-        $entityManager->flush();
-        $this->addFlash('success', 'Toutes les transactions ont été effectuées');
-
-        return $this->redirectToRoute('app_equarrisseur_transferList');
     }
 }
