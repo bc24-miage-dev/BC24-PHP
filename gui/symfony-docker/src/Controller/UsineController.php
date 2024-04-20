@@ -276,8 +276,9 @@ class UsineController extends AbstractController
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
         $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
+        $pastTransactions = $requestRepository->findPastRequests($this->getUser());
         return $this->render('pro/usine/transferList.html.twig',
-            ['requests' => $requests]
+            ['requests' => $requests, 'pastTransactions' => $pastTransactions]
         );
     }
 

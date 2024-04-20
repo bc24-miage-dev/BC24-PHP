@@ -117,8 +117,11 @@ class DistributeurController extends AbstractController
             return $this->redirectToRoute('app_distributeur_vendu');
         }
 
+        $resources = $resourceRepo->findBy(['currentOwner' => $this->getUser(), 'IsLifeCycleOver' => true], ['date' => 'DESC'], limit: 30);
+
         return $this->render('pro/distributeur/vente.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'resources' => $resources
         ]);
     }
 }
