@@ -2,16 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\Recipe;
-use App\Entity\ResourceName;
 use App\Form\ResourceOwnerChangerType;
-use App\Handlers\ResourceHandler;
-use App\Handlers\ResourceNameHandler;
 use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
+use App\Handlers\UsineHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\RecipeRepository;
-use App\Repository\ResourceCategoryRepository;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
@@ -25,12 +21,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/pro/usine')]
 class UsineController extends AbstractController
 {
-
     private TransactionHandler $transactionHandler;
+    private UsineHandler $usineHandler;
 
-    public function __construct(TransactionHandler $transactionHandler)
+    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler)
     {
         $this->transactionHandler = $transactionHandler;
+        $this->usineHandler = $usineHandler;
     }
 
     #[Route('/', name: 'app_usine_index')]
@@ -109,40 +106,27 @@ class UsineController extends AbstractController
                             ResourceNameRepository $nameRepository,
                             $id): Response
     {
-        $resource = $resourceRepository->find($id);
+        $demiCarcasse = $resourceRepository->find($id);
 
-        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress() ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'DEMI-CARCASSE') {
-            $this->addFlash('error', 'Ce tag NFC ne correspond pas à une demi-carcasse');
-            return $this->redirectToRoute('app_usine_list');
+        if (!$this->usineHandler->canCutIntoPieces($demiCarcasse, $this->getUser())) {
+            $this->addFlash('error', 'Il y a eu une erreur, veuillez réessayer');
+            return $this->redirectToRoute('app_usine_list', ['category' => 'DEMI-CARCASSE']);
         }
-
-        $resources = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
-            family: $resourceRepository->find($id)->getResourceName()->getResourceFamilies()[0]->getName());
+        $morceaux = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
+            family: $demiCarcasse->getResourceName()->getResourceFamilies()[0]->getName());
             // Only products can have multiple families
 
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list'];
-            $handler = new ResourceHandler();
-            foreach ($list as $element) {
-                $childResource = $handler->createChildResource($resource, $this->getUser());
-                $childResource->setWeight($element['weight']);
-                $childResource->setId($element['NFC']);
-                $childResource->setResourceName($this->searchInArrayByName($resources, $element['name']));
-                $entityManager->persist($childResource);
-                $entityManager->flush();
-            }
-            $resource->setIsLifeCycleOver(true);
-            $entityManager->persist($resource);
-            $entityManager->flush();
 
+            $this->usineHandler->cuttingProcess($demiCarcasse, $morceaux, $list, $this->getUser());
             $this->addFlash('success', 'La demi-carcasse a bien été découpée');
             return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
         }
 
         return $this->render('pro/usine/decoupe.html.twig', [
-            'demiCarcasse' => $resource, // La demi-carcasse à découper
-            'morceauxPossibles' => $resources // Les ressources possibles à partir d'elle
+            'demiCarcasse' => $demiCarcasse, // La demi-carcasse à découper
+            'morceauxPossibles' => $morceaux // Les ressources possibles à partir d'elle
         ]);
     }
 
@@ -163,12 +147,7 @@ class UsineController extends AbstractController
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');
             $families = $request->request->all()['families'];
-            $ingredients = [];
-            foreach($families as $family){
-                foreach($nameRepo->findByCategoryAndFamily('MORCEAU', $family) as $ingredient){
-                    $ingredients[] = $ingredient;
-                }
-            }
+            $ingredients = $this->usineHandler->getAllPossibleIngredients($families);
             return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
                 'name' => $name,
                 'ingredients' => $ingredients
@@ -178,38 +157,13 @@ class UsineController extends AbstractController
     }
 
     #[Route('/creationRecette/process', name: 'app_usine_creationRecetteProcess')]
-    public function creationRecetteProcess(Request $request,
-                                           EntityManagerInterface $entityManager,
-                                           ResourceFamilyRepository $familyRepo,
-                                           ResourceCategoryRepository $categoryRepo,
-                                           ResourceNameRepository $nameRepo, ResourceNameHandler $nameHandler) : RedirectResponse
+    public function creationRecetteProcess(Request $request) : RedirectResponse
     {
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
             $name = $request->request->get('name');
-            $families = [];
 
-            $newProduct = $nameHandler->createResourceName(
-                $name,
-                $categoryRepo->findOneBy(['category' => 'PRODUIT']),
-                $this->getUser()->getProductionSite()
-            );
-            foreach ($list as $element) {
-                $recipe = new Recipe();
-                $recipe->setIngredient($nameRepo->findOneBy(['name' => $element['ingredient']]));
-                $recipe->setIngredientNumber(intval($element['quantity']));
-                $recipe->setRecipeTitle($newProduct);
-
-                if (! isset($families[$recipe->getIngredient()->getResourceFamilies()[0]->getName()])) {
-                    // Set simulation; get a set of ResourceFamilies used in the recipe
-                    $families[$recipe->getIngredient()->getResourceFamilies()[0]->getName()] = $recipe->getIngredient()->getResourceFamilies()[0];
-                }
-                $entityManager->persist($recipe);
-            }
-            $newProduct->setResourceFamilies($families);
-            $entityManager->persist($newProduct);
-            $entityManager->flush();
-
+            $this->usineHandler->recipeCreatingProcess($list, $name, $this->getUser());
             $this->addFlash('success', 'La recette a bien été enregistrée');
             return $this->redirectToRoute('app_usine_index');
         }
@@ -228,48 +182,29 @@ class UsineController extends AbstractController
     #[Route('/recette/{id}', name: 'app_usine_recette')]
     public function appliRecette($id,
                                  Request $request,
-                                 EntityManagerInterface $entityManager,
-                                 ResourceRepository $resourceRepo,
                                  RecipeRepository $recipeRepo,
                                  ResourceNameRepository $nameRepo) : Response
     {
         $ingredients = $recipeRepo->findBy(['recipeTitle' => $id]);
+        $recipeTitle = $nameRepo->find($id);
 
         if ($request -> isMethod('POST')){
             $morceaux = $request->request->all()['morceaux'];
-            $i = 0;
-            foreach ($ingredients as $ingredient){ //Test loop to check if the morceaux match with the recipe
-                for ($j = 0; $j<$ingredient->getIngredientNumber(); $j++){
-                    $resource = $resourceRepo->find($morceaux[$i]);
-                    if ($resource == null || $resource->getResourceName()->getName() != $ingredient->getIngredient()->getName()){
-                        $this->addFlash('error', 'Erreur dans la sélection des morceaux');
-                        return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
-                    }
-                    $i++;
-                }
+            $newProductId = $request->request->get('newProductId');
+            $weight = $request->request->get('weight');
+            try {
+                $this->usineHandler->recipeApplication($recipeTitle, $ingredients, $morceaux, $this->getUser(),
+                    $newProductId, $weight);
             }
-            $handler = new ResourceHandler();
-            $newProduct = $handler->createDefaultNewResource($this->getUser());
-            $newProduct->setId($request->request->get('newProductId'));
-            $newProduct->setResourceName($nameRepo->find($id));
-            $newProduct->setWeight($request->request->get('weight'));
-            $entityManager->persist($newProduct);
-            $entityManager->flush();
-            foreach ($morceaux as $morceau){
-                $resource = $resourceRepo->find($morceau);
-                $resource->setIsLifeCycleOver(true);
-                $resource->addResource($newProduct);
-                $entityManager->persist($resource);
-                $entityManager->flush();
+            catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
             }
             $this->addFlash('success', 'La recette a bien été appliquée');
             return $this->redirectToRoute('app_usine_choixRecette');
         }
         return $this->render('pro/usine/appliRecette.html.twig',
-            [
-                'ingredients' => $ingredients,
-                'product' => $nameRepo->find($id)
-            ]);
+            ['ingredients' => $ingredients, 'product' => $recipeTitle]);
     }
 
     #[Route('/transaction', name: 'app_usine_transferList')]
@@ -320,16 +255,6 @@ class UsineController extends AbstractController
         } finally {
             return $this->redirectToRoute('app_usine_transferList');
         }
-    }
-
-    private function searchInArrayByName($array, $nameString): ?ResourceName
-    {
-        foreach ($array as $item) {
-            if ($item->getName() == $nameString) {
-                return $item;
-            }
-        }
-        return null;
     }
 
 }
