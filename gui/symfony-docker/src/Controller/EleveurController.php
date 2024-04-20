@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 
+use App\Entity\Resource;
 use App\Form\EleveurBirthType;
 use App\Form\EleveurWeightType;
 use App\Form\ResourceOwnerChangerType;
+use App\Handlers\EleveurHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
@@ -23,33 +25,37 @@ class EleveurController extends AbstractController
 {
 
     private TransactionHandler $transactionHandler;
+    private EleveurHandler $eleveurHandler;
+    private EntityManagerInterface $entityManager;
+    private ResourceRepository $resourceRepository;
 
-    public function __construct(TransactionHandler $handler)
+    public function __construct(TransactionHandler $handler,
+                                EleveurHandler $eleveurHandler,
+                                EntityManagerInterface $entityManager,
+                                ResourceRepository $resourceRepository)
     {
         $this->transactionHandler = $handler;
+        $this->eleveurHandler = $eleveurHandler;
+        $this->entityManager = $entityManager;
+        $this->resourceRepository = $resourceRepository;
     }
 
     #[Route('/', name: 'app_eleveur_index')]
-    public function index(ResourceRepository $resourceRepo): Response
+    public function index(): Response
     {
-        $resource = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
-
-        return $this->render('pro/eleveur/index.html.twig', [
-            'resource' => $resource,
-        ]);
+        return $this->render('pro/eleveur/index.html.twig');
     }
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
-                              EntityManagerInterface $entityManager,
                               ResourceHandler $handler): Response
     {
         $form = $this->createForm(EleveurBirthType::class,
             $resource = $handler->createDefaultNewResource($this->getUser()));
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($resource);
-            $entityManager->flush();
+            $this->entityManager->persist($resource);
+            $this->entityManager->flush();
 
             $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée !');
             return $this->redirectToRoute('app_eleveur_index');
@@ -107,14 +113,10 @@ class EleveurController extends AbstractController
 
     #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
     public function weight(Request $request,
-                           EntityManagerInterface $entityManager,
-                           ResourceRepository $resourceRepo,
                            $id): Response {
-        $resource = $resourceRepo->findOneBy(['id' => $id]);
 
-        if (!$resource ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress())
+        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
+        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser()))
         {
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
@@ -123,39 +125,30 @@ class EleveurController extends AbstractController
         $form = $this->createForm(EleveurWeightType::class, $resource);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($resource);
-            $entityManager->flush();
-
+            $this->entityManager->persist($resource);
+            $this->entityManager->flush();
             $this->addFlash('success', 'L\'animal a bien été pesé');
             return $this->redirectToRoute('app_eleveur_list');
         }
         return $this->render('pro/eleveur/weight.html.twig', [
             'form' => $form->createView(),
+            'id' => $id
         ]);
     }
 
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
     public function vaccine(Request $request,
-                            EntityManagerInterface $entityManager,
-                            ResourceRepository $resourceRepo,
                             $id): Response {
 
-        $resource = $resourceRepo->findOneBy(['id' => $id]);
+        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 
-        if (!$resource ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
 
         if ($request->isMethod('POST')) {
-            $newVaccine = $request->request->get('vaccine');
-            $date = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
-            $dateString = $date->format('Y-m-d');
-            $resource->setDescription($resource->getDescription() . 'VACCIN|' . $newVaccine . '|' . $dateString . ';');
-            $entityManager->persist($resource);
-            $entityManager->flush();
+            $this->eleveurHandler->vaccineAnimal($request->request->get('vaccine'), $resource);
             $this->addFlash('success', 'Le vaccin a bien été enregistré');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -164,26 +157,17 @@ class EleveurController extends AbstractController
 
     #[Route('/nutrition/{id}', name: 'app_eleveur_nutrition')]
     public function nutrition(Request $request,
-                              EntityManagerInterface $entityManager,
-                              ResourceRepository $resourceRepo,
                               $id): Response
     {
+        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 
-        $resource = $resourceRepo->findOneBy(['id' => $id]);
-
-        if (!$resource ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
-
         if ($request->isMethod('POST')) {
-            $newNutrition = $request->request->get('nutrition');
-            $resource->setDescription($resource->getDescription() . 'NUTRITION|' . $newNutrition . ';');
-            $entityManager->persist($resource);
-            $entityManager->flush();
-            $this->addFlash('success', 'Votre animal a bien mangé');
+            $this->eleveurHandler->addNutrition($request->request->get('nutrition'), $resource);
+            $this->addFlash('success', 'Le changement de nutrition de votre animal a bien été enregistré');
             return $this->redirectToRoute('app_eleveur_list');
         }
         return $this->render('pro/eleveur/nutrition.html.twig', ['id' => $id]);
@@ -191,27 +175,17 @@ class EleveurController extends AbstractController
 
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request,
-                            EntityManagerInterface $entityManager,
-                            ResourceRepository $resourceRepo,
                             $id): Response
     {
-        $resource = $resourceRepo->findOneBy(['id' => $id]);
-        if (!$resource ||
-            $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||
-            $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
+        if (!$this->eleveurHandler->isAllowedToTouch($resource, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
 
         if ($request->isMethod('POST')) {
-            $newDisease = $request->request->get('disease');
-            $beginDate = $request->request->get('dateBegin');
-
-            $resource->setDescription($resource->getDescription() .
-                'MALADIE|' . $newDisease . '|' . $beginDate . ';');
-
-            $entityManager->persist($resource);
-            $entityManager->flush();
+            $this->eleveurHandler->addDisease($request->request->get('disease'),
+                $request->request->get('dateBegin'), $resource);
             $this->addFlash('success', 'La maladie a bien été enregistrée');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -219,10 +193,11 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/specific/{id}', name: 'app_eleveur_specific')]
-    public function specific(ResourceRepository $resourceRepository, $id) : Response
+    public function specific(ResourceRepository $resourceRepository,
+                             $id) : Response
     {
         $animal = $resourceRepository->findOneBy(['id' => $id]);
-        if (!$animal || $animal->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+        if (!$this->eleveurHandler->isAllowedToTouch($animal, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
             return $this->redirectToRoute('app_eleveur_list');
         }
@@ -257,7 +232,7 @@ class EleveurController extends AbstractController
 
 
     #[Route('/transactionRefused/{id}', name: 'app_eleveur_transferRefused', requirements: ['id' => '\d+'])]
-    public function transferRefused($id,): RedirectResponse
+    public function transferRefused($id): RedirectResponse
     {
         try {
             $this->transactionHandler->refuseTransaction($id, $this->getUser());
