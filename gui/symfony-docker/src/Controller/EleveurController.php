@@ -6,8 +6,8 @@ namespace App\Controller;
 use App\Form\EleveurBirthType;
 use App\Form\EleveurWeightType;
 use App\Form\ResourceOwnerChangerType;
-use App\Handlers\OwnershipHandler;
 use App\Handlers\ResourceHandler;
+use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceRepository;
@@ -41,11 +41,11 @@ class EleveurController extends AbstractController
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
-        EntityManagerInterface $entityManager): Response {
-        $handler = new ResourceHandler();
-        $resource = $handler->createDefaultNewResource($this->getUser());
-
-        $form = $this->createForm(EleveurBirthType::class, $resource);
+                              EntityManagerInterface $entityManager,
+                              ResourceHandler $handler): Response
+    {
+        $form = $this->createForm(EleveurBirthType::class,
+            $resource = $handler->createDefaultNewResource($this->getUser()));
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($resource);
@@ -61,19 +61,22 @@ class EleveurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_eleveur_list')]
-    public function list(ResourceRepository $resourceRepo, Request $request): Response
+    public function list(Request $request,
+                         ResourcesListHandler $listHandler): Response
     {
         if ($request->isMethod('POST')) {
-            $NFC = $request->request->get('NFC');
-            $animaux = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
-            if($animaux == null){
-                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+            try {
+                $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
+            }
+            catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('app_eleveur_list');
             }
         }
         else{
-        $animaux = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(), 'ANIMAL');
+            $animaux = $listHandler->getResources($this->getUser(), 'ANIMAL');
         }
+
         return $this->render('pro/eleveur/list.html.twig',
             ['animaux' => $animaux]
         );
@@ -81,28 +84,20 @@ class EleveurController extends AbstractController
 
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
     public function acquisition(Request $request,
-                                EntityManagerInterface $entityManager,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo,
-                                ResourceRepository $resourceRepo,
-                                OwnershipHandler $ownershipHandler): Response {
+                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response {
+
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $resource =$resourceRepo->find($form->getData()->getId());
-            if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $this->getUser()->getWalletAddress()) {
-                $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
+            try {
+                $this->transactionHandler->askOwnership($form->getData()->getId(), $this->getUser());
+                $this->addFlash('success', 'La demande de propriété a bien été envoyée');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+            } finally {
                 return $this->redirectToRoute('app_eleveur_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
-                $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
-                return $this->redirectToRoute('app_eleveur_acquire');
-            }
-
-            $ownershipHandler->ownershipRequestCreate($this->getUser(), $entityManager, $resource);
-            $this->addFlash('success', 'La demande de propriété a bien été envoyée');
-            return $this->redirectToRoute('app_eleveur_acquire');
         }
-
         $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/eleveur/acquire.html.twig', [
             'form' => $form->createView(),
@@ -141,9 +136,9 @@ class EleveurController extends AbstractController
 
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
     public function vaccine(Request $request,
-        EntityManagerInterface $entityManager,
-        ResourceRepository $resourceRepo,
-        $id): Response {
+                            EntityManagerInterface $entityManager,
+                            ResourceRepository $resourceRepo,
+                            $id): Response {
 
         $resource = $resourceRepo->findOneBy(['id' => $id]);
 
@@ -169,9 +164,10 @@ class EleveurController extends AbstractController
 
     #[Route('/nutrition/{id}', name: 'app_eleveur_nutrition')]
     public function nutrition(Request $request,
-        EntityManagerInterface $entityManager,
-        ResourceRepository $resourceRepo,
-        $id): Response {
+                              EntityManagerInterface $entityManager,
+                              ResourceRepository $resourceRepo,
+                              $id): Response
+    {
 
         $resource = $resourceRepo->findOneBy(['id' => $id]);
 
@@ -195,9 +191,10 @@ class EleveurController extends AbstractController
 
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request,
-        EntityManagerInterface $entityManager,
-        ResourceRepository $resourceRepo,
-        $id): Response {
+                            EntityManagerInterface $entityManager,
+                            ResourceRepository $resourceRepo,
+                            $id): Response
+    {
         $resource = $resourceRepo->findOneBy(['id' => $id]);
         if (!$resource ||
             $resource->getResourceName()->getResourceCategory()->getCategory() != 'ANIMAL' ||

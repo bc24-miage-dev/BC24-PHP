@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Handlers\OwnershipHandler;
+use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceRepository;
@@ -34,26 +35,19 @@ class TransporteurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_transporteur_acquire')]
     public function acquisition(Request $request,
-                                ResourceRepository $resourceRepo,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo,
-                                EntityManagerInterface $entityManager,
-                                OwnershipHandler $ownershipHandler): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $resource = $resourceRepo->find($form->getData()->getId());
-            if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $this->getUser()->getWalletAddress()) {
-                $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
+            try {
+                $this->transactionHandler->askOwnership($form->getData()->getId(), $this->getUser());
+                $this->addFlash('success', 'La demande de propriété a bien été envoyée');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+            } finally {
                 return $this->redirectToRoute('app_transporteur_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])) {
-                $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
-                return $this->redirectToRoute('app_transporteur_acquire');
-            }
-            $ownershipHandler->ownershipRequestCreate($this->getUser(), $entityManager, $resource);
-            $this->addFlash('success', 'La demande de propriété a bien été envoyée');
-            return $this->redirectToRoute('app_transporteur_acquire');
         }
         $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/transporteur/acquire.html.twig', [
@@ -63,21 +57,21 @@ class TransporteurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_transporteur_list')]
-    public function list(ResourceRepository $resourceRepo,
+    public function list(ResourcesListHandler $listHandler,
                          Request $request) : Response
     {
         if ($request->isMethod('POST')) {
-            $NFC = $request->request->get('NFC');
-            $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
-            if($resources == null){
-                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
+            try {
+                $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
+            }
+            catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
                 return $this->redirectToRoute('app_transporteur_list');
             }
         }
         else{
-        $resources = $resourceRepo->findByWalletAddress($this->getUser()->getWalletAddress());
+            $resources = $listHandler->getResources($this->getUser());
         }
-
         return $this->render('pro/transporteur/list.html.twig',
             ['resources' => $resources]
         );

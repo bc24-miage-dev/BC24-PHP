@@ -8,6 +8,7 @@ use App\Form\ResourceOwnerChangerType;
 use App\Handlers\OwnershipHandler;
 use App\Handlers\ResourceHandler;
 use App\Handlers\ResourceNameHandler;
+use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\RecipeRepository;
@@ -41,30 +42,20 @@ class UsineController extends AbstractController
 
     #[Route('/arrivage', name:'app_usine_acquire')]
     public function acquire(Request $request,
-                            ResourceRepository $resourceRepo,
-                            OwnershipAcquisitionRequestRepository $ownershipRepo,
-                            EntityManagerInterface $entityManager,
-                            OwnershipHandler $ownershipHandler): Response
+                            OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
-            $resource =$resourceRepo->find($form->getData()->getId());
-            if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $this->getUser()->getWalletAddress()) {
-                $this->addFlash('error', 'Vous ne pouvez pas demander la propriété de cette ressource');
+            try {
+                $this->transactionHandler->askOwnership($form->getData()->getId(), $this->getUser());
+                $this->addFlash('success', 'La demande de propriété a bien été envoyée');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+            } finally {
                 return $this->redirectToRoute('app_usine_acquire');
             }
-            if ($ownershipRepo->findOneBy(['requester' => $this->getUser(), 'resource' => $resource, 'state' => 'En attente'])){
-                $this->addFlash('error', 'Vous avez déjà demandé la propriété de cette ressource');
-                return $this->redirectToRoute('app_usine_acquire');
-            }
-
-            $ownershipHandler->ownershipRequestCreate($this->getUser(), $entityManager, $resource);
-            $this->addFlash('success', 'La demande de propriété a bien été envoyée');
-            return $this->redirectToRoute('app_usine_acquire');
         }
-
         $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/usine/acquire.html.twig', [
             'form' => $form->createView(),
@@ -73,27 +64,27 @@ class UsineController extends AbstractController
     }
 
     #[Route('/list/{category}', name: 'app_usine_list')]
-    public function list(ResourceRepository $resourceRepo, Request $request, $category): Response
+    public function list(ResourcesListHandler $listHandler,
+                         Request $request,
+                         $category): Response
     {
         if ($request->isMethod('POST')) {
-            $NFC = $request->request->get('NFC');
-            $resources = $resourceRepo->findByWalletAddressAndNFC($this->getUser()->getWalletAddress(),$NFC);
-            if($resources == null){
-                $this->addFlash('error', 'Cette ressoure ne vous appartient pas');
-                return $this->redirectToRoute('app_usine_index');
+            try {
+                $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
+            }
+            catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_usine_list', ['category' => $category] );
             }
         }
-        else if ($category == "produit"){
-            $resources = $resourceRepo->findProductByWalletAddress($this->getUser()->getWalletAddress());
-        }
-
         else{
-        $resources = $resourceRepo->findByWalletAddressCategory($this->getUser()->getWalletAddress(), $category);
+            $resources = $listHandler->getResources($this->getUser(), $category);
         }
 
-        return $this->render('pro/usine/list.html.twig', [
-            'resources' => $resources
-        ]);
+        return $this->render('pro/usine/list.html.twig',
+            ['resources' => $resources]
+        );
+
     }
 
     #[Route('/specific/{id}', name: 'app_usine_specific')]
