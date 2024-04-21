@@ -4,11 +4,11 @@
     <div class="container-fluid">
         <h1 class="mt-4">Vos ressources :</h1>
         <form action="" method="post">
-                <label for="NFC">Tag NFC de la ressource</label>
-                <input type="number" class="form-control" id="NFC" name="NFC">
-                <br>
-                <button type="submit" class="btn btn-primary">Chercher</button>
-                <button href="" class="btn btn-primary">Scanner</button>
+            <label for="NFC">Tag NFC de la ressource</label>
+            <input type="number" class="form-control" id="NFC" name="NFC">
+            <br>
+            <button disabled id="scan" class="btn btn-primary">Scanner</button>
+            <button type="submit" class="btn btn-primary">Chercher</button>
         </form>
         {% if resources %}
             <br><br>
