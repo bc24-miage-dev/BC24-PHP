@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/pro/usine')]
-class UsineController extends AbstractController
+class  UsineController extends AbstractController
 {
     private TransactionHandler $transactionHandler;
     private UsineHandler $usineHandler;
