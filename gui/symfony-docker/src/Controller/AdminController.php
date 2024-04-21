@@ -6,6 +6,7 @@ use App\Entity\ProductionSite;
 use App\Form\ProductionSiteType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceType;
+use App\Form\SearchType;
 use App\Handlers\ResourceHandler;
 use App\Repository\ProductionSiteRepository;
 use App\Repository\ReportRepository;
@@ -58,10 +59,17 @@ class AdminController extends AbstractController
     }
 
     #[Route('/modify', name: 'app_admin_modify')] // Resource list for modification
-    public function modify(ResourceRepository $resourceRepo): Response
+    public function modify(ResourceRepository $resourceRepo,
+                           Request $request): Response
     {
-        $resources = $resourceRepo->findAll();
-        return $this->render('admin/modify.html.twig', ['resources' => $resources]);
+        $form = $this->createForm(SearchType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->redirectToRoute('app_admin_modifySpecific', ['id' => $form->get('id')->getData()]);
+        }
+
+        $resources = $resourceRepo->getFewLastResources();
+        return $this->render('admin/modify.html.twig', ['resources' => $resources, 'form' => $form->createView()]);
     }
 
     #[Route('/modify/{id}', name: 'app_admin_modifySpecific')] // Resource modification

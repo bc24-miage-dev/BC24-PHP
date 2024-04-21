@@ -120,4 +120,13 @@ class ResourceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getFewLastResources(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->orderBy('r.date', 'DESC')
+            ->setMaxResults(25)
+            ->getQuery()
+            ->getResult();
+    }
 }
