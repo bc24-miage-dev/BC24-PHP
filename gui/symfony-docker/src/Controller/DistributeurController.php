@@ -59,7 +59,8 @@ class DistributeurController extends AbstractController
     }
 
     #[Route('/list', name: 'app_distributeur_list')]
-    public function list(ResourcesListHandler $listHandler, Request $request) : Response
+    public function list(ResourcesListHandler $listHandler,
+                         Request $request) : Response
     {
         if ($request->isMethod('POST')) {
             try {

@@ -101,7 +101,6 @@ class UsineController extends AbstractController
 
     #[Route('/decoupe/{id}', name: 'app_usine_decoupe')]
     public function decoupe(Request $request,
-                            EntityManagerInterface $entityManager,
                             ResourceRepository $resourceRepository,
                             ResourceNameRepository $nameRepository,
                             $id): Response
@@ -141,8 +140,7 @@ class UsineController extends AbstractController
     }
 
     #[Route('/creationRecette/ingredients', name: 'app_usine_creationRecetteIngredients')]
-    public function creationRecetteIngredients(Request $request,
-                                              ResourceNameRepository $nameRepo): Response
+    public function creationRecetteIngredients(Request $request): Response
     {
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');

@@ -25,10 +25,15 @@ class EquarrisseurController extends AbstractController
     private TransactionHandler $transactionHandler;
     private EquarrisseurHandler $equarrisseurHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, EquarrisseurHandler $equarrisseurHandler)
+    private ResourceRepository $resourceRepository;
+
+    public function __construct(TransactionHandler $transactionHandler,
+                                EquarrisseurHandler $equarrisseurHandler,
+                                ResourceRepository $resourceRepository)
     {
         $this->transactionHandler = $transactionHandler;
         $this->equarrisseurHandler = $equarrisseurHandler;
+        $this->resourceRepository = $resourceRepository;
     }
 
     #[Route('/', name: 'app_equarrisseur_index')]
@@ -84,11 +89,10 @@ class EquarrisseurController extends AbstractController
     }
 
     #[Route('/specific/{id}', name: 'app_equarrisseur_job')]
-    public function job(ResourceRepository $resourceRepo,
-                        $id): Response
+    public function job($id): Response
     {
 
-        $resource = $resourceRepo->findOneBy(['id' => $id]);
+        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 
         if (!$this->equarrisseurHandler->canHaveAccess($resource, $this->getUser())){
             $this->addFlash('error', 'Ressource introuvable');
@@ -104,11 +108,10 @@ class EquarrisseurController extends AbstractController
 
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
     public function equarrir(ResourceHandler $handler,
-                             ResourceRepository $resourceRepo,
                              Request $request,
                              $id) : Response
     {
-        $resource = $resourceRepo->findOneBy(['id' => $id]);
+        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
         if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
             $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
             return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
@@ -131,10 +134,9 @@ class EquarrisseurController extends AbstractController
 
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
     public function decoupe(Request $request,
-                            ResourceRepository $resourceRepo,
                             $id) : Response
     {
-        $resource = $resourceRepo->findOneBy(['id'=> $id]);
+        $resource = $this->resourceRepository->findOneBy(['id'=> $id]);
         if (!$this->equarrisseurHandler->canSlice($resource, $this->getUser()))
         {
             $this->addFlash('error', 'Il y a eu un problème, veuillez contacter un administrateur');

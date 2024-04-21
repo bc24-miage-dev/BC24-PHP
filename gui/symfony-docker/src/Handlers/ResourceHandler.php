@@ -11,6 +11,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class ResourceHandler
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public function findAllChildren(Resource $resource): array {
         $array = [$resource];
 
@@ -23,19 +30,18 @@ class ResourceHandler
 
 
     /**
-     * @param EntityManagerInterface $entityManager
      * @param Resource $resource
      */
-    public function contaminateChildren(EntityManagerInterface $entityManager, Resource $resource): void
+    public function contaminateChildren(Resource $resource): void
     {
 
         foreach ($this->findAllChildren($resource) as $parentResource) {
             $parentResource->setIsContamined(true);
-            $entityManager->persist($parentResource);
+            $this->entityManager->persist($parentResource);
 
         }
 
-        $entityManager->flush();
+        $this->entityManager->flush();
 
     }
 
