@@ -49,7 +49,7 @@
                     </li>
                     {% if app.user %}
                         {% if "ROLE_PRO" in app.user.roles %}
-                            <li><a href="{{ path('app_pro') }}">Vue Pro</a> </li>
+                            <li class="current"><a href="{{ path('app_pro') }}">Vue Pro</a> </li>
                         {% endif %}
                     {% endif %}
                     <li><a href={{ path('app_report_reportAliment') }}>Signaler un produit</a></li>
@@ -164,7 +164,6 @@
 </div>
 
 <!-- Scripts -->
-
 <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.dropotron.min.js') }}"></script>
 <script src="{{ asset('assets/js/browser.min.js') }}"></script>
