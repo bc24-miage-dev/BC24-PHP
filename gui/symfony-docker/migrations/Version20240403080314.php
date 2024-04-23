@@ -28,7 +28,6 @@ final class Version20240403080314 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_BC91F41656A273CC ON resource (origin_id)');
         $this->addSql('CREATE INDEX IDX_BC91F416E3441BD3 ON resource (current_owner_id)');
         $this->addSql('CREATE INDEX IDX_BC91F4162CB77B3E ON resource (resource_name_id)');
-        $this->addSql('ALTER TABLE user ADD COLUMN wallet_address VARCHAR(255) DEFAULT NULL');
     }
 
     public function down(Schema $schema): void

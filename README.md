@@ -13,7 +13,7 @@ facilitant la gestion pour les différents acteurs de la chaîne.
 ## Installation
 
 1. Cloner le projet et se placer à la racine du projet (gui/symfony-docker).
-2. Installer les dépendances avec `composer install`
+2. Installer les dépendances avec `composer update`
 3. La BDD se trouve dans le dossier 'var' ; c'est un fichier SQLite nommé "BC24DB.db". 
 Pour faire apparaître les différentes tables, il faut exécuter la commande `php bin/console doctrine:schema:update --force`
 4. Pour peupler la BDD, exécuter la commande `php bin/console doctrine:fixtures:load --group=app`
