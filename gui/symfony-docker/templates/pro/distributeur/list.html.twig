@@ -2,18 +2,21 @@
 
 {%  block body %}
     <div class="container-fluid">
+
     <form action="" method="post">
                 <label for="NFC">Tag NFC de la ressource</label>
-                <input type="text" class="form-control" id="NFC" name="NFC">
+                <input required type="number" class="form-control" id="NFC" name="NFC">
+                <br>
+                <button disabled id="scan" class="btn btn-primary">Scanner</button>
                 <button type="submit" class="btn btn-primary">Chercher</button>
-                <button href="" class="btn btn-primary">Scanner</button>
         </form>
 
         {% if resources %}
+            <br><br>
             {% for product in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
-                        <h5 class="card-title">{{ product.ResourceName.name }}</h5>
+                        <h5 class="card-title">{{ product.ResourceName.name }}- {{ product.id }}</h5>
                         <a class="card-link" href="{{ path('app_distributeur_specific', {'id': product.id}) }}">Informations</a>
                     </div>
                 </div>

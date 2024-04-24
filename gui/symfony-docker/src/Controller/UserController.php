@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Handlers\UserRoleRequestHandler;
 use App\Repository\UserRoleRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,10 +20,13 @@ use App\Form\ProductionSiteType;
 #[Route('/user')]
 class UserController extends AbstractController
 {
-    private $tokenStorage;
-    public function __construct(TokenStorageInterface $tokenStorage)
+    private TokenStorageInterface $tokenStorage;
+
+    private EntityManagerInterface $entityManager;
+    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager)
     {
         $this->tokenStorage = $tokenStorage;
+        $this->entityManager = $entityManager;
     }
 
 
@@ -45,13 +47,13 @@ class UserController extends AbstractController
     }
 
     #[Route('/delete', name: 'app_user_delete_process')]
-    public function deleteUserProcess(EntityManagerInterface$entityManager): RedirectResponse
+    public function deleteUserProcess(): RedirectResponse
     {
         $user = $this->getUser();
         if ($user) {
             $user->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
             //Kill la session
             $this->tokenStorage->setToken(null);
             $this->addFlash('success', 'Votre compte a bien été supprimé');
@@ -61,17 +63,15 @@ class UserController extends AbstractController
     }
 
     #[Route('/update', name: 'app_user_update')]
-    public function modifUser(Request $request,
-                              EntityManagerInterface $entityManager): Response
+    public function modifUser(Request $request): Response
     {
-        $user = $this->getUser();
-        if ($user) {
+        if ($user = $this->getUser()) {
             $form = $this->createForm(ModifierUserType::class, $user);
             $form->handleRequest($request);
 
-            if($form -> isSubmitted() && $form -> isValid()){
-                $entityManager->persist($user);
-                $entityManager->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
                 return $this->redirectToRoute('app_user_account');
             }
             $form = $this->createForm(ModifierUserType::class, $user);
@@ -83,27 +83,19 @@ class UserController extends AbstractController
 
     #[Route('/request', name: 'app_admin_user_request')]
     public function userRequestRole(Request $request,
-                                    EntityManagerInterface $entityManager,
-                                    UserRoleRequestRepository $requestRepository): Response
+                                    UserRoleRequestRepository $requestRepository,
+                                    UserRoleRequestHandler $requestHandler): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        $UserRoleRequest = new UserRoleRequest();
-        $repoRequest = $requestRepository->findBy(['User' => $this->getUser()]);
 
-        if (count($repoRequest) > 0) {
-            $UserRoleRequest = $repoRequest[0];
-        }
+        $repoRequest = $requestRepository->findOneBy(['User' => $this->getUser()]);
+        $repoRequest ? $UserRoleRequest = $repoRequest : $UserRoleRequest = new UserRoleRequest();
+
         $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $UserRoleRequest = $form->getData();
-            $UserRoleRequest->setUser($this->getUser());
-            $UserRoleRequest->setRead(false);
-            $UserRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-            $entityManager->persist($UserRoleRequest);
-            $entityManager->flush();
-
+            $requestHandler->initializeRoleRequest($form->getData(), $this->getUser());
             $this->addFlash('success', 'Votre demande à bien été envoyée');
             return $this->redirectToRoute('app_index');
         }
@@ -114,17 +106,15 @@ class UserController extends AbstractController
 
     #[Route('/productionSiteRequest', name: 'app_user_productionSiteRequest')]
 
-    public function createProductionSite(EntityManagerInterface $entityManager,
-                                         Request $request): Response
+    public function createProductionSite(Request $request): Response
     {
-        $productionSite = new ProductionSite();
-        $form = $this->createForm(ProductionSiteType::class, $productionSite);
+        $form = $this->createForm(ProductionSiteType::class, $productionSite = new ProductionSite());
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $productionSite->setValidate(false);
-            $entityManager->persist($productionSite);
-            $entityManager->flush();
+            $this->entityManager->persist($productionSite);
+            $this->entityManager->flush();
 
             $this->addFlash('success', 'Demande de création de site de production enregistrée');
             return $this->redirectToRoute('app_admin_user_request');

@@ -24,10 +24,10 @@
                     <tbody id="table-body">
                         <tr class="copy-row">
                             <td>
-                                <input type="number" name="list[1][NFC]" id="tag1">
+                                <input type="number" name="list[1][NFC]" id="tag1" required >
                             </td>
                             <td>
-                                <select name="list[1][name]" id="name1">
+                                <select name="list[1][name]" id="name1" required >
                                     {% for i in range (0,morceauxPossibles|length -1) %}
                                         {% set morceau = morceauxPossibles[i]%}
                                         <option value="{{ morceau.name }}">{{ morceau.name }}</option>
@@ -35,13 +35,14 @@
                                 </select>
                             </td>
                             <td>
-                                <input type="number" name="list[1][weight]" id="weight1">
+                                <input type="number" name="list[1][weight]" id="weight1" required >
                             </td>
                         </tr>
                     </tbody>
                 </div>
             </table>
             <input type="button" onclick="ajouterLigne()" value="Ajouter ligne">
+            <input type="button" onclick="supprimerLigne()" value="Supprimer ligne">
             <button type="submit">Valider</button>
         </div>
 
@@ -50,5 +51,5 @@
 {% endblock %}
 
 {% block script %}
-    <script src="{{ asset('assets/js/decoupe.js') }}" defer  ></script>
+    <script src="{{ asset('JS/decoupe.js') }}" defer  ></script>
 {% endblock %}

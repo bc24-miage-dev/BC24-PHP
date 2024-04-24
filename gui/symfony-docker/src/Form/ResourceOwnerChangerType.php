@@ -17,11 +17,7 @@ class ResourceOwnerChangerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id')
-            ->add('submit', SubmitType::class, [
-                'label' => 'Demander la propriété'
-            ])
-        ;
+            ->add('id');
     }
 
     public function configureOptions(OptionsResolver $resolver): void

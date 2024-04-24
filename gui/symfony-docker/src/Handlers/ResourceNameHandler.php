@@ -10,13 +10,10 @@ use App\Entity\User;
 
 class ResourceNameHandler
 {
-    public function createResourceName(String $name, array $families, ResourceCategory $category, ?ProductionSite $owner): ResourceName
+    public function createResourceName(String $name, ResourceCategory $category, ?ProductionSite $owner): ResourceName
     {
         $resourceName = new ResourceName();
         $resourceName->setName($name);
-        foreach ($families as $family) {
-            $resourceName->addResourceFamily($family);
-        }
         $resourceName->setResourceCategory($category);
         $resourceName->setProductionSiteOwner($owner);
         return $resourceName;

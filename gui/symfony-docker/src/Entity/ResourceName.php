@@ -192,6 +192,14 @@ class ResourceName
         return $this;
     }
 
+    public function setResourceFamilies(array $resourceFamilies): static
+    {
+        foreach ($resourceFamilies as $resourceFamily) {
+            $this->resourceFamilies->add($resourceFamily);
+        }
+        return $this;
+    }
+
     public function removeResourceFamily(ResourceFamily $resourceFamily): static
     {
         $this->resourceFamilies->removeElement($resourceFamily);

@@ -4,7 +4,13 @@
 
     <div class="container-fluid">
         <h1>Modifier une ressource : </h1><br>
-        <div class="row">
+        {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
+        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherchez par Tag NFC'}}) }}<br>
+        <button disabled class="btn btn-primary">Scanner</button>
+        <button type="submit" class="btn btn-primary">Rechercher</button>
+        {{ form_end(form) }}
+        <br>
+        <div class="row ml-5" >
             {% for resource in resources %}
 
             <div class="card mr-2 mb-2" style="width: 18rem;">

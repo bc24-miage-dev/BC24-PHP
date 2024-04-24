@@ -5,8 +5,6 @@ namespace App\Controller;
 use App\Handlers\PictureHandler;
 use App\Form\SearchType;
 use App\Repository\ResourceRepository;
-use App\Repository\UserResearchRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,10 +32,9 @@ class SearchController extends AbstractController
 
     #[Route('/{id}', name: 'app_search_result')]
     public function result(int $id,
-                           EntityManagerInterface $entityManager,
-                           UserResearchRepository $userResearchRepository,
                            ResourceRepository $resourceRepository,
                            PictureHandler $pictureHandler,
+                           UserResearchHandler $userResearchHandler,
                            Request $request): Response
     {
         $form = $this->createForm(SearchType::class);
@@ -53,26 +50,13 @@ class SearchController extends AbstractController
             $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
             return $this->redirectToRoute('app_search');
         }
-
-        $categoryName = $resource->getResourceName()->getResourceCategory()->getCategory();
-        $imagePath = $pictureHandler->getImageForCategory($categoryName);
-
-        if ($user = $this->getUser()) {
-            $history = $userResearchRepository->findOneBy(['User' => $user, 'Resource' => $resourceRepository->find($id)]);
-            if ($history) {
-                $history->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                $entityManager->persist($history);
-            } else {
-                $handler = new UserResearchHandler();
-                $entityManager->persist($handler->createUserResearch($user, $resource));
-            }
-            $entityManager->flush();
-        }
+        $userResearchHandler->userResearchRecordingProcess($this->getUser(), $resource);
 
         return $this->render('search/result.html.twig', [
             'form' => $form -> createView(),
             'resource' => $resource,
-            'imagePath' => $imagePath,
+            'imagePath' => $pictureHandler->getImageForCategory(
+                $resource->getResourceName()->getResourceCategory()->getCategory())
         ]);
     }
 

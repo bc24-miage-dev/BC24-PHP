@@ -45,4 +45,17 @@ class OwnershipAcquisitionRequestRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findPastRequests($user) : array
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.initialOwner = :val')
+            ->setParameter('val', $user)
+            ->andWhere('o.state != :state')
+            ->setParameter('state', 'En attente')
+            ->orderBy('o.requestDate', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
 }
