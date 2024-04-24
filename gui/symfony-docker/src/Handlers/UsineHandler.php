@@ -2,6 +2,7 @@
 
 namespace App\Handlers;
 
+use App\Entity\ProductionSite;
 use App\Entity\Recipe;
 use App\Entity\Resource;
 use App\Entity\ResourceName;
@@ -19,7 +20,6 @@ class UsineHandler extends ProHandler
     private ResourceCategoryRepository $categoryRepository;
     private ResourceHandler $resourceHandler;
     private ResourceNameHandler $nameHandler;
-    private ResourceRepository $resourceRepo;
 
     public function __construct(EntityManagerInterface $em,
                                 ResourceNameRepository $nameRepository,
@@ -28,12 +28,11 @@ class UsineHandler extends ProHandler
                                 ResourceCategoryRepository $categoryRepository,
                                 ResourceRepository $resourceRepository)
     {
-        parent::__construct($em);
+        parent::__construct($em, $resourceRepository);
         $this->nameRepository = $nameRepository;
         $this->resourceHandler = $resourceHandler;
         $this->nameHandler = $nameHandler;
         $this->categoryRepository = $categoryRepository;
-        $this->resourceRepo = $resourceRepository;
     }
 
     public function cuttingProcess(Resource $demiCarcasse,
@@ -161,5 +160,10 @@ class UsineHandler extends ProHandler
             $verifiedIngredients[] = $ingredient;
         }
         return false;
+    }
+
+    public function nameAlreadyExists(String $name, ProductionSite $productionSite) : bool
+    {
+        return $this->nameRepository->findOneBy(['name' => $name, 'productionSiteOwner' => $productionSite]) != null;
     }
 }

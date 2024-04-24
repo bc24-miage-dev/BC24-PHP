@@ -4,6 +4,7 @@ namespace App\Handlers;
 
 use App\Entity\Resource;
 use App\Repository\ResourceNameRepository;
+use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -15,9 +16,10 @@ class EquarrisseurHandler extends ProHandler
 
     public function __construct(EntityManagerInterface $em,
                                 ResourceNameRepository $resourceNameRepo,
-                                ResourceHandler $resourceHandler)
+                                ResourceHandler $resourceHandler,
+                                ResourceRepository $resourceRepository)
     {
-        parent::__construct($em);
+        parent::__construct($em, $resourceRepository);
         $this->resourceNameRepo = $resourceNameRepo;
         $this->resourceHandler = $resourceHandler;
     }
@@ -40,10 +42,18 @@ class EquarrisseurHandler extends ProHandler
             $resource->getResourceName()->getResourceCategory()->getCategory() == 'ANIMAL';
     }
 
-    public function slicingProcess(Resource $carcasse,
+    /**
+     * @throws \Exception
+     */
+    public function slicingProcess(Resource      $carcasse,
                                    UserInterface $user,
-                                   Request $request) : void
+                                   Request       $request) : void
     {
+        $firstId = $request->request->get('tag1');
+        $secondId = $request->request->get('tag2');
+        if ($firstId == $secondId) {
+            throw new \Exception('Les deux tags NFC doivent être différents');
+        }
         $rN = $this->resourceNameRepo->findOneByCategoryAndFamily('DEMI-CARCASSE',
             $carcasse->getResourceName()->getResourceFamilies()[0]->getName());
         // Same here, since the $carcasse is a carcasse, we can assume that it has only one family (vache, porc, etc.)
@@ -52,8 +62,8 @@ class EquarrisseurHandler extends ProHandler
         $secondHalf = $this->resourceHandler->createChildResource($carcasse, $user);
         $secondHalf->setResourceName($rN);
 
-        $firstHalf->setId($request->request->get('tag1'));
-        $secondHalf->setId($request->request->get('tag2'));
+        $firstHalf->setId($firstId);
+        $secondHalf->setId($secondId);
         $firstHalf->setWeight($request->request->get('weight1'));
         $secondHalf->setWeight($request->request->get('weight2'));
         $carcasse->setIsLifeCycleOver(true);

@@ -30,7 +30,7 @@ class SearchController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_search_result')]
+    #[Route('/{id}', name: 'app_search_result', requirements: ['id' => '\d+'])]
     public function result(int $id,
                            ResourceRepository $resourceRepository,
                            PictureHandler $pictureHandler,

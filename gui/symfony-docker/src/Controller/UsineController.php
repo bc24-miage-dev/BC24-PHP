@@ -88,9 +88,10 @@ class  UsineController extends AbstractController
                              $id): Response
     {
         $resource = $resourceRepo->find($id);
-        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+        if (!$this->usineHandler->canHaveAccess($resource, $this->getUser())) {
             $this->addFlash('error', 'Cette ressource ne vous appartient pas');
-            return $this->redirectToRoute('app_usine_list');
+            return $this->redirectToRoute('app_usine_list', ['category' => 'MORCEAU']);
+
         }
         $category = $resource->getResourceName()->getResourceCategory()->getCategory();
         return $this->render('pro/usine/specific.html.twig', [
@@ -144,6 +145,10 @@ class  UsineController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');
+            if ($this->usineHandler->nameAlreadyExists($name, $this->getUser()->getProductionSite())) {
+                $this->addFlash('error', 'Ce nom de recette est déjà utilisé');
+                return $this->redirectToRoute('app_usine_creationRecetteName');
+            }
             $families = $request->request->all()['families'];
             $ingredients = $this->usineHandler->getAllPossibleIngredients($families);
             return $this->render('pro/usine/creationRecetteIngredients.html.twig', [

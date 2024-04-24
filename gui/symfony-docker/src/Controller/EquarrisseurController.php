@@ -11,7 +11,9 @@ use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -121,8 +123,12 @@ class EquarrisseurController extends AbstractController
             $newCarcasse = $handler->createChildResource($resource, $this->getUser()));
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
-            $this->equarrisseurHandler->slaughteringProcess($resource, $newCarcasse);
+            try {
+                $this->equarrisseurHandler->slaughteringProcess($resource, $newCarcasse);
+            } catch (UniqueConstraintViolationException) {
+                $this->addFlash('error', 'Le tag NFC existe déjà');
+                return $this->redirectToRoute('app_equarrisseur_equarrir', ['id' => $id]);
+            }
             $this->addFlash('success', 'L\'animal a bien été abattu, une carcasse a été créée');
             return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
         }
@@ -145,7 +151,16 @@ class EquarrisseurController extends AbstractController
 
         //Classic form because two different entities must be processed at once
         if ($request->isMethod('POST')) {
+            try {
             $this->equarrisseurHandler->slicingProcess($resource, $this->getUser(), $request);
+            } catch(UniqueConstraintViolationException){
+                $this->addFlash('error', 'Au moins un des tags NFC existe déjà');
+                return $this->redirectToRoute('app_equarrisseur_decoupe', ['id' => $id]);
+            }
+            catch(Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_equarrisseur_decoupe', ['id' => $id]);
+            }
             $this->addFlash('success', 'Cette carcasse a bien été découpée');
             return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'DEMI-CARCASSE']);
         }

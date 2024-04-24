@@ -10,18 +10,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class DistributeurHandler extends ProHandler
 {
-    private ResourceRepository $resourceRepo;
-    public function __construct(EntityManagerInterface $entityManager, ResourceRepository $resourceRepo)
-    {
-        parent::__construct($entityManager);
-        $this->resourceRepo = $resourceRepo;
-    }
-
-    public function canHaveAccess(?Resource $resource, UserInterface $user) : bool
-    {
-        return parent::canHaveAccess($resource, $user)
-            && $resource->getResourceName()->getResourceCategory()->getCategory() == 'PRODUIT';
-    }
 
     /**
      * @throws Exception

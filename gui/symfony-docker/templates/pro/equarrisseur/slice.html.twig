@@ -6,20 +6,28 @@
         <br>
 
         <form method="post">
-            <div class="form-group">
+
                 <label for="tag1">Tag NFC Demi-Carcasse n°1</label>
-                <input type="number" class="form-control" id="tag1" name="tag1"" required>
+                <input type="number" class="form-control" id="tag1" name="tag1" required>
+            <br>
+                <button disabled class="btn btn-primary" id="scan">Scanner</button>
+                <br><br>
                 <label for="weight1">Poids Demi-Carcasse n°1</label>
+
                 <input type="number" class="form-control" id="weight1" name="weight1" required>
-            </div>
+
             <hr>
-            <div class="form-group">
+
                 <label for="tag2">Tag NFC Demi-Carcasse n°2</label>
                 <input type="number" class="form-control" id="tag2" name="tag2" required>
+            <br>
+                <button disabled class="btn btn-primary" id="scan">Scanner</button>
+                <br><br>
                 <label for="weight2">Poids Demi-Carcasse n°2</label>
                 <input type="number" class="form-control" id="weight2" name="weight2" required>
-            </div>
+            <br><br>
             <button type="submit" class="btn btn-primary">Découper</button>
         </form>
     </div>
+
 {% endblock %}

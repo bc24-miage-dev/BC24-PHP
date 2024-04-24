@@ -23,10 +23,13 @@ class UserController extends AbstractController
     private TokenStorageInterface $tokenStorage;
 
     private EntityManagerInterface $entityManager;
-    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager)
+    private UserRoleRequestHandler $userRoleRequestHandler;
+    public function __construct(TokenStorageInterface $tokenStorage, EntityManagerInterface $entityManager,
+                                UserRoleRequestHandler $userRoleRequestHandler)
     {
         $this->tokenStorage = $tokenStorage;
         $this->entityManager = $entityManager;
+        $this->userRoleRequestHandler = $userRoleRequestHandler;
     }
 
 
@@ -49,17 +52,15 @@ class UserController extends AbstractController
     #[Route('/delete', name: 'app_user_delete_process')]
     public function deleteUserProcess(): RedirectResponse
     {
-        $user = $this->getUser();
-        if ($user) {
-            $user->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+        try{
+            $this->userRoleRequestHandler->deleteUser($this->getUser());
             //Kill la session
             $this->tokenStorage->setToken(null);
             $this->addFlash('success', 'Votre compte a bien été supprimé');
             return $this->redirectToRoute('app_index');
+        } catch (\Exception $e){
+            return $this->redirectToRoute('app_login');
         }
-        return $this->redirectToRoute('app_index');
     }
 
     #[Route('/update', name: 'app_user_update')]

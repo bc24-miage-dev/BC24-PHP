@@ -7,12 +7,14 @@ use App\Form\ProductionSiteType;
 use App\Form\ResourceModifierType;
 use App\Form\ResourceType;
 use App\Form\SearchType;
+use App\Handlers\ProHandler;
 use App\Handlers\ResourceHandler;
 use App\Repository\ProductionSiteRepository;
 use App\Repository\ReportRepository;
 use App\Repository\ResourceRepository;
 use App\Repository\UserRepository;
 use App\Repository\UserRoleRequestRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,10 +26,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private ProHandler $proHandler;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager,
+                                ProHandler $proHandler)
     {
         $this->entityManager = $entityManager;
+        $this->proHandler = $proHandler;
     }
 
     #[Route('/', name: 'app_admin_index')]
@@ -45,15 +50,23 @@ class AdminController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($resource);
-            $this->entityManager->flush();
+            try {
+                $this->entityManager->persist($resource);
+                $this->entityManager->flush();
+            } catch (UniqueConstraintViolationException){
+                 $this->addFlash('error', 'Le tag NFC est déjà utilisé');
+                return $this->render('admin/add.html.twig', [
+                    'form' => $form->createView()
+                ]);
+            }
+                $this->addFlash('success', 'Ressource ajoutée avec succès');
+                return $this->render('admin/admin.html.twig');
 
-            $this->addFlash('success', 'Ressource ajoutée avec succès');
-            return $this->render('admin/admin.html.twig');
-
+        } else{
+            $this->addFlash('error', 'Erreur lors de l\'ajout de la ressource');
         }
         return $this->render('admin/add.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form->createView()
         ]);
 
     }
@@ -93,6 +106,8 @@ class AdminController extends AbstractController
             $this->entityManager->persist($resource);
             $this->entityManager->flush();
             return $this->redirectToRoute('app_admin_modify');
+        } else {
+            $this->addFlash('error', 'Erreur lors de la modification de la ressource');
         }
         return $this->render('admin/modifySpecific.html.twig',
             [   'form' => $form->createView(),
@@ -141,7 +156,7 @@ class AdminController extends AbstractController
     public function userList(UserRepository $userRepo,
                              ProductionSiteRepository $productionSiteRepo): Response
     {
-        $users = $userRepo->findAll();
+        $users = $userRepo->getAllActiveUsers();
         $pSites = $productionSiteRepo->findAll();
         return $this->render('admin/userList.html.twig', ['users' => $users, 'pSites' => $pSites]);
     }

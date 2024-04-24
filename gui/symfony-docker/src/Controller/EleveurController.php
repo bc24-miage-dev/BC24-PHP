@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 #[Route('/pro/eleveur')]
 class EleveurController extends AbstractController
@@ -52,9 +53,13 @@ class EleveurController extends AbstractController
             $resource = $handler->createDefaultNewResource($this->getUser()));
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->entityManager->persist($resource);
-            $this->entityManager->flush();
-
+            try {
+                $this->entityManager->persist($resource);
+                $this->entityManager->flush();
+            } catch (UniqueConstraintViolationException){
+                $this->addFlash('error', 'Le tag NFC est déjà utilisé');
+                return $this->redirectToRoute('app_eleveur_naissance');
+            }
             $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée !');
             return $this->redirectToRoute('app_eleveur_index');
         }
