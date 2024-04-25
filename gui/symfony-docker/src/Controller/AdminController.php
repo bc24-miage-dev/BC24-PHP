@@ -26,13 +26,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class AdminController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
-    private ProHandler $proHandler;
 
-    public function __construct(EntityManagerInterface $entityManager,
-                                ProHandler $proHandler)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->proHandler = $proHandler;
     }
 
     #[Route('/', name: 'app_admin_index')]

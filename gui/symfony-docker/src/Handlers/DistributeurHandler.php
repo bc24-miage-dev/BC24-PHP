@@ -16,7 +16,7 @@ class DistributeurHandler extends ProHandler
      */
     public function saleProcess(int $nfc, UserInterface $user) : void
     {
-        $resource = $this->resourceRepo->findOneBy(['id' => $nfc]);
+        $resource = $this->resourceRepository->findOneBy(['id' => $nfc]);
 
         if (!$this->canHaveAccess($resource, $user))
         {
@@ -30,7 +30,7 @@ class DistributeurHandler extends ProHandler
 
     public function getRecentSalesHistory(UserInterface $user) : array
     {
-        return $this->resourceRepo->findBy(['currentOwner' => $user, 'IsLifeCycleOver' => true],
+        return $this->resourceRepository->findBy(['currentOwner' => $user, 'IsLifeCycleOver' => true],
             ['date' => 'DESC'],
             limit: 30);
     }
