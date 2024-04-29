@@ -82,7 +82,7 @@ class TransactionHandler
     public function askOwnership(int $id, UserInterface $user) : void
     {
         $resource = $this->resourceRepo->find($id);
-        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $user->getWalletAddress()) {
+        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $user->getWalletAddress() || $resource->isIsLifeCycleOver()){
             throw new Exception('Vous ne pouvez pas demander la propriété de cette ressource');
 
         }

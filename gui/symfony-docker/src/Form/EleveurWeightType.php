@@ -18,7 +18,7 @@ class EleveurWeightType extends AbstractType
     {
         $builder
             ->add('weight')
-            ->add('Submit', SubmitType::class, [
+            ->add('Peser', SubmitType::class, [
             ])
         ;
     }

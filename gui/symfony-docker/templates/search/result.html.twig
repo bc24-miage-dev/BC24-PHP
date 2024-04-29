@@ -21,7 +21,7 @@
                     <div class="col-6 col-25-medium">
                         <h1>{{ resource.ResourceName.name }}</h1><hr>
                         {% if resource.isIsContamined %}
-                        <h2 style="color:red"> Attention Produit Contaminé </h2><hr>
+                        <h2 style="color:red"> Attention Ressource Contaminée </h2><hr>
                         {% endif %}
                         <p>Poids : {{ resource.getWeight }} g</p>
                         {% if resource.ResourceName.ResourceCategory.category == 'PRODUIT' %}

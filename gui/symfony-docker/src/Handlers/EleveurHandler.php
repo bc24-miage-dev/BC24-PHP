@@ -8,10 +8,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class EleveurHandler extends ProHandler
 {
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        parent::__construct($entityManager);
-    }
 
     public function canHaveAccess(?Resource $resource, UserInterface $user): bool
     {

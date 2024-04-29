@@ -5,25 +5,26 @@
     <h1>Application de la recette : {{ product.name }}</h1><br>
     <form method="post">
         <label> NFC du Nouveau produit :
-            <input type="number" name="newProductId">
+            <input type="number" name="newProductId" class="form-control" required>
+        </label>
+        <input type="submit" value="Valider et créer le produit" class="btn btn-primary">
+        <br><br>
+        <label> Poids du produit final (en grammes) :
+            <input type="number" name="weight" class="form-control" required>
         </label>
         <br><br>
-
         <h3>Scannez un tag NFC correspondant pour chaque ingrédient :</h3><br>
         {% for ingredient in ingredients %}
            {% for i in 1..ingredient.ingredientNumber %}
                <label for="prod_{{ loop.index0 }}">{{ ingredient.ingredient.name }} : </label>
-               <input type="number" id="prod_{{ loop.index0 }}" name="morceaux[]">
-               <button class="btn-primary">Scanner</button>
+               <input type="number" id="prod_{{ loop.index0 }}" name="morceaux[]" class="form-control" required>
+               <br>
+               <button class="btn btn-primary" disabled >Scanner</button>
+               <br>
                <br>
            {% endfor %}
         {% endfor %}
-        <br><br>
-        <label> Poids du produit final (en grammes) :
-            <input type="number" name="weight">
-        </label>
-        <br>
-        <input type="submit" value="Valider et créer le produit">
+
     </form>
     </div>
 {% endblock %}

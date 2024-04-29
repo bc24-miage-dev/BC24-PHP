@@ -70,9 +70,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->ownershipAcquisitionRequestsReceived = new ArrayCollection();
     }
 
-    // #[ORM\Column(type: 'boolean')]
-    // private $isVerified = false;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -166,18 +163,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-    // public function isVerified(): bool
-    // {
-    //     return $this->isVerified;
-    // }
-
-    // public function setIsVerified(bool $isVerified): static
-    // {
-    //     $this->isVerified = $isVerified;
-
-    //     return $this;
-    // }
 
     /**
      * @return Collection<int, Report>

@@ -11,6 +11,8 @@ use App\Repository\RecipeRepository;
 use App\Repository\ResourceFamilyRepository;
 use App\Repository\ResourceNameRepository;
 use App\Repository\ResourceRepository;
+use Doctrine\DBAL\Driver\Exception;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -88,9 +90,10 @@ class  UsineController extends AbstractController
                              $id): Response
     {
         $resource = $resourceRepo->find($id);
-        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() != $this->getUser()->getWalletAddress()){
+        if (!$this->usineHandler->canHaveAccess($resource, $this->getUser())) {
             $this->addFlash('error', 'Cette ressource ne vous appartient pas');
-            return $this->redirectToRoute('app_usine_list');
+            return $this->redirectToRoute('app_usine_list', ['category' => 'MORCEAU']);
+
         }
         $category = $resource->getResourceName()->getResourceCategory()->getCategory();
         return $this->render('pro/usine/specific.html.twig', [
@@ -117,9 +120,16 @@ class  UsineController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list'];
-
-            $this->usineHandler->cuttingProcess($demiCarcasse, $morceaux, $list, $this->getUser());
-            $this->addFlash('success', 'La demi-carcasse a bien été découpée');
+            try {
+                $this->usineHandler->cuttingProcess($demiCarcasse, $morceaux, $list, $this->getUser());
+                $this->addFlash('success', 'La demi-carcasse a bien été découpée');
+            } catch (UniqueConstraintViolationException) {
+                $this->addFlash('error', 'Au moins un tag NFC est déjà utilisé par une autre ressource');
+                return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
+            }
             return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
         }
 
@@ -144,6 +154,10 @@ class  UsineController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $name = $request->request->get('name');
+            if ($this->usineHandler->nameAlreadyExists($name, $this->getUser()->getProductionSite())) {
+                $this->addFlash('error', 'Ce nom de recette est déjà utilisé');
+                return $this->redirectToRoute('app_usine_creationRecetteName');
+            }
             $families = $request->request->all()['families'];
             $ingredients = $this->usineHandler->getAllPossibleIngredients($families);
             return $this->render('pro/usine/creationRecetteIngredients.html.twig', [
@@ -160,8 +174,12 @@ class  UsineController extends AbstractController
         if ($request->isMethod('POST')) {
             $list = $request->request->all()['list']; //an Array like [['ingredient' => 'name', 'quantity' => 'quantity'], ...]
             $name = $request->request->get('name');
-
-            $this->usineHandler->recipeCreatingProcess($list, $name, $this->getUser());
+            try {
+                $this->usineHandler->recipeCreatingProcess($list, $name, $this->getUser());
+            } catch (\Exception $e){
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_usine_creationRecetteName');
+            }
             $this->addFlash('success', 'La recette a bien été enregistrée');
             return $this->redirectToRoute('app_usine_index');
         }

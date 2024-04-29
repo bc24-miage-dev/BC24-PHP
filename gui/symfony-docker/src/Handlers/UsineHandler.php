@@ -2,6 +2,7 @@
 
 namespace App\Handlers;
 
+use App\Entity\ProductionSite;
 use App\Entity\Recipe;
 use App\Entity\Resource;
 use App\Entity\ResourceName;
@@ -19,7 +20,6 @@ class UsineHandler extends ProHandler
     private ResourceCategoryRepository $categoryRepository;
     private ResourceHandler $resourceHandler;
     private ResourceNameHandler $nameHandler;
-    private ResourceRepository $resourceRepo;
 
     public function __construct(EntityManagerInterface $em,
                                 ResourceNameRepository $nameRepository,
@@ -28,29 +28,45 @@ class UsineHandler extends ProHandler
                                 ResourceCategoryRepository $categoryRepository,
                                 ResourceRepository $resourceRepository)
     {
-        parent::__construct($em);
+        parent::__construct($em, $resourceRepository);
         $this->nameRepository = $nameRepository;
         $this->resourceHandler = $resourceHandler;
         $this->nameHandler = $nameHandler;
         $this->categoryRepository = $categoryRepository;
-        $this->resourceRepo = $resourceRepository;
     }
 
+    /**
+     * @throws Exception
+     */
     public function cuttingProcess(Resource $demiCarcasse,
                                    array $morceaux, array $listOfPieces,
                                    UserInterface $user): void
     {
+        if (! $this->checkNotMultipleIdToCut($listOfPieces)) {
+            throw new Exception('Vous ne pouvez pas utiliser le même NFC pour plusieurs morceaux');
+        }
         foreach ($listOfPieces as $element) {
             $childResource = $this->resourceHandler->createChildResource($demiCarcasse, $user);
             $childResource->setWeight($element['weight']);
             $childResource->setId($element['NFC']);
             $childResource->setResourceName($this->searchInArrayByName($morceaux, $element['name']));
             $this->entityManager->persist($childResource);
-            $this->entityManager->flush();
         }
         $demiCarcasse->setIsLifeCycleOver(true);
         $this->entityManager->persist($demiCarcasse);
         $this->entityManager->flush();
+    }
+
+    private function checkNotMultipleIdToCut(array $listOfPieces) : bool
+    {
+        $nfcs = [];
+        foreach ($listOfPieces as $element) {
+            if (in_array($element['NFC'], $nfcs)) {
+                return false;
+            }
+            $nfcs[] = $element['NFC'];
+        }
+        return true;
     }
 
     public function canCutIntoPieces(?Resource $resource, UserInterface $user) : bool
@@ -81,8 +97,14 @@ class UsineHandler extends ProHandler
         return $ingredients;
     }
 
+    /**
+     * @throws Exception
+     */
     public function recipeCreatingProcess(array $list, String $name, UserInterface $user) : void
     {
+        if (! $this->checkNotMultipleIngredients($list)) {
+            throw new Exception('Vous ne pouvez pas utiliser le même ingrédient plusieurs fois, spécifiez plutôt sa quantité');
+        }
         $actualFamilies = [];
         $newProduct = $this->nameHandler->createResourceName(
             $name,
@@ -93,7 +115,7 @@ class UsineHandler extends ProHandler
         foreach ($list as $element) {
             $recipe = new Recipe();
             $recipe->setIngredient($this->nameRepository->findOneBy(['name' => $element['ingredient']]));
-            $recipe->setIngredientNumber(intval($element['quantity']) != 0 ? intval($element['quantity']) : 1);
+            $recipe->setIngredientNumber(intval($element['quantity']) > 0 ? intval($element['quantity']) : 1);
             $recipe->setRecipeTitle($newProduct);
 
             if (! isset($actualFamilies[$recipe->getIngredient()->getResourceFamilies()[0]->getName()])) {
@@ -105,6 +127,18 @@ class UsineHandler extends ProHandler
         $newProduct->setResourceFamilies($actualFamilies);
         $this->entityManager->persist($newProduct);
         $this->entityManager->flush();
+    }
+
+    private function checkNotMultipleIngredients(array $list) : bool
+    {
+        $ingredients = [];
+        foreach ($list as $element) {
+            if (in_array($element['ingredient'], $ingredients)) {
+                return false;
+            }
+            $ingredients[] = $element['ingredient'];
+        }
+        return true;
     }
 
     /**
@@ -123,11 +157,10 @@ class UsineHandler extends ProHandler
         $i = 0;
         foreach ($neededIngredients as $neededIngredient) { //Test loop to check if the morceaux match with the recipe
             for ($j = 0; $j < $neededIngredient->getIngredientNumber(); $j++) {
-                $resource = $this->resourceRepo->find($providedIngredients[$i]);
+                $resource = $this->resourceRepository->find($providedIngredients[$i]);
                 if ((!parent::canHaveAccess($resource, $user)) ||
                     $resource->getResourceName()->getName() != $neededIngredient->getIngredient()->getName()) {
                     throw new Exception('Erreur dans la sélection des morceaux');
-                    //return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
                 }
                 $i++;
             }
@@ -143,7 +176,7 @@ class UsineHandler extends ProHandler
             throw new Exception('Cet identifiant est déjà utilisé pour un autre produit');
         }
         foreach ($providedIngredients as $morceau) {
-            $resource = $this->resourceRepo->find($morceau);
+            $resource = $this->resourceRepository->find($morceau);
             $resource->setIsLifeCycleOver(true);
             $resource->addResource($newProduct);
             $this->entityManager->persist($resource);
@@ -161,5 +194,10 @@ class UsineHandler extends ProHandler
             $verifiedIngredients[] = $ingredient;
         }
         return false;
+    }
+
+    public function nameAlreadyExists(String $name, ProductionSite $productionSite) : bool
+    {
+        return $this->nameRepository->findOneBy(['name' => $name, 'productionSiteOwner' => $productionSite]) != null;
     }
 }
