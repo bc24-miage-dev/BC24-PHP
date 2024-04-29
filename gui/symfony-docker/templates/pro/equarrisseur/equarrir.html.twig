@@ -2,19 +2,19 @@
 
 {% block body %}
     <div class="container-fluid">
-    <h1>Équarrir une bête :</h1>
-    <p>Remplissez les champs suivants pour équarrir une bête.</p>
-    <br>
-    {{ form_start(form) }}
-    <label> Tag NFC de la carcasse :
-        <input type="number" name="{{ field_name(form.id) }}" class="form-control">
-    </label>
-    <br>
-    <label> Poids de la carcasse (en grammes) :
-        <input type="number" name="{{ field_name(form.weight) }}" class="form-control">
-    </label>
-    <br><br>
-    <input type="submit" name="{{ field_name(form.submit) }}" value="Valider" class="btn btn-primary">
-    {{ form_end(form) }}
+        <h1>Équarrir une bête :</h1>
+        <p>Remplissez les champs suivants pour équarrir une bête.</p>
+        <br>
+        {{ form_start(form) }}
+        <label> Tag NFC de la carcasse :
+            <input type="number" name="{{ field_name(form.id) }}" class="form-control">
+        </label>
+        <br>
+        <label> Poids de la carcasse (en grammes) :
+            <input type="number" name="{{ field_name(form.weight) }}" class="form-control">
+        </label>
+        <br><br>
+        <input type="submit" name="{{ field_name(form.submit) }}" value="Valider" class="btn btn-primary">
+        {{ form_end(form) }}
     </div>
 {% endblock %}
