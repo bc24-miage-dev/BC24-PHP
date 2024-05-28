@@ -18,11 +18,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 #[Route('/pro/eleveur')]
 class EleveurController extends AbstractController
 {
-
+    private HttpClientInterface $httpClient;
     private TransactionHandler $transactionHandler;
     private EleveurHandler $eleveurHandler;
     private EntityManagerInterface $entityManager;
@@ -31,12 +34,14 @@ class EleveurController extends AbstractController
     public function __construct(TransactionHandler $handler,
                                 EleveurHandler $eleveurHandler,
                                 EntityManagerInterface $entityManager,
-                                ResourceRepository $resourceRepository)
+                                ResourceRepository $resourceRepository,
+                                HttpClientInterface $httpClient)
     {
         $this->transactionHandler = $handler;
         $this->eleveurHandler = $eleveurHandler;
         $this->entityManager = $entityManager;
         $this->resourceRepository = $resourceRepository;
+        $this->httpClient = $httpClient;
     }
 
     #[Route('/', name: 'app_eleveur_index')]
@@ -47,8 +52,26 @@ class EleveurController extends AbstractController
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
-                              ResourceHandler $handler): Response
+                              ResourceHandler $handler,
+                              SessionInterface $session): Response
     {
+        try {
+            // APPEL STARTREADER
+            //$this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
+            $session->set('reader_started', true);
+        } catch (ClientException $e) {
+            if ($e->getCode() === 403) {
+                // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
+                return new Response("Le scanner n'est pas activé, veuillez rafraîchir la page", Response::HTTP_FORBIDDEN);
+            } else {
+                // Pour d'autres types d'erreurs
+                $errorMessage = $e->getMessage();
+                $this->logger->error('Erreur lors de la requête HTTP : ' . $errorMessage);
+                // Ou afficher un message d'erreur générique à l'utilisateur
+                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
         $form = $this->createForm(EleveurBirthType::class,
             $resource = $handler->createDefaultNewResource($this->getUser()));
         $form->handleRequest($request);
@@ -69,10 +92,30 @@ class EleveurController extends AbstractController
 
     }
 
+
+
     #[Route('/list', name: 'app_eleveur_list')]
     public function list(Request $request,
-                         ResourcesListHandler $listHandler): Response
+                         ResourcesListHandler $listHandler,
+                         SessionInterface $session): Response
     {
+        try {
+            // APPEL STARTREADER
+            //$this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
+            $session->set('reader_started', true);
+        } catch (ClientException $e) {
+            if ($e->getCode() === 403) {
+                // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
+                return new Response("Le scanner n'est pas activé, veuillez rafraîchir la page", Response::HTTP_FORBIDDEN);
+            } else {
+                // Pour d'autres types d'erreurs
+                $errorMessage = $e->getMessage();
+                $this->logger->error('Erreur lors de la requête HTTP : ' . $errorMessage);
+                // Ou afficher un message d'erreur générique à l'utilisateur
+                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
+
         if ($request->isMethod('POST')) {
             try {
                 $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -91,9 +134,29 @@ class EleveurController extends AbstractController
         );
     }
 
+
+
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response {
+                                OwnershipAcquisitionRequestRepository $ownershipRepo,
+                                SessionInterface $session): Response {
+
+        try {
+            // APPEL STARTREADER
+            //$this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
+            $session->set('reader_started', true);
+        } catch (ClientException $e) {
+            if ($e->getCode() === 403) {
+                // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
+                return new Response("Le scanner n'est pas activé, veuillez rafraîchir la page", Response::HTTP_FORBIDDEN);
+            } else {
+                // Pour d'autres types d'erreurs
+                $errorMessage = $e->getMessage();
+                $this->logger->error('Erreur lors de la requête HTTP : ' . $errorMessage);
+                // Ou afficher un message d'erreur générique à l'utilisateur
+                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+        }
 
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
@@ -113,6 +176,8 @@ class EleveurController extends AbstractController
             'requests' => $requests
         ]);
     }
+
+
 
     #[Route('/pesee/{id}', name: 'app_eleveur_weight')]
     public function weight(Request $request,
@@ -139,6 +204,8 @@ class EleveurController extends AbstractController
         ]);
     }
 
+
+
     #[Route('/vaccine/{id}', name: 'app_eleveur_vaccine')]
     public function vaccine(Request $request,
                             $id): Response {
@@ -158,6 +225,8 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/vaccine.html.twig', ['id' => $id]);
     }
 
+
+
     #[Route('/nutrition/{id}', name: 'app_eleveur_nutrition')]
     public function nutrition(Request $request,
                               $id): Response
@@ -175,6 +244,8 @@ class EleveurController extends AbstractController
         }
         return $this->render('pro/eleveur/nutrition.html.twig', ['id' => $id]);
     }
+
+
 
     #[Route('/disease/{id}', name: 'app_eleveur_disease')]
     public function disease(Request $request,
@@ -195,6 +266,8 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/disease.html.twig', ['id' => $id]);
     }
 
+
+
     #[Route('/specific/{id}', name: 'app_eleveur_specific')]
     public function specific(ResourceRepository $resourceRepository,
                              $id) : Response
@@ -208,6 +281,8 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/specific.html.twig', ['animal' => $animal ]);
     }
 
+
+
     #[Route('/transaction', name: 'app_eleveur_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
@@ -217,6 +292,8 @@ class EleveurController extends AbstractController
             ['requests' => $requests, 'pastTransactions' => $pastTransactions]
         );
     }
+
+
 
     #[Route('/transaction/{id}', name: 'app_eleveur_transfer', requirements: ['id' => '\d+'])]
     public function transfer($id): RedirectResponse
@@ -234,6 +311,7 @@ class EleveurController extends AbstractController
     }
 
 
+
     #[Route('/transactionRefused/{id}', name: 'app_eleveur_transferRefused', requirements: ['id' => '\d+'])]
     public function transferRefused($id): RedirectResponse
     {
@@ -246,6 +324,8 @@ class EleveurController extends AbstractController
             return $this->redirectToRoute('app_eleveur_transferList');
         }
     }
+
+
 
     #[Route('/transaction/all' , name: 'app_eleveur_transferAll')]
     public function transferAll(): RedirectResponse

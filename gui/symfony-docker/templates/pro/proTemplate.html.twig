@@ -122,8 +122,6 @@
 </div>
 
 
-
-
 <!-- Bootstrap core JavaScript-->
 <script src="{{ asset('proAssets/vendor/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('proAssets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -134,8 +132,35 @@
 <!-- Custom scripts for all pages-->
 <script src="{{ asset('proAssets/js/sb-admin-2.min.js') }}"></script>
 
+{% block script %}
+<!-- Optional additional scripts -->
+<script>
+        var exitRequested = false;
+
+        function sendExitRequest() {
+            if (!exitRequested) {
+                navigator.sendBeacon('{{ path('app_exit') }}');
+                exitRequested = true;
+            }
+        }
+
+        window.addEventListener('beforeunload', sendExitRequest);
+
+        document.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                var href = event.target.getAttribute('href'); 
+                if (href) {
+                    event.preventDefault();
+                    sendExitRequest();
+                    setTimeout(function() {
+                        window.location.href = href;
+                    }, 100);
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
 </body>
 
-    {% block script %}
-    {% endblock %}
 </html>
