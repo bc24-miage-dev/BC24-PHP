@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -49,10 +48,9 @@ class AdminController extends AbstractController
 
     #[Route('/add', name: 'app_admin_add')] // Resource creation
     public function add(Request $request,
-                        ResourceHandler $handler,
-                        SessionInterface $session): Response
+                        ResourceHandler $handler): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -84,10 +82,9 @@ class AdminController extends AbstractController
 
     #[Route('/modify', name: 'app_admin_modify')] // Resource list for modification
     public function modify(ResourceRepository $resourceRepo,
-                           Request $request,
-                           SessionInterface $session): Response
+                           Request $request): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -106,10 +103,9 @@ class AdminController extends AbstractController
     public function modifySpecific(Request $request,
                                    ResourceHandler $resourceHandler,
                                    ResourceRepository $resourceRepo,
-                                   $id,
-                                   SessionInterface $session): Response
+                                   $id): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

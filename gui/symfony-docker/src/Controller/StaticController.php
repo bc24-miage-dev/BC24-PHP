@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -25,9 +24,9 @@ class StaticController extends AbstractController
     
 
     #[Route('/', name: 'app_index')]
-    public function index(Request $request, SessionInterface $session): Response
+    public function index(Request $request): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

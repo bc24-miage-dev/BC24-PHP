@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -54,10 +53,9 @@ class EquarrisseurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_equarrisseur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo,
-                                SessionInterface $session): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -84,10 +82,9 @@ class EquarrisseurController extends AbstractController
     #[Route('/list/{category}', name: 'app_equarrisseur_list')] // An 'Equarrisseur' have access to the list of his animals and carcasses
     public function list(ResourcesListHandler $listHandler,
                          String $category,
-                         Request $request,
-                         SessionInterface $session) : Response
+                         Request $request) : Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -130,10 +127,9 @@ class EquarrisseurController extends AbstractController
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
     public function equarrir(ResourceHandler $handler,
                              Request $request,
-                             $id,
-                             SessionInterface $session) : Response
+                             $id) : Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -164,10 +160,9 @@ class EquarrisseurController extends AbstractController
 
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
     public function decoupe(Request $request,
-                            $id,
-                            SessionInterface $session) : Response
+                            $id) : Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

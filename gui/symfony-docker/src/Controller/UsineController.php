@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -50,10 +49,9 @@ class  UsineController extends AbstractController
 
     #[Route('/arrivage', name:'app_usine_acquire')]
     public function acquire(Request $request,
-                            OwnershipAcquisitionRequestRepository $ownershipRepo,
-                            SessionInterface $session): Response
+                            OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -80,10 +78,9 @@ class  UsineController extends AbstractController
     #[Route('/list/{category}', name: 'app_usine_list')]
     public function list(ResourcesListHandler $listHandler,
                          Request $request,
-                         $category,
-                         SessionInterface $session): Response
+                         $category): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -129,10 +126,9 @@ class  UsineController extends AbstractController
     public function decoupe(Request $request,
                             ResourceRepository $resourceRepository,
                             ResourceNameRepository $nameRepository,
-                            $id,
-                            SessionInterface $session): Response
+                            $id): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -232,10 +228,9 @@ class  UsineController extends AbstractController
     public function appliRecette($id,
                                  Request $request,
                                  RecipeRepository $recipeRepo,
-                                 ResourceNameRepository $nameRepo,
-                                 SessionInterface $session) : Response
+                                 ResourceNameRepository $nameRepo) : Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

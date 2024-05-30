@@ -10,27 +10,23 @@ use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\NetworkException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Psr\Log\LoggerInterface;
 
 
-class HardwareService
-{
+class HardwareService {
+
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
 
-    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger)
-    {
+    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger) {
         $this->httpClient = $httpClient;
         $this->logger = $logger;
     }
 
-    public function startReader(SessionInterface $session): ?Response {
+    public function startReader(): ?Response {
         try {
-            if (!$session->get('reader_started')) {
-                $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-                $session->set('reader_started', true);
-            }
+            $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
+            $this->reader_started = true;
         } catch (ClientException $e) {
             if ($e->getCode() === 403) {
                 // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
@@ -57,15 +53,11 @@ class HardwareService
     }
 
 
-    public function stopReader(SessionInterface $session): ?Response {
+    public function stopReader(): Response {
         try {
-            if ($session->get('reader_started')) {
-                $this->httpClient->request('GET', 'http://127.0.0.1:5000/stopReader');
-                $session->set('reader_started', false);
-                return new Response('Reader stopped successfully.', Response::HTTP_OK);
-            } else {
-                return new Response('Reader was not started, so nothing to stop.', Response::HTTP_OK);
-            }
+            $this->httpClient->request('GET', 'http://127.0.0.1:5000/stopReader');
+            $this->reader_started = false;
+            return new Response('Reader stopped successfully.', Response::HTTP_OK);
         } catch (ClientException $e) {
             if ($e->getCode() === 403) {
                 return new Response("Le scanner ne s'est pas stoppé, veuillez lancer une requête 'curl -X GET http://127.0.0.1:5000/stopReader'", Response::HTTP_FORBIDDEN);

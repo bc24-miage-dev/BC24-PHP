@@ -15,7 +15,6 @@ use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\ResourceNfcType;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -44,10 +43,9 @@ class DistributeurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_distributeur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo,
-                                SessionInterface $session): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -73,10 +71,9 @@ class DistributeurController extends AbstractController
 
     #[Route('/list', name: 'app_distributeur_list')]
     public function list(ResourcesListHandler $listHandler,
-                         Request $request,
-                         SessionInterface $session) : Response
+                         Request $request) : Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -114,9 +111,9 @@ class DistributeurController extends AbstractController
 
 
     #[Route('/vente', name: 'app_distributeur_vendu')]
-    public function vendre(Request $request, SessionInterface $session): Response
+    public function vendre(Request $request): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

@@ -22,9 +22,7 @@ class ExitController extends AbstractController
 
 
     #[Route('/exit', name: 'app_exit')]
-    public function exit(SessionInterface $session): Response
-    {
-        $response = $this->hardwareService->stopReader($session);
-        return $response;
+    public function exit(): Response {
+        return $this->hardwareService->stopReader();
     }
 }

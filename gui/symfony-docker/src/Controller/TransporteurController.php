@@ -14,7 +14,6 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -44,10 +43,9 @@ class TransporteurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_transporteur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo,
-                                SessionInterface $session): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -73,10 +71,9 @@ class TransporteurController extends AbstractController
 
     #[Route('/list', name: 'app_transporteur_list')]
     public function list(ResourcesListHandler $listHandler,
-                         Request $request,
-                         SessionInterface $session) : Response
+                         Request $request) : Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

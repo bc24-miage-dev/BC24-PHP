@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Handlers\UserResearchHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -28,9 +27,9 @@ class SearchController extends AbstractController
     
     
     #[Route('/', name: 'app_search')]
-    public function search(Request $request, SessionInterface $session): Response
+    public function search(Request $request): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }

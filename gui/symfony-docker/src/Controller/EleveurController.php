@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\HardwareService;
 
 
@@ -55,10 +54,9 @@ class EleveurController extends AbstractController
 
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
-                              ResourceHandler $handler,
-                              SessionInterface $session): Response
+                              ResourceHandler $handler): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -86,10 +84,9 @@ class EleveurController extends AbstractController
 
     #[Route('/list', name: 'app_eleveur_list')]
     public function list(Request $request,
-                         ResourcesListHandler $listHandler,
-                         SessionInterface $session): Response
+                         ResourcesListHandler $listHandler): Response
     {
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
@@ -115,10 +112,9 @@ class EleveurController extends AbstractController
 
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo,
-                                SessionInterface $session): Response {
+                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response {
 
-        $response = $this->hardwareService->startReader($session);
+        $response = $this->hardwareService->startReader();
         if ($response !== null) {
             return $response;
         }
