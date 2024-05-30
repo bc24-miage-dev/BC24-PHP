@@ -135,30 +135,30 @@
 {% block script %}
 <!-- Optional additional scripts -->
 <script>
-        var exitRequested = false;
+    var exitRequested = false;
 
-        function sendExitRequest() {
-            if (!exitRequested) {
-                navigator.sendBeacon('{{ path('app_exit') }}');
-                exitRequested = true;
-            }
+    function sendExitRequest() {
+        if (!exitRequested) {
+            navigator.sendBeacon('{{ path('app_exit') }}');
+            exitRequested = true;
         }
+    }
 
-        window.addEventListener('beforeunload', sendExitRequest);
+    window.addEventListener('beforeunload', sendExitRequest);
 
-        document.querySelectorAll('a').forEach(function(link) {
-            link.addEventListener('click', function(event) {
-                var href = event.target.getAttribute('href'); 
-                if (href) {
-                    event.preventDefault();
-                    sendExitRequest();
-                    setTimeout(function() {
-                        window.location.href = href;
-                    }, 100);
-                }
-            });
+    document.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            var href = event.target.getAttribute('href'); 
+            if (href) {
+                event.preventDefault();
+                sendExitRequest();
+                setTimeout(function() {
+                    window.location.href = href;
+                }, 100);
+            }
         });
-    </script>
+    });
+</script>
 
 {% endblock %}
 </body>

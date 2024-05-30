@@ -21,16 +21,24 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\HardwareService;
+
 
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
+    private HardwareService $hardwareService;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, HardwareService $hardwareService)
     {
         $this->entityManager = $entityManager;
+        $this->hardwareService = $hardwareService;
     }
+
+
 
     #[Route('/', name: 'app_admin_index')]
     public function admin(): Response
@@ -38,10 +46,16 @@ class AdminController extends AbstractController
         return $this->render('admin/admin.html.twig');
     }
 
+
     #[Route('/add', name: 'app_admin_add')] // Resource creation
     public function add(Request $request,
-                        ResourceHandler $handler): Response
+                        ResourceHandler $handler,
+                        SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $resource = $handler->createDefaultNewResource($this->getUser());
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
@@ -65,13 +79,18 @@ class AdminController extends AbstractController
         return $this->render('admin/add.html.twig', [
             'form' => $form->createView()
         ]);
-
     }
+
 
     #[Route('/modify', name: 'app_admin_modify')] // Resource list for modification
     public function modify(ResourceRepository $resourceRepo,
-                           Request $request): Response
+                           Request $request,
+                           SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -82,12 +101,18 @@ class AdminController extends AbstractController
         return $this->render('admin/modify.html.twig', ['resources' => $resources, 'form' => $form->createView()]);
     }
 
+
     #[Route('/modify/{id}', name: 'app_admin_modifySpecific')] // Resource modification
     public function modifySpecific(Request $request,
                                    ResourceHandler $resourceHandler,
                                    ResourceRepository $resourceRepo,
-                                   $id): Response
+                                   $id,
+                                   SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $resource = $resourceRepo->find($id);
         if (!$resource) {
             $this->addFlash('error', 'Ressource introuvable');
@@ -112,12 +137,14 @@ class AdminController extends AbstractController
                 'composants' => $resource->getComponents()]);
     }
 
+
     #[Route('/reportList', name: 'app_admin_reportList')]
     public function reportList(ReportRepository $reportRepo): Response
     {
         $report = $reportRepo->findBy(criteria:['read' => false], orderBy:['date' => 'DESC']);
         return $this->render('admin/reportList.html.twig', ['report' => $report]);
     }
+
 
     #[Route('/checkReport/{id}', name: 'app_admin_checkReport')]
 
@@ -128,6 +155,7 @@ class AdminController extends AbstractController
         $resource = $report->getResource();
         return $this->render('admin/checkReport.html.twig', ['report' => $report, 'resource' => $resource]);
     }
+
 
     #[Route('/checkReportProcess/{idRep}/{action}', name: 'app_admin_checkReportProcess')]
     public function checkReportProcess(ReportRepository $reportRepo,
@@ -148,6 +176,7 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin_reportList');
     }
 
+
     #[Route('/userList', name: 'app_admin_userList')]
 
     public function userList(UserRepository $userRepo,
@@ -157,6 +186,7 @@ class AdminController extends AbstractController
         $pSites = $productionSiteRepo->findAll();
         return $this->render('admin/userList.html.twig', ['users' => $users, 'pSites' => $pSites]);
     }
+
 
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
     public function userEdit(UserRepository $userRepo,
@@ -169,6 +199,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_userList');
     }
+
 
     #[Route('/userProdSiteEdit/{id}/{productionSiteId}', name: 'app_admin_userProdSiteEdit')]
     public function userProdSiteEdit(UserRepository $userRepo,
@@ -189,8 +220,8 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin_userList');
     }
 
-    #[Route('/productionSite', name: 'app_productionSite')]
 
+    #[Route('/productionSite', name: 'app_productionSite')]
     public function createProductionSite(Request $request): Response
     {
         $productionSite = new ProductionSite();
@@ -210,12 +241,14 @@ class AdminController extends AbstractController
         ]);
     }
 
+
     #[Route('/request/check', name: 'app_admin_request_check')]
     public function userRequestCheck(UserRoleRequestRepository $roleRequestRepo): Response
     {
         $UserRoleRequest = $roleRequestRepo->findBy(['Read' => false]); // Select all unread requests
         return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
     }
+
 
     #[Route('/request/roleEdit/{id}/{validation}/{role}', name: 'app_admin_request_roleEdit')]
     public function userRequestRoleEdit(UserRoleRequestRepository $roleRequestRepo,
@@ -237,6 +270,7 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('app_admin_userList');
     }
+
 
     #[Route('/request/roleEdit/WalletAdress/{id}', name: 'app_admin_userWalletAddressEdit')]
     public function userWalletAddressEdit(UserRepository $userRepo,
@@ -263,6 +297,7 @@ class AdminController extends AbstractController
         $productionSite = $roleRequestRepo->findBy(['Read' => false]);
         return $this->render('admin/productionSiteRequestList.html.twig', ['productionSiteList' => $productionSite]);
     }
+
 
     #[Route('/request/productionSiteRequestEdit/{id}/{validation}', name: 'app_admin_request_productionSiteRequestEdit')]
 

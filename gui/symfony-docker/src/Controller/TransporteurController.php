@@ -13,19 +13,27 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\HardwareService;
+
 
 #[Route('/pro/transporteur')]
 class TransporteurController extends AbstractController
 {
 
+    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private ProHandler $proHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler)
+    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler, HardwareService $hardwareService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->proHandler = $proHandler;
+        $this->hardwareService = $hardwareService;
     }
+
+    
 
     #[Route('/', name: 'app_transporteur_index')]
     public function index(): Response
@@ -36,8 +44,13 @@ class TransporteurController extends AbstractController
 
     #[Route('/acquisition', name: 'app_transporteur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo,
+                                SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -57,10 +70,16 @@ class TransporteurController extends AbstractController
         ]);
     }
 
+
     #[Route('/list', name: 'app_transporteur_list')]
     public function list(ResourcesListHandler $listHandler,
-                         Request $request) : Response
+                         Request $request,
+                         SessionInterface $session) : Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -77,6 +96,7 @@ class TransporteurController extends AbstractController
             ['resources' => $resources]
         );
     }
+
 
     #[Route('/specific/{id}', name: 'app_transporteur_specific')]
     public function specific(ResourceRepository $resourceRepository,
@@ -102,6 +122,7 @@ class TransporteurController extends AbstractController
         );
     }
 
+
     #[Route('/transaction/{id}', name: 'app_transporteur_transfer', requirements: ['id' => '\d+'])]
     public function transfer($id): RedirectResponse
     {
@@ -116,6 +137,7 @@ class TransporteurController extends AbstractController
         }
     }
 
+
     #[Route('/transactionRefused/{id}', name: 'app_transporteur_transferRefused', requirements: ['id' => '\d+'])]
     public function transferRefused($id): RedirectResponse
     {
@@ -128,6 +150,7 @@ class TransporteurController extends AbstractController
             return $this->redirectToRoute('app_transporteur_transferList');
         }
     }
+
 
     #[Route('/transaction/all' , name: 'app_transporteur_transferAll')]
     public function transferAll(): RedirectResponse

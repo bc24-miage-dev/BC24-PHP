@@ -19,24 +19,31 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\HardwareService;
+
 
 #[Route('/pro/equarrisseur')]
 class EquarrisseurController extends AbstractController
 {
-
+    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private EquarrisseurHandler $equarrisseurHandler;
-
     private ResourceRepository $resourceRepository;
 
     public function __construct(TransactionHandler $transactionHandler,
                                 EquarrisseurHandler $equarrisseurHandler,
-                                ResourceRepository $resourceRepository)
+                                ResourceRepository $resourceRepository,
+                                HardwareService $hardwareService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->equarrisseurHandler = $equarrisseurHandler;
         $this->resourceRepository = $resourceRepository;
+        $this->hardwareService = $hardwareService;
     }
+
+
 
     #[Route('/', name: 'app_equarrisseur_index')]
     public function index(): Response
@@ -44,10 +51,16 @@ class EquarrisseurController extends AbstractController
         return $this->render('pro/equarrisseur/index.html.twig');
     }
 
+
     #[Route('/acquisition', name: 'app_equarrisseur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo,
+                                SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -67,11 +80,17 @@ class EquarrisseurController extends AbstractController
         ]);
     }
 
+
     #[Route('/list/{category}', name: 'app_equarrisseur_list')] // An 'Equarrisseur' have access to the list of his animals and carcasses
     public function list(ResourcesListHandler $listHandler,
                          String $category,
-                         Request $request) : Response
+                         Request $request,
+                         SessionInterface $session) : Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -111,8 +130,13 @@ class EquarrisseurController extends AbstractController
     #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
     public function equarrir(ResourceHandler $handler,
                              Request $request,
-                             $id) : Response
+                             $id,
+                             SessionInterface $session) : Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $resource = $this->resourceRepository->findOneBy(['id' => $id]);
         if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
             $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
@@ -140,8 +164,13 @@ class EquarrisseurController extends AbstractController
 
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
     public function decoupe(Request $request,
-                            $id) : Response
+                            $id,
+                            SessionInterface $session) : Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $resource = $this->resourceRepository->findOneBy(['id'=> $id]);
         if (!$this->equarrisseurHandler->canSlice($resource, $this->getUser()))
         {

@@ -19,13 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\HardwareService;
+
 
 #[Route('/pro/eleveur')]
 class EleveurController extends AbstractController
 {
-    private HttpClientInterface $httpClient;
+    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private EleveurHandler $eleveurHandler;
     private EntityManagerInterface $entityManager;
@@ -35,14 +36,16 @@ class EleveurController extends AbstractController
                                 EleveurHandler $eleveurHandler,
                                 EntityManagerInterface $entityManager,
                                 ResourceRepository $resourceRepository,
-                                HttpClientInterface $httpClient)
+                                HardwareService $hardwareService)
     {
         $this->transactionHandler = $handler;
         $this->eleveurHandler = $eleveurHandler;
         $this->entityManager = $entityManager;
         $this->resourceRepository = $resourceRepository;
-        $this->httpClient = $httpClient;
+        $this->hardwareService = $hardwareService;
     }
+
+
 
     #[Route('/', name: 'app_eleveur_index')]
     public function index(): Response
@@ -55,23 +58,10 @@ class EleveurController extends AbstractController
                               ResourceHandler $handler,
                               SessionInterface $session): Response
     {
-        try {
-            // APPEL STARTREADER
-            //$this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-            $session->set('reader_started', true);
-        } catch (ClientException $e) {
-            if ($e->getCode() === 403) {
-                // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
-                return new Response("Le scanner n'est pas activé, veuillez rafraîchir la page", Response::HTTP_FORBIDDEN);
-            } else {
-                // Pour d'autres types d'erreurs
-                $errorMessage = $e->getMessage();
-                $this->logger->error('Erreur lors de la requête HTTP : ' . $errorMessage);
-                // Ou afficher un message d'erreur générique à l'utilisateur
-                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
         }
-
         $form = $this->createForm(EleveurBirthType::class,
             $resource = $handler->createDefaultNewResource($this->getUser()));
         $form->handleRequest($request);
@@ -99,23 +89,10 @@ class EleveurController extends AbstractController
                          ResourcesListHandler $listHandler,
                          SessionInterface $session): Response
     {
-        try {
-            // APPEL STARTREADER
-            //$this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-            $session->set('reader_started', true);
-        } catch (ClientException $e) {
-            if ($e->getCode() === 403) {
-                // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
-                return new Response("Le scanner n'est pas activé, veuillez rafraîchir la page", Response::HTTP_FORBIDDEN);
-            } else {
-                // Pour d'autres types d'erreurs
-                $errorMessage = $e->getMessage();
-                $this->logger->error('Erreur lors de la requête HTTP : ' . $errorMessage);
-                // Ou afficher un message d'erreur générique à l'utilisateur
-                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
         }
-
         if ($request->isMethod('POST')) {
             try {
                 $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -141,23 +118,10 @@ class EleveurController extends AbstractController
                                 OwnershipAcquisitionRequestRepository $ownershipRepo,
                                 SessionInterface $session): Response {
 
-        try {
-            // APPEL STARTREADER
-            //$this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-            $session->set('reader_started', true);
-        } catch (ClientException $e) {
-            if ($e->getCode() === 403) {
-                // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
-                return new Response("Le scanner n'est pas activé, veuillez rafraîchir la page", Response::HTTP_FORBIDDEN);
-            } else {
-                // Pour d'autres types d'erreurs
-                $errorMessage = $e->getMessage();
-                $this->logger->error('Erreur lors de la requête HTTP : ' . $errorMessage);
-                // Ou afficher un message d'erreur générique à l'utilisateur
-                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
         }
-
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

@@ -14,20 +14,26 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\ResourceNfcType;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\HardwareService;
+
 
 #[Route('/pro/distributeur')]
 class DistributeurController extends AbstractController
 {
 
+    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
-
     private DistributeurHandler $distributeurHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, DistributeurHandler $distributeurHandler)
+    public function __construct(TransactionHandler $transactionHandler, DistributeurHandler $distributeurHandler, HardwareService $hardwareService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->distributeurHandler = $distributeurHandler;
+        $this->hardwareService = $hardwareService;
     }
+
 
     #[Route('/', name: 'app_distributeur_index')]
     public function index(): Response
@@ -35,10 +41,16 @@ class DistributeurController extends AbstractController
         return $this->render('pro/distributeur/index.html.twig');
     }
 
+
     #[Route('/acquisition', name: 'app_distributeur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
+                                OwnershipAcquisitionRequestRepository $ownershipRepo,
+                                SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -58,10 +70,16 @@ class DistributeurController extends AbstractController
         ]);
     }
 
+
     #[Route('/list', name: 'app_distributeur_list')]
     public function list(ResourcesListHandler $listHandler,
-                         Request $request) : Response
+                         Request $request,
+                         SessionInterface $session) : Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -80,6 +98,7 @@ class DistributeurController extends AbstractController
         );
     }
 
+
     #[Route('/specific/{id}', name: 'app_distributeur_specific')]
     public function specific(ResourceRepository $resourceRepo, $id) : Response
     {
@@ -94,10 +113,13 @@ class DistributeurController extends AbstractController
     }
 
 
-
     #[Route('/vente', name: 'app_distributeur_vendu')]
-    public function vendre(Request $request): Response
+    public function vendre(Request $request, SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $form = $this->createForm(ResourceNfcType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

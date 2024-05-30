@@ -19,18 +19,27 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\HardwareService;
+
 
 #[Route('/pro/usine')]
 class  UsineController extends AbstractController
 {
+    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private UsineHandler $usineHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler)
+    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler, HardwareService $hardwareService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->usineHandler = $usineHandler;
+        $this->hardwareService = $hardwareService;
     }
+
+    
+
 
     #[Route('/', name: 'app_usine_index')]
     public function index(): Response
@@ -38,10 +47,16 @@ class  UsineController extends AbstractController
         return $this->render('pro/usine/index.html.twig');
     }
 
+
     #[Route('/arrivage', name:'app_usine_acquire')]
     public function acquire(Request $request,
-                            OwnershipAcquisitionRequestRepository $ownershipRepo): Response
+                            OwnershipAcquisitionRequestRepository $ownershipRepo,
+                            SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -61,11 +76,17 @@ class  UsineController extends AbstractController
         ]);
     }
 
+
     #[Route('/list/{category}', name: 'app_usine_list')]
     public function list(ResourcesListHandler $listHandler,
                          Request $request,
-                         $category): Response
+                         $category,
+                         SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -85,6 +106,7 @@ class  UsineController extends AbstractController
 
     }
 
+
     #[Route('/specific/{id}', name: 'app_usine_specific')]
     public function specific(ResourceRepository $resourceRepo,
                              $id): Response
@@ -102,12 +124,18 @@ class  UsineController extends AbstractController
         ]);
     }
 
+
     #[Route('/decoupe/{id}', name: 'app_usine_decoupe')]
     public function decoupe(Request $request,
                             ResourceRepository $resourceRepository,
                             ResourceNameRepository $nameRepository,
-                            $id): Response
+                            $id,
+                            SessionInterface $session): Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $demiCarcasse = $resourceRepository->find($id);
 
         if (!$this->usineHandler->canCutIntoPieces($demiCarcasse, $this->getUser())) {
@@ -139,6 +167,7 @@ class  UsineController extends AbstractController
         ]);
     }
 
+
     #[Route('/creationRecette/name', name: 'app_usine_creationRecetteName')]
     public function creationRecetteName(ResourceFamilyRepository $repoFamily): Response
     {
@@ -148,6 +177,7 @@ class  UsineController extends AbstractController
             'families' => $families
         ]);
     }
+
 
     #[Route('/creationRecette/ingredients', name: 'app_usine_creationRecetteIngredients')]
     public function creationRecetteIngredients(Request $request): Response
@@ -168,6 +198,7 @@ class  UsineController extends AbstractController
         return $this->redirectToRoute('app_usine_creationRecetteName');
     }
 
+
     #[Route('/creationRecette/process', name: 'app_usine_creationRecetteProcess')]
     public function creationRecetteProcess(Request $request) : RedirectResponse
     {
@@ -186,6 +217,7 @@ class  UsineController extends AbstractController
         return $this->redirectToRoute('app_usine_creationRecetteName');
     }
 
+
     #[Route('/choixRecette', name: 'app_usine_choixRecette')]
     public function choixRecette(ResourceNameRepository $nameRepo) : Response
     {
@@ -195,12 +227,18 @@ class  UsineController extends AbstractController
         ]);
     }
 
+
     #[Route('/recette/{id}', name: 'app_usine_recette')]
     public function appliRecette($id,
                                  Request $request,
                                  RecipeRepository $recipeRepo,
-                                 ResourceNameRepository $nameRepo) : Response
+                                 ResourceNameRepository $nameRepo,
+                                 SessionInterface $session) : Response
     {
+        $response = $this->hardwareService->startReader($session);
+        if ($response !== null) {
+            return $response;
+        }
         $ingredients = $recipeRepo->findBy(['recipeTitle' => $id]);
         $recipeTitle = $nameRepo->find($id);
 
@@ -223,6 +261,7 @@ class  UsineController extends AbstractController
             ['ingredients' => $ingredients, 'product' => $recipeTitle]);
     }
 
+
     #[Route('/transaction', name: 'app_usine_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
@@ -232,6 +271,7 @@ class  UsineController extends AbstractController
             ['requests' => $requests, 'pastTransactions' => $pastTransactions]
         );
     }
+
 
     #[Route('/transaction/{id}', name: 'app_usine_transfer', requirements: ['id' => '\d+'])]
     public function transfer($id): RedirectResponse
@@ -246,6 +286,7 @@ class  UsineController extends AbstractController
         }
     }
 
+
     #[Route('/transactionRefused/{id}', name: 'app_usine_transferRefused', requirements: ['id' => '\d+'])]
     public function transferRefused($id): RedirectResponse
     {
@@ -258,6 +299,7 @@ class  UsineController extends AbstractController
             return $this->redirectToRoute('app_usine_transferList');
         }
     }
+
 
     #[Route('/transaction/all' , name: 'app_usine_transferAll')]
     public function transferAll(): RedirectResponse
