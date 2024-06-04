@@ -170,31 +170,6 @@
 <script src="{{ asset('assets/js/breakpoints.min.js') }}"></script>
 <script src="{{ asset('assets/js/util.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
-
-<script>
-    var exitRequested = false;
-
-    function sendExitRequest() {
-        if (!exitRequested) {
-            navigator.sendBeacon('{{ path('app_exit') }}');
-            exitRequested = true;
-        }
-    }
-
-    window.addEventListener('beforeunload', sendExitRequest);
-
-    document.querySelectorAll('a').forEach(function(link) {
-        link.addEventListener('click', function(event) {
-            var href = event.target.getAttribute('href'); 
-            if (href) {
-                event.preventDefault();
-                sendExitRequest();
-                setTimeout(function() {
-                    window.location.href = href;
-                }, 100);
-            }
-        });
-    });
-</script>
+<script src="{{ asset('assets/js/scanner.js') }}"></script>
 
 </html>

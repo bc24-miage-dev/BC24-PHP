@@ -10,6 +10,7 @@ use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\NetworkException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Psr\Log\LoggerInterface;
 
 
@@ -23,10 +24,24 @@ class HardwareService {
         $this->logger = $logger;
     }
 
-    public function startReader(): ?Response {
+
+    public function startReader(): JsonResponse {
         try {
-            $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-            $this->reader_started = true;
+            //TO BE DECOMMENTED
+            //$response = $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
+            //return $response->getContent(); // Obtenir le JSON brut
+
+            //TO BE COMMENTED
+            $data = [
+                "NFT_tokenID" => "11111",
+                "date_creation" => "2024-05-08",
+                "date_derniere_modification" => "2024-05-30",
+                "gps" => "{'latitude': 0.0, 'longitude': 0.0, 'altitude': None}",
+                "temperature" => "28.05",
+                "uid" => "BA:44:47:73"
+            ];
+            return new JsonResponse(['data' => $data]);
+
         } catch (ClientException $e) {
             if ($e->getCode() === 403) {
                 // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
@@ -52,31 +67,4 @@ class HardwareService {
         return null;
     }
 
-
-    public function stopReader(): Response {
-        try {
-            $this->httpClient->request('GET', 'http://127.0.0.1:5000/stopReader');
-            $this->reader_started = false;
-            return new Response('Reader stopped successfully.', Response::HTTP_OK);
-        } catch (ClientException $e) {
-            if ($e->getCode() === 403) {
-                return new Response("Le scanner ne s'est pas stoppé, veuillez lancer une requête 'curl -X GET http://127.0.0.1:5000/stopReader'", Response::HTTP_FORBIDDEN);
-            } else {
-                $this->logger->error('Erreur lors de la requête HTTP : ' . $e->getMessage());
-                return new Response('Une erreur s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
-            }
-        } catch (ServerException $e) {
-            // Pour les erreurs serveur
-            $this->logger->error('Erreur serveur lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-            return new Response('Une erreur s\'est produite lors de la requête HTTP (server error).', Response::HTTP_INTERNAL_SERVER_ERROR);
-        } catch (NetworkException $e) {
-            // Pour les erreurs de réseau
-            $this->logger->error('Erreur réseau lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-            return new Response('Une erreur réseau s\'est produite lors de la requête HTTP.', Response::HTTP_SERVICE_UNAVAILABLE);
-        } catch (\Exception $e) {
-            // Pour toutes les autres erreurs
-            $this->logger->error('Erreur inattendue lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-            return new Response('Une erreur inattendue s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 }

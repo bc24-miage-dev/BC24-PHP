@@ -11,28 +11,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Handlers\UserResearchHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
 
 
 #[Route('/search')]
 class SearchController extends AbstractController
 {
-    private HardwareService $hardwareService;
-
-    public function __construct(HardwareService $hardwareService)
-    {
-        $this->hardwareService = $hardwareService;
-    }
-
-    
     
     #[Route('/', name: 'app_search')]
     public function search(Request $request): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
 

@@ -22,19 +22,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
 
 
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
-    private HardwareService $hardwareService;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, HardwareService $hardwareService)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->hardwareService = $hardwareService;
     }
 
 
@@ -50,10 +47,6 @@ class AdminController extends AbstractController
     public function add(Request $request,
                         ResourceHandler $handler): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $resource = $handler->createDefaultNewResource($this->getUser());
         $form = $this->createForm(ResourceType::class, $resource);
         $form->handleRequest($request);
@@ -84,10 +77,6 @@ class AdminController extends AbstractController
     public function modify(ResourceRepository $resourceRepo,
                            Request $request): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -105,10 +94,6 @@ class AdminController extends AbstractController
                                    ResourceRepository $resourceRepo,
                                    $id): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $resource = $resourceRepo->find($id);
         if (!$resource) {
             $this->addFlash('error', 'Ressource introuvable');

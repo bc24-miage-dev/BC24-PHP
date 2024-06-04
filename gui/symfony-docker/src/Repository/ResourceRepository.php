@@ -58,7 +58,7 @@ class ResourceRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByWalletAddressAndNFC(String $walletAddress, int $NFC): array
+    public function findByWalletAddressAndNFC(String $walletAddress, String $NFC): array
     {
         return $this->createQueryBuilder('r')
                 ->join('r.currentOwner', 'c')
@@ -91,7 +91,7 @@ class ResourceRepository extends ServiceEntityRepository
 
 
 
-    public function findByWalletAddressNFC(String $walletAddress, int $NFC): array
+    public function findByWalletAddressNFC(String $walletAddress, String $NFC): array
     {
         return $this->createQueryBuilder('r')
                 ->join('r.currentOwner', 'u')

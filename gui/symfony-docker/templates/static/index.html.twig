@@ -30,11 +30,11 @@
         <div class="hero-content">
             <h1>Rechercher un produit</h1>
             {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-            {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par Tag NFC'}}) }}
+            {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherche par NFC'}}) }}
             <button type="submit" class="search-button"><img src="{{ asset('images/Rechercher.png') }}" alt="Search" /></button>
             {{ form_end(form) }}
             <br>
-            <button type="button" class="scanner-button">Scanner pour rechercher</button>
+            <button type="button" class="scanner-button" id="scanner-button">Scanner pour rechercher</button>
         </div>
     </div>
 

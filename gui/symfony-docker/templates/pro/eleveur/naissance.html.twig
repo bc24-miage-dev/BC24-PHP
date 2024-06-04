@@ -6,9 +6,9 @@
 
 {{ form_start(form) }}
     <label>Tag NFC:
-        <input type="number" name="{{ field_name(form.id) }}" class="form-control" required>
+        <input name="{{ field_name(form.id) }}" class="form-control search-input" required>
     </label>
-    <button disabled class="btn btn-primary">Scanner</button>
+    <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button>
     <br>
     <label> Espèce de l'animal :
         <select name="{{ field_name(form.ResourceName) }}" class="form-control">

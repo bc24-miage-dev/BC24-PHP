@@ -19,13 +19,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
 
 
 #[Route('/pro/eleveur')]
 class EleveurController extends AbstractController
 {
-    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private EleveurHandler $eleveurHandler;
     private EntityManagerInterface $entityManager;
@@ -34,14 +32,12 @@ class EleveurController extends AbstractController
     public function __construct(TransactionHandler $handler,
                                 EleveurHandler $eleveurHandler,
                                 EntityManagerInterface $entityManager,
-                                ResourceRepository $resourceRepository,
-                                HardwareService $hardwareService)
+                                ResourceRepository $resourceRepository)
     {
         $this->transactionHandler = $handler;
         $this->eleveurHandler = $eleveurHandler;
         $this->entityManager = $entityManager;
         $this->resourceRepository = $resourceRepository;
-        $this->hardwareService = $hardwareService;
     }
 
 
@@ -56,10 +52,6 @@ class EleveurController extends AbstractController
     public function naissance(Request $request,
                               ResourceHandler $handler): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(EleveurBirthType::class,
             $resource = $handler->createDefaultNewResource($this->getUser()));
         $form->handleRequest($request);
@@ -86,10 +78,6 @@ class EleveurController extends AbstractController
     public function list(Request $request,
                          ResourcesListHandler $listHandler): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         if ($request->isMethod('POST')) {
             try {
                 $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -114,10 +102,6 @@ class EleveurController extends AbstractController
     public function acquisition(Request $request,
                                 OwnershipAcquisitionRequestRepository $ownershipRepo): Response {
 
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

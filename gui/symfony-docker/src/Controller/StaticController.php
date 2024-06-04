@@ -13,23 +13,11 @@ use App\Service\HardwareService;
 
 
 class StaticController extends AbstractController
-{
-    private HardwareService $hardwareService;
-
-    public function __construct(HardwareService $hardwareService)
-    {
-        $this->hardwareService = $hardwareService;
-    }
-
-    
+{   
 
     #[Route('/', name: 'app_index')]
     public function index(Request $request): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
 
@@ -40,8 +28,7 @@ class StaticController extends AbstractController
         }
 
         return $this->render('static/index.html.twig', [
-            'form' => $form->createView(),
-            'apiData' => $data, // Passer les données API à la vue si nécessaire
+            'form' => $form->createView()
         ]);
     }
 
