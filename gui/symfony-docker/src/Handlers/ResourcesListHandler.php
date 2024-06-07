@@ -34,7 +34,7 @@ class ResourcesListHandler
     /**
      * @throws Exception
      */
-    public function getSpecificResource(String $NFC,
+    public function getSpecificResource(int $NFC,
                                         UserInterface $user) : array
     {
         $resourceSpecific = $this->resourceRepo->findByWalletAddressAndNFC($user->getWalletAddress(), $NFC);

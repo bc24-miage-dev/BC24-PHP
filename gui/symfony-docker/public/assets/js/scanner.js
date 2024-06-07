@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     const searchInput = document.querySelector('.search-input');
                     console.log('Type of searchInput:', searchInput.type);
                     console.log('Current value of searchInput:', searchInput.value);
-                    console.log('Setting searchInput value to:', data.data.uid);
+                    console.log('Setting searchInput value to:', data.data.NFT_tokenID);
                     
-                    // Assurez-vous que le champ de saisie est de type texte
-                    if (searchInput && searchInput.type === 'text') {
-                        searchInput.value = data.data.uid;
+                    // Assurez-vous que le champ de saisie est de type number
+                    if (searchInput && searchInput.type === 'number') {
+                        searchInput.value = data.data.NFT_tokenID;
                     } else {
-                        console.error('searchInput is not a text input');
+                        console.error('searchInput is not a number input');
                     }
                 } else {
                     alert('Erreur: ' + data.error);

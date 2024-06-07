@@ -33,7 +33,7 @@ class HardwareService {
 
             //TO BE COMMENTED
             $data = [
-                "NFT_tokenID" => "11111",
+                "NFT_tokenID" => 11111,
                 "date_creation" => "2024-05-08",
                 "date_derniere_modification" => "2024-05-30",
                 "gps" => "{'latitude': 0.0, 'longitude': 0.0, 'altitude': None}",
