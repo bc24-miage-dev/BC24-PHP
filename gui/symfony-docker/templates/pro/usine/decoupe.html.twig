@@ -16,16 +16,12 @@
                 <div id="copy">
                 <thead>
                     <tr>
-                        <th>Tag NFC</th>
                         <th>Morceau de viande</th>
                         <th>Poids</th>
                     </tr>
                 </thead>
                     <tbody id="table-body">
                         <tr class="copy-row">
-                            <td>
-                                <input type="number" name="list[1][NFC]" id="tag1" required class="form-control">
-                            </td>
                             <td>
                                 <select name="list[1][name]" id="name1" required class="form-control">
                                     {% for i in range (0,morceauxPossibles|length -1) %}
@@ -37,13 +33,15 @@
                             <td>
                                 <input type="number" name="list[1][weight]" id="weight1" required class="form-control">
                             </td>
+                            <td>
+                                <button type="submit" class="btn btn-primary">Valider</button>
+                            </td>
                         </tr>
                     </tbody>
                 </div>
             </table>
             <input type="button" onclick="ajouterLigne()" value="Ajouter ligne" class="btn btn-secondary">
             <input type="button" onclick="supprimerLigne()" value="Supprimer ligne" class="btn btn-secondary">
-            <button type="submit" class="btn btn-primary">Valider</button>
         </div>
 
 

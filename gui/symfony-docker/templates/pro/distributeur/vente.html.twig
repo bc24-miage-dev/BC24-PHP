@@ -3,18 +3,15 @@
 {% block body %}
     <div class="container-fluid">
         <h1>Vente</h1>
-        <p>Scannez le code du produit vendu</p>
+        <p>Scannez le produit vendu</p>
         <br>
 
-        {{ form_start(form) }}
-        <label> Tag NFC :
-            <input type="number" name="{{ field_name(form.id) }}" class="form-control" >
-        </label>
-
-            <button class="btn btn-primary" disabled>Scanner</button>
+        <form action="" method="post" class="search-form">
+            <label for="NFC">Entrez le NFT ID ou scannez le produit</label><br>
+            <input class="search-input" id="NFC" name="NFC" type="number" required>
+            <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br>
             <button class="btn btn-primary" type="submit">Vente</button>
-
-        {{ form_end(form) }}
+        </form>
 
 
         <br><br>

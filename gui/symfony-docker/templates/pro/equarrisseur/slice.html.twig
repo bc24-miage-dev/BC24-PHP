@@ -2,31 +2,24 @@
 
 {% block body %}
     <div class="container-fluid">
-        <h1>Découpe d'une carcasse</h1>
+        <h1>Découpe de la carcasse</h1>
         <br>
+
 
         <form method="post">
 
-                <label for="tag1">Tag NFC Demi-Carcasse n°1</label>
-                <input type="number" class="form-control" id="tag1" name="tag1" required>
-            <br>
-                <button disabled class="btn btn-primary" id="scan">Scanner</button>
-                <br><br>
-                <label for="weight1">Poids Demi-Carcasse n°1</label>
+            <label for="weight1">Poids Demi-Carcasse n°1</label>
+            <input type="number" class="form-control" id="weight1" name="weight1" required><br>
+            <p>Avant de cliquer sur découper, veuillez vous assurer que seulement le tag NFC qui servira à identifier la 1ère demi-carcasse est à proximité du scanner</p>
+            <button type="submit" class="btn btn-primary">Découper 1/2</button>
 
-                <input type="number" class="form-control" id="weight1" name="weight1" required>
-
+            
             <hr>
 
-                <label for="tag2">Tag NFC Demi-Carcasse n°2</label>
-                <input type="number" class="form-control" id="tag2" name="tag2" required>
-            <br>
-                <button disabled class="btn btn-primary" id="scan">Scanner</button>
-                <br><br>
-                <label for="weight2">Poids Demi-Carcasse n°2</label>
-                <input type="number" class="form-control" id="weight2" name="weight2" required>
-            <br><br>
-            <button type="submit" class="btn btn-primary">Découper</button>
+            <label for="weight2">Poids Demi-Carcasse n°2</label>
+            <input type="number" class="form-control" id="weight2" name="weight2" required><br>
+            <p>Avant de cliquer sur découper, veuillez vous assurer que seulement le tag NFC qui servira à identifier la 2ème demi-carcasse est à proximité du scanner</p>
+            <button type="submit" class="btn btn-primary">Découper 2/2</button>
         </form>
     </div>
 

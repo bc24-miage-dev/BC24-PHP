@@ -3,11 +3,10 @@
 {%  block body %}
 
     <div class="container-fluid">
-        <form action="" method="post">
-            <label for="NFC">Tag NFC de la ressource</label>
-            <input required type="number" class="form-control" id="NFC" name="NFC">
-            <br>
-            <button disabled id="scan" class="btn btn-primary">Scanner</button>
+        <form action="" method="post" class="search-form">
+            <label for="NFC">Entrez le NFT ID ou scannez la ressource</label><br>
+            <input class="search-input" id="NFC" name="NFC" type="number" required>
+            <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br>
             <button type="submit" class="btn btn-primary">Chercher</button>
         </form>
         {% if resources %}
