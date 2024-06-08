@@ -20,26 +20,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
-
 
 #[Route('/pro/equarrisseur')]
 class EquarrisseurController extends AbstractController
 {
-    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private EquarrisseurHandler $equarrisseurHandler;
     private ResourceRepository $resourceRepository;
 
     public function __construct(TransactionHandler $transactionHandler,
                                 EquarrisseurHandler $equarrisseurHandler,
-                                ResourceRepository $resourceRepository,
-                                HardwareService $hardwareService)
+                                ResourceRepository $resourceRepository)
     {
         $this->transactionHandler = $transactionHandler;
         $this->equarrisseurHandler = $equarrisseurHandler;
         $this->resourceRepository = $resourceRepository;
-        $this->hardwareService = $hardwareService;
     }
 
 
@@ -55,10 +50,6 @@ class EquarrisseurController extends AbstractController
     public function acquisition(Request $request,
                                 OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -84,10 +75,6 @@ class EquarrisseurController extends AbstractController
                          String $category,
                          Request $request) : Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -129,10 +116,6 @@ class EquarrisseurController extends AbstractController
                              Request $request,
                              $id) : Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $resource = $this->resourceRepository->findOneBy(['id' => $id]);
         if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
             $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
@@ -162,10 +145,6 @@ class EquarrisseurController extends AbstractController
     public function decoupe(Request $request,
                             $id) : Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $resource = $this->resourceRepository->findOneBy(['id'=> $id]);
         if (!$this->equarrisseurHandler->canSlice($resource, $this->getUser()))
         {

@@ -15,22 +15,18 @@ use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\ResourceNfcType;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
-
 
 #[Route('/pro/distributeur')]
 class DistributeurController extends AbstractController
 {
 
-    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private DistributeurHandler $distributeurHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, DistributeurHandler $distributeurHandler, HardwareService $hardwareService)
+    public function __construct(TransactionHandler $transactionHandler, DistributeurHandler $distributeurHandler)
     {
         $this->transactionHandler = $transactionHandler;
         $this->distributeurHandler = $distributeurHandler;
-        $this->hardwareService = $hardwareService;
     }
 
 
@@ -45,10 +41,6 @@ class DistributeurController extends AbstractController
     public function acquisition(Request $request,
                                 OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -73,10 +65,6 @@ class DistributeurController extends AbstractController
     public function list(ResourcesListHandler $listHandler,
                          Request $request) : Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -113,10 +101,6 @@ class DistributeurController extends AbstractController
     #[Route('/vente', name: 'app_distributeur_vendu')]
     public function vendre(Request $request): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(ResourceNfcType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

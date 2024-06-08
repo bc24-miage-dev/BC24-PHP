@@ -20,21 +20,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
 
 
 #[Route('/pro/usine')]
 class  UsineController extends AbstractController
 {
-    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private UsineHandler $usineHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler, HardwareService $hardwareService)
+    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler)
     {
         $this->transactionHandler = $transactionHandler;
         $this->usineHandler = $usineHandler;
-        $this->hardwareService = $hardwareService;
     }
 
     
@@ -51,10 +48,6 @@ class  UsineController extends AbstractController
     public function acquire(Request $request,
                             OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -80,10 +73,6 @@ class  UsineController extends AbstractController
                          Request $request,
                          $category): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -128,10 +117,6 @@ class  UsineController extends AbstractController
                             ResourceNameRepository $nameRepository,
                             $id): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $demiCarcasse = $resourceRepository->find($id);
 
         if (!$this->usineHandler->canCutIntoPieces($demiCarcasse, $this->getUser())) {
@@ -230,10 +215,6 @@ class  UsineController extends AbstractController
                                  RecipeRepository $recipeRepo,
                                  ResourceNameRepository $nameRepo) : Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $ingredients = $recipeRepo->findBy(['recipeTitle' => $id]);
         $recipeTitle = $nameRepo->find($id);
 

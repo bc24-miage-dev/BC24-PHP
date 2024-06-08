@@ -14,22 +14,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Service\HardwareService;
-
 
 #[Route('/pro/transporteur')]
 class TransporteurController extends AbstractController
 {
 
-    private HardwareService $hardwareService;
     private TransactionHandler $transactionHandler;
     private ProHandler $proHandler;
 
-    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler, HardwareService $hardwareService)
+    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler)
     {
         $this->transactionHandler = $transactionHandler;
         $this->proHandler = $proHandler;
-        $this->hardwareService = $hardwareService;
     }
 
     
@@ -45,10 +41,6 @@ class TransporteurController extends AbstractController
     public function acquisition(Request $request,
                                 OwnershipAcquisitionRequestRepository $ownershipRepo): Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -73,10 +65,6 @@ class TransporteurController extends AbstractController
     public function list(ResourcesListHandler $listHandler,
                          Request $request) : Response
     {
-        $response = $this->hardwareService->startReader();
-        if ($response !== null) {
-            return $response;
-        }
         if ($request->isMethod('POST')) {
             try {
                 $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
