@@ -4,10 +4,9 @@
     <div class="container-fluid">
         <h1 class="mt-4">Liste de vos animaux</h1>
         <form action="" method="post" class="search-form">
-            <label for="NFC">NFT de la ressource</label>
+            <label for="NFC">Entrez le NFT ID ou scanner la ressource</label><br>
             <input class="search-input" id="NFC" name="NFC" type="number" required>
-            <br>
-            <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button>
+            <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br>
             <button type="submit" class="btn btn-primary">Chercher</button>
         </form>
 
@@ -24,6 +23,7 @@
         {% endfor %}
 
     {% else %}
+        <br><br>
         <p>Vous n'avez pas encore d'animaux</p>
     {% endif %}
     </div>

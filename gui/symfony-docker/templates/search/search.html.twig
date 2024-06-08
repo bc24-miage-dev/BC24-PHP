@@ -11,7 +11,7 @@
         <div class="hero-content">
             <h1>Rechercher un produit</h1>
             {{ form_start(form) }}
-            <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="identifiant nft" type="number" required>
+            <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="Entrez le NFT ID ou scanner la ressource" type="number" required>
             <button type="button" class="scanner-button" id="scanner-button">Scanner la ressource</button>
             {{ form_end(form) }}
             <br>
