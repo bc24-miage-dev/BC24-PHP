@@ -28,7 +28,7 @@
         })
         }}
 
-        <label> NFC des Composants :
+        <label> NFT des Composants :
             {% if composants|length > 0 %}
                 {% for i in 0..(composants|length - 1) %}
                     <input class="ml-3" type="number" name="{{ field_name(form.components) }}" value="{{ composants[i].id }}">

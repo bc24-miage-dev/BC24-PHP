@@ -5,11 +5,6 @@
     <h1>Signalez une naissance :</h1><br>
 
 {{ form_start(form) }}
-    <label>Ressource:
-        <input name="{{ field_name(form.id) }}" class="form-control search-input" type="number" required>
-    </label>
-    <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button>
-    <br>
     <label> Espèce de l'animal :
         <select name="{{ field_name(form.ResourceName) }}" class="form-control">
             {% for name, id in field_choices(form.ResourceName) %}

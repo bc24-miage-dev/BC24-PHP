@@ -4,11 +4,12 @@
 
     <div class="container-fluid">
         <h1>Modifier une ressource : </h1><br>
-        {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Recherchez par Tag NFC'}}) }}<br>
-        <button disabled class="btn btn-primary">Scanner</button>
-        <button type="submit" class="btn btn-primary">Rechercher</button>
-        {{ form_end(form) }}
+        <form action="" method="post" class="search-form">
+            <label for="NFC">Entrez le NFT ID ou scannez la ressource</label><br>
+            <input class="search-input" id="NFC" name="NFC" type="number" required>
+            <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br>
+            <button type="submit" class="btn btn-primary">Chercher</button>
+        </form>
         <br>
         <div class="row ml-5" >
             {% for resource in resources %}
