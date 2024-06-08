@@ -2,14 +2,13 @@
 
 {% block body %}
     <div class="container-fluid">
-        <h1>Tag NFC de la ressource</h1>
+        <h1>Réception de demi-carcasses</h1>
         <br>
-        {{ form_start(form, {'attr': {'class': 'search-form'}}) }}
-
-        {{ form_widget(form.id, {'attr': {'class': 'search-input', 'placeholder': 'Entrez le Tag NFC'}}) }}<br>
-
-        <button disabled class="btn btn-primary" id="scan">Scanner</button>
-        <input type="submit" class="btn btn-primary" value="Demander la propriété">
+        
+        {{ form_start(form) }}
+        <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="Entrez le NFT ID ou scanner la ressource" type="number" required>
+        <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br></br>
+        <button type="submit" class="btn btn-primary" value="Demander la propriété">Demander la propriété</button>
         {{ form_end(form) }}
 
         <br>
