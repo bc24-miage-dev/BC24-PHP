@@ -16,19 +16,19 @@ WORKDIR /app
 # persistent / runtime deps
 # hadolint ignore=DL3018
 RUN apk add --no-cache \
-		acl \
-		file \
-		gettext \
-		git \
+	acl \
+	file \
+	gettext \
+	git \
 	;
 
 RUN set -eux; \
 	install-php-extensions \
-		@composer \
-		apcu \
-		intl \
-		opcache \
-		zip \
+	@composer \
+	apcu \
+	intl \
+	opcache \
+	zip \
 	;
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
@@ -59,7 +59,7 @@ RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN set -eux; \
 	install-php-extensions \
-		xdebug \
+	xdebug \
 	;
 
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/

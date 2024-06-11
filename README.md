@@ -21,6 +21,35 @@ Pour faire apparaître les différentes tables, il faut exécuter la commande `p
 dans le .env
 6. Les fichiers docker et le dossier frankenphp sont à usage futur, se servir du serveur de Symfony pour le moment : `symfony serve -d` 
 
+## OR run with docker anywhere 
+1) change the last line in bundles.php 
+	Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => false],
+
+2) go into the root directory 
+	
+	cd gui/symfony-docker
+
+3) run the docker compose command 
+
+	docker-compose -f compose.yaml up --build
+
+ - first time will take a minute or two
+ - will finally launch the application (make sure you check out all the host addresses)
+  there are https://localhost:443 (https) and http://localhost:80 (http)
+  Both should work but lets just stay with the later (80) one for now. 
+
+You will already be able to see the web app but no login is possible, since the DB migration was not yet done
+
+4) enter the docker container comand line interface 
+
+	docker exec -ti symfony-docker-php-1 sh
+
+5) in the docker container execute the DB shema creation and migration commands (answer all the questions with y)
+
+	php bin/console doctrine:migrations:migrate
+	php bin/console doctrine:fixtures:load --group=app
+
+If you go back to the web app you will be able to log in now. 
 ## Utilisation
 
 ### À savoir :
