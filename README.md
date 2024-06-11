@@ -35,9 +35,10 @@ facilitant la gestion pour les différents acteurs de la chaîne.
 3. run the docker compose command
 
    ```
-   docker-compose -f compose.yaml up --build
+	docker-compose -f compose.yaml up --build -d
    ```
 
+- dont use `-d` if you want to have docker output
 - first time will take a minute or two
 - will finally launch the application (make sure you check out all the host addresses)
   there are https://localhost:443 (https) and http://localhost:80 (http)
