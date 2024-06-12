@@ -63,4 +63,25 @@ class HardwareService
             'nutrition' => []
         ];
     }
+
+    public function filterByRole(String $role): array
+    {
+        $respponse = $this->httpClient->request('POST', 'http://127.0.0.1:8080/mintResource', [
+            'json' => $body,
+        ]);
+        $data = json_decode($response->getContent(), true);
+        $returnData = [];
+        foreach ($data as $key => $value) {
+            if ($value['role'] !== $role) {
+                $returnData[$value["ressource_id"]] = $value["ressource_name"];
+                // something like this i hope :
+                // 1 => "sheep"
+                // 2 => "cow"
+                // 3 => "pig"
+                // ...
+            }
+        }
+
+        return $returnData;
+    }
 }
