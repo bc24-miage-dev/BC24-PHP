@@ -6,8 +6,11 @@
 
 {{ form_start(form) }}
     <label> Espèce de l'animal :
-        <select name="{{ field_name(form.ResourceName) }}" class="form-control">
-            {% for name, id in field_choices(form.ResourceName) %}
+        <select name="{{ field_name(form.resourceName) }}" class="form-control">
+
+            {# {{ dump(form.resourceName) }} #}
+
+            {% for name, id in field_choices(form.resourceName) %}
 
                 <option value="{{ id }}">{{ name }}</option>
 

@@ -31,7 +31,7 @@ class NFCController extends AbstractController
             $this->addFlash('error', 'An error occurred while writing the resource NFT ID on the NFC');
         }
     }
-    return $this->render('user/ScanNFC.html.twig', [
+    return $this->render('user/WriteOnNFC.html.twig', [
         'id' => $id,
     ]);
 }

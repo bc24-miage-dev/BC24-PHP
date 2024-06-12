@@ -71,26 +71,29 @@ class EleveurController extends AbstractController
     public function naissance(Request $request,
                               ResourceHandler $handler): Response
     {
-        $form = $this->createForm(EleveurBirthType::class,
-        $resource = $handler->createDefaultNewResource($this->getUser()));
+        
+        $form = $this->createForm(EleveurBirthType::class);
     $form->handleRequest($request);
+    
     if ($form->isSubmitted() && $form->isValid()) {
         try {
             // dd($form->getData());
-            $metadata = $this->blockChainService->metadataTemplate((int)$form->getData()->getWeight(),
-                                                                (int)$form->getData()->getPrice(),
-                                                                $form->getData()->getDescription(),
-                                                                $form->getData()->getGenre()
+            $metadata = $this->blockChainService->metadataTemplate((int)$form->getData()["weight"],
+                                                                (int)$form->getData()["price"],
+                                                                $form->getData()["description"],
+                                                                $form->getData()["Genre"],
+                                                                false
                                                             );
-            $response = $this->blockChainService->mintResource(1,1, ['metadata' => $metadata]);
+            $response = $this->blockChainService->mintResource((int)$form->getData()["resourceName"],1, ['metadata' => $metadata]);
             $responseArray = json_decode($response, true);
         } catch (UniqueConstraintViolationException){
-            $this->addFlash('error', 'Le tag NFT est déjà utilisé');
+            $this->addFlash('error', 'Le tag NFC est déjà utilisé');
             return $this->redirectToRoute('app_eleveur_naissance');
         }
-        $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFT : ' . $responseArray[1]['tokenId']);
-        return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray[1]['tokenId']]);
+        $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFT : ' . $responseArray["tokenId"]);
+        return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray['tokenId']]);
     }
+
     return $this->render('pro/eleveur/naissance.html.twig', [
         'form' => $form->createView(),
     ]);

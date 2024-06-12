@@ -3,8 +3,7 @@
 namespace App\Form;
 
 use App\Entity\ProductionSite;
-use App\Entity\Resource;
-use App\Entity\ResourceName;
+
 use App\Entity\User;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -14,21 +13,31 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use App\Service\BlockChainService;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 
 class EleveurBirthType extends AbstractType
 {
+    public function __construct(BlockChainService $blockChainService)
+    {
+        $this->blockChainService = $blockChainService;
+    }
+
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $resourceTemplates = $this->blockChainService->getResourceTemplate("BREEDER");
+
         $builder
-            ->add('ResourceName', EntityType::class, [
-            'class' => ResourceName::class,
-            'choice_label' => 'name',
-            'query_builder' => function (EntityRepository $er){
-                return $er->createQueryBuilder('rn')
-                    ->join('rn.resourceCategory', 'rc')
-                    ->andWhere('rc.category = :category')
-                    ->setParameter('category', 'ANIMAL');
-            }
+        ->add('resourceName', ChoiceType::class, [
+            'choices' => $resourceTemplates,
+            'choice_label' => function ($choice, $key, $value) {
+                return $key; //i swear i don t know why it works
+            },
+            'choice_value' => function ($choice) {
+                return $choice;
+            },
         ])
             ->add('price')
             ->add('Genre')
@@ -41,10 +50,10 @@ class EleveurBirthType extends AbstractType
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Resource::class,
-        ]);
-    }
+    // public function configureOptions(OptionsResolver $resolver): void
+    // {
+    //     $resolver->setDefaults([
+    //         'data_class' => Resource::class,
+    //     ]);
+    // }
 }
