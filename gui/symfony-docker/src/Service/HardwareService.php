@@ -66,46 +66,6 @@ class HardwareService
         return null;
     }
 
-    public function mintResource(int $resourceId,
-                                 int $quantity = 1,
-                                 array $metadata = [],
-                                array $ingredients = []
-                                ): String
-    {
-        try {
-            $body = [
-                'resourceId' => $resourceId,
-                'quantity' => $quantity,
-                'metaData' => $metadata, // Empty associative array
-                'ingredients' => $ingredients, // Empty associative array
-            ];
-
-            $response = $this->httpClient->request('POST', 'http://127.0.0.1:8080/mintResource', [
-                'json' => $body,
-            ]);
-
-            return $response->getContent(); // Obtenir le JSON brut
-        } catch (\Exception $e) {
-            return "Error";
-            // Handle exception
-        }
-    }
-
-    public function metadataTemplate(int $weight = 0, 
-                                    int $price = 0, 
-                                    String $description = "NAN",
-                                    String $genre = "NAN",
-                                    bool $isContaminated = false ): array
-    {
-        return [
-            'isContaminated' => $isContaminated,
-            'weight' => $weight,
-            'price' => $price,
-            'description' => $description,
-            'genre' => $genre,
-            'nutrition' => []
-        ];
-    }
 
     public function write($tokenId): String
     {

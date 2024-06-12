@@ -3,7 +3,7 @@
 {% block body %}
 
 <div class="container-fluid">
-    <h1>Présenter votre TagNFC près du lecteur </h1><br>
+    <h1>Présenterz un tag NFC à proximité du scanner, puis cliquer sur le bouton "Ecrire" </h1><br>
         <form action="{{ path('app_nfc_write', {'id': id}) }}" method="post">
         <button class="btn btn-primary" type="submit" >Ecrire</button>
         <input type="hidden" name="tokenID" value="{{id}}">

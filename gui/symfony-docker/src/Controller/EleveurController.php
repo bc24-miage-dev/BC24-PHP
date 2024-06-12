@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\NetworkException;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-
+use App\Service\BlockChainService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Psr\Log\LoggerInterface;
 
@@ -36,7 +36,7 @@ class EleveurController extends AbstractController
     private EntityManagerInterface $entityManager;
     private ResourceRepository $resourceRepository;
     private HttpClientInterface $httpClient;
-
+    private BlockChainService $blockChainService;
     private HardwareService $hardwareService;
 
     public function __construct(TransactionHandler $handler,
@@ -44,7 +44,8 @@ class EleveurController extends AbstractController
                                 EntityManagerInterface $entityManager,
                                 ResourceRepository $resourceRepository,
                                 HttpClientInterface $httpClient,
-                                HardwareService $hardwareService)
+                                HardwareService $hardwareService,
+                                BlockChainService $blockChainService,)
     {
         $this->transactionHandler = $handler;
         $this->eleveurHandler = $eleveurHandler;
@@ -52,6 +53,7 @@ class EleveurController extends AbstractController
         $this->resourceRepository = $resourceRepository;
         $this->httpClient = $httpClient;
         $this->hardwareService = $hardwareService;
+        $this->blockChainService = $blockChainService;
 
     }
 
@@ -75,21 +77,18 @@ class EleveurController extends AbstractController
     if ($form->isSubmitted() && $form->isValid()) {
         try {
             // dd($form->getData());
-            $metadata = $this->hardwareService->metadataTemplate((int)$form->getData()->getWeight(),
+            $metadata = $this->blockChainService->metadataTemplate((int)$form->getData()->getWeight(),
                                                                 (int)$form->getData()->getPrice(),
                                                                 $form->getData()->getDescription(),
                                                                 $form->getData()->getGenre()
                                                             );
-            $response = $this->hardwareService->mintResource(1,1, ['metadata' => $metadata]);
+            $response = $this->blockChainService->mintResource(1,1, ['metadata' => $metadata]);
             $responseArray = json_decode($response, true);
-            // dd($responseArray);
-            // $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFC : ' . $responseArray[1]['tokenId']);
         } catch (UniqueConstraintViolationException){
-            $this->addFlash('error', 'Le tag NFC est déjà utilisé');
+            $this->addFlash('error', 'Le tag NFT est déjà utilisé');
             return $this->redirectToRoute('app_eleveur_naissance');
         }
-        // $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée !');
-        $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFC : ' . $responseArray[1]['tokenId']);
+        $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFT : ' . $responseArray[1]['tokenId']);
         return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray[1]['tokenId']]);
     }
     return $this->render('pro/eleveur/naissance.html.twig', [

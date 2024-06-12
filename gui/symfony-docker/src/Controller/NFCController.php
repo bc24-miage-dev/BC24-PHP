@@ -20,20 +20,17 @@ class NFCController extends AbstractController
     }
 
     #[Route('/NFC/write/{id}', name: 'app_nfc_write')]
-    public function ScanNFC(Request $request, $id): Response
+    public function startWriteNFC(Request $request, $id): Response
 {
     if ($request->isMethod('POST')) {       //if post method
-        // The form is submitted
         $response = $this->hardwareService->write($id);
-        // Do something with the data
         if ($response->getStatusCode() === 200) {
-            $this->addFlash('success', 'The data has been saved');
-        } else {
-            $this->addFlash('error', 'An error occurred while saving the data');
+            $this->addFlash('success', 'The NFT ID of the resource has been write on the NFC');
+        } 
+        else {
+            $this->addFlash('error', 'An error occurred while writing the resource NFT ID on the NFC');
         }
-
     }
-
     return $this->render('user/ScanNFC.html.twig', [
         'id' => $id,
     ]);
