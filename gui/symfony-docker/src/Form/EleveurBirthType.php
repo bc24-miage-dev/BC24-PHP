@@ -12,13 +12,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class EleveurBirthType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('id')
             ->add('ResourceName', EntityType::class, [
             'class' => ResourceName::class,
             'choice_label' => 'name',
@@ -29,8 +30,10 @@ class EleveurBirthType extends AbstractType
                     ->setParameter('category', 'ANIMAL');
             }
         ])
+            ->add('price')
             ->add('Genre')
-            ->add('weight')
+            ->add('weight', IntegerType::class)
+            ->add('description', TextareaType::class) // Set description as TextareaType
             ->add('submit', SubmitType::class, [
                 'label' => 'Confirmer la naissance'
             ])

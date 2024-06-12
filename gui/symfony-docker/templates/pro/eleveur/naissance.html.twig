@@ -14,22 +14,27 @@
             {% endfor %}
         </select>
     </label>
-
+    <br>
     <label>Genre :
         <select name="{{ field_name(form.Genre) }}" class="form-control">
             <option value="M">Mâle</option>
             <option value="F">Femelle</option>
         </select>
     </label>
-
     <br>
-
-    <label>Poids de l'animal (en grammes) :
-        <input type="number" name="{{ field_name(form.weight) }}" class="form-control" required>
+     <label>prix :
+        <input type = "number" name="{{ field_name(form.price) }}" class="form-control" min ="0" required>
     </label>
+    <br>
+    <label>Poids de l'animal (en grammes) :
+        <input type="number" name="{{ field_name(form.weight) }}" class="form-control" min= "0" required>
+    </label>
+    <br>
+    <label> Description de l'animal :
+        <input type= "text" name="{{ field_name(form.description) }}" class="form-control" rows="4"></textarea>
     <br><br>
-
 {{ form_end(form) }}
 </div>
+
 {% endblock %}
 

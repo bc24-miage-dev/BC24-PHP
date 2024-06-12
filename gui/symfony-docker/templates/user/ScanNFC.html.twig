@@ -1,0 +1,17 @@
+{% extends 'template.html.twig' %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <h1>Présenter votre TagNFC près du lecteur </h1><br>
+        <form action="{{ path('app_nfc', {'id': id}) }}" method="post">
+        <button class="btn btn-primary" type="submit" >Ecrire</button>
+        <input type="hidden" name="tokenID" value="{{id}}">
+        </form>
+        {# <h3>Entrez le tag NFC</h3>
+        <input type="text" name="tag" class="form-control" placeholder="{{id}}" required> #}
+
+
+    </div>
+
+{% endblock %}
