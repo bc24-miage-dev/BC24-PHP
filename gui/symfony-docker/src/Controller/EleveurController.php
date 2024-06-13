@@ -87,7 +87,7 @@ class EleveurController extends AbstractController
             $response = $this->blockChainService->mintResource((int)$form->getData()["resourceName"],1, ['metadata' => $metadata]);
             $responseArray = json_decode($response, true);
         } catch (UniqueConstraintViolationException){
-            $this->addFlash('error', 'Le tag NFC est déjà utilisé');
+            $this->addFlash('error', 'Le tag NFT est déjà utilisé');
             return $this->redirectToRoute('app_eleveur_naissance');
         }
         $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFT : ' . $responseArray["tokenId"]);
