@@ -18,7 +18,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use App\Service\HardwareService;
+use Symfony\Component\HttpClient\Exception\ServerException;
+use Symfony\Component\HttpClient\Exception\NetworkException;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Psr\Log\LoggerInterface;
 
 
 #[Route('/pro/eleveur')]
@@ -28,16 +35,26 @@ class EleveurController extends AbstractController
     private EleveurHandler $eleveurHandler;
     private EntityManagerInterface $entityManager;
     private ResourceRepository $resourceRepository;
+    private HttpClientInterface $httpClient;
+    private BlockChainService $blockChainService;
+    private HardwareService $hardwareService;
 
     public function __construct(TransactionHandler $handler,
                                 EleveurHandler $eleveurHandler,
                                 EntityManagerInterface $entityManager,
-                                ResourceRepository $resourceRepository)
+                                ResourceRepository $resourceRepository,
+                                HttpClientInterface $httpClient,
+                                HardwareService $hardwareService,
+                                BlockChainService $blockChainService,)
     {
         $this->transactionHandler = $handler;
         $this->eleveurHandler = $eleveurHandler;
         $this->entityManager = $entityManager;
         $this->resourceRepository = $resourceRepository;
+        $this->httpClient = $httpClient;
+        $this->hardwareService = $hardwareService;
+        $this->blockChainService = $blockChainService;
+
     }
 
 
@@ -48,27 +65,38 @@ class EleveurController extends AbstractController
         return $this->render('pro/eleveur/index.html.twig');
     }
 
+
+
     #[Route('/naissance', name: 'app_eleveur_naissance')]
     public function naissance(Request $request,
                               ResourceHandler $handler): Response
     {
-        $form = $this->createForm(EleveurBirthType::class,
-            $resource = $handler->createDefaultNewResource($this->getUser()));
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->entityManager->persist($resource);
-                $this->entityManager->flush();
-            } catch (UniqueConstraintViolationException){
-                $this->addFlash('error', 'Le tag NFC est déjà utilisé');
-                return $this->redirectToRoute('app_eleveur_naissance');
-            }
-            $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée !');
-            return $this->redirectToRoute('app_eleveur_index');
+        
+        $form = $this->createForm(EleveurBirthType::class);
+    $form->handleRequest($request);
+    
+    if ($form->isSubmitted() && $form->isValid()) {
+        try {
+            // dd($form->getData());
+            $metadata = $this->blockChainService->metadataTemplate((int)$form->getData()["weight"],
+                                                                (int)$form->getData()["price"],
+                                                                $form->getData()["description"],
+                                                                $form->getData()["Genre"],
+                                                                false
+                                                            );
+            $response = $this->blockChainService->mintResource((int)$form->getData()["resourceName"],1, ['metadata' => $metadata]);
+            $responseArray = json_decode($response, true);
+        } catch (UniqueConstraintViolationException){
+            $this->addFlash('error', 'Le NFT existe déjà');
+            return $this->redirectToRoute('app_eleveur_naissance');
         }
-        return $this->render('pro/eleveur/naissance.html.twig', [
-            'form' => $form->createView(),
-        ]);
+        $this->addFlash('success', 'La naissance de votre animal a bien été enregistrée ! NFT : ' . $responseArray["tokenId"]);
+        return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray['tokenId']]);
+    }
+
+    return $this->render('pro/eleveur/naissance.html.twig', [
+        'form' => $form->createView(),
+    ]);
 
     }
 

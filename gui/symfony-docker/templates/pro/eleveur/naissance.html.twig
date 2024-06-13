@@ -6,30 +6,38 @@
 
 {{ form_start(form) }}
     <label> Espèce de l'animal :
-        <select name="{{ field_name(form.ResourceName) }}" class="form-control">
-            {% for name, id in field_choices(form.ResourceName) %}
+        <select name="{{ field_name(form.resourceName) }}" class="form-control">
+
+            {# {{ dump(form.resourceName) }} #}
+
+            {% for name, id in field_choices(form.resourceName) %}
 
                 <option value="{{ id }}">{{ name }}</option>
 
             {% endfor %}
         </select>
     </label>
-
+    <br>
     <label>Genre :
         <select name="{{ field_name(form.Genre) }}" class="form-control">
             <option value="M">Mâle</option>
             <option value="F">Femelle</option>
         </select>
     </label>
-
     <br>
-
-    <label>Poids de l'animal (en grammes) :
-        <input type="number" name="{{ field_name(form.weight) }}" class="form-control" required>
+     <label>prix :
+        <input type = "number" name="{{ field_name(form.price) }}" class="form-control" min ="0" required>
     </label>
+    <br>
+    <label>Poids de l'animal (en grammes) :
+        <input type="number" name="{{ field_name(form.weight) }}" class="form-control" min= "0" required>
+    </label>
+    <br>
+    <label> Description de l'animal :
+        <input type= "text" name="{{ field_name(form.description) }}" class="form-control" rows="4"></textarea>
     <br><br>
-
 {{ form_end(form) }}
 </div>
+
 {% endblock %}
 
