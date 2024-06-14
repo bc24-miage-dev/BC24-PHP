@@ -74,7 +74,6 @@ class EleveurController extends AbstractController
         
         $form = $this->createForm(EleveurBirthType::class);
     $form->handleRequest($request);
-    
     if ($form->isSubmitted() && $form->isValid()) {
         try {
             // dd($form->getData());
@@ -84,7 +83,7 @@ class EleveurController extends AbstractController
                                                                 $form->getData()["Genre"],
                                                                 false
                                                             );
-            $response = $this->blockChainService->mintResource((int)$form->getData()["resourceName"],1, ['metadata' => $metadata]);
+            $response = $this->blockChainService->mintResource($this->getUser()->getWalletAddress(),(int)$form->getData()["resourceName"],1,  $metadata);
             $responseArray = json_decode($response, true);
         } catch (UniqueConstraintViolationException){
             $this->addFlash('error', 'Le NFT existe déjà');
