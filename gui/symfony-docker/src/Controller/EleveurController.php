@@ -105,23 +105,26 @@ class EleveurController extends AbstractController
     #[Route('/list', name: 'app_eleveur_list')]
     public function list(Request $request,
                          ResourcesListHandler $listHandler): Response
-    {
-        if ($request->isMethod('POST')) {
-            try {
-                $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-            }
-            catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_eleveur_list');
-            }
-        }
-        else{
-            $animaux = $listHandler->getResources($this->getUser(), 'ANIMAL');
-        }
+    {   
+        // dd($this->getUser()->getWalletAddress());
+        $animaux = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
+        return $this->render('pro/eleveur/list.html.twig', ['animaux' => $animaux]);
+        // if ($request->isMethod('POST')) {
+        //     try {
+        //         $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
+        //     }
+        //     catch (\Exception $e) {
+        //         $this->addFlash('error', $e->getMessage());
+        //         return $this->redirectToRoute('app_eleveur_list');
+        //     }
+        // }
+        // else{
+        //     $animaux = $listHandler->getResources($this->getUser(), 'ANIMAL');
+        // }
 
-        return $this->render('pro/eleveur/list.html.twig',
-            ['animaux' => $animaux]
-        );
+        // return $this->render('pro/eleveur/list.html.twig',
+        //     ['animaux' => $animaux]
+        // );
     }
 
 
@@ -244,6 +247,7 @@ class EleveurController extends AbstractController
     public function specific(ResourceRepository $resourceRepository,
                              $id) : Response
     {
+        
         $animal = $resourceRepository->findOneBy(['id' => $id]);
         if (!$this->eleveurHandler->canHaveAccess($animal, $this->getUser())){
             $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');

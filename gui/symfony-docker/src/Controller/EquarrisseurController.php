@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
 
 #[Route('/pro/equarrisseur')]
 class EquarrisseurController extends AbstractController
@@ -27,14 +28,17 @@ class EquarrisseurController extends AbstractController
     private TransactionHandler $transactionHandler;
     private EquarrisseurHandler $equarrisseurHandler;
     private ResourceRepository $resourceRepository;
+    private BlockChainService $blockChainService;
 
     public function __construct(TransactionHandler $transactionHandler,
                                 EquarrisseurHandler $equarrisseurHandler,
-                                ResourceRepository $resourceRepository)
+                                ResourceRepository $resourceRepository,
+                                BlockChainService $blockChainService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->equarrisseurHandler = $equarrisseurHandler;
         $this->resourceRepository = $resourceRepository;
+        $this->blockChainService = $blockChainService;
     }
 
 

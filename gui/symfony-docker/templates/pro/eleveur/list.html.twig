@@ -16,8 +16,8 @@
         {% for animal in animaux %}
             <div class="card mr-2 mb-2" style="width: 100%;">
                 <div class="card-body ">
-                    <h5 class="card-title">{{ animal.ResourceName.name }} - {{ animal.id }}</h5>
-                    <a href="{{ path('app_eleveur_specific', {'id' : animal.id}) }}" class="card-link">Informations et actions</a>
+                    <h5 class="card-title">{{ animal.resource_name }} - {{ animal.tokenId }}</h5>
+                    <a href="{{ path('app_eleveur_specific', {'id' : animal.tokenId}) }}" class="card-link">Informations et actions</a>
                 </div>
             </div>
         {% endfor %}
