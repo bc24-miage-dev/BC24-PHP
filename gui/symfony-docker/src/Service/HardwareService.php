@@ -29,8 +29,9 @@ class HardwareService
             //TO BE DECOMMENTED
             //$response = $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
             //return $response->getContent(); // Obtenir le JSON brut
-
+            
             //TO BE COMMENTED
+            sleep(3);
             $data = [
                 "NFT_tokenID" => 11111,
                 "date_creation" => "2024-05-08",

@@ -72,6 +72,7 @@ input, select, textarea {
 	appearance: none;
 }
 
+
 /* Basic */
 
 	@-ms-viewport {
@@ -476,7 +477,7 @@ input, select, textarea {
 				}
 
 		@media screen and (max-width: 1680px) {
-
+			
 			.row {
 				display: flex;
 				flex-wrap: wrap;

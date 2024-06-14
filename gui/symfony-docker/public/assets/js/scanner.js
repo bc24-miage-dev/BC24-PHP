@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.scanner-button').forEach(button => {
         button.addEventListener('click', function() {
+            // Show the loader modal
+            var loaderModal = document.getElementById('loaderModal');
+            loaderModal.style.display = 'flex';
             fetch('/start-reader', {
                 method: 'POST',
                 headers: {
@@ -10,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                // Hide the loader modal
+                loaderModal.style.display = 'none';
                 if (!data.error) {
                     // Manipuler les données JSON récupérées
                     console.log('Scanner data:', data.data);
@@ -30,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
+                // Hide the loader modal
+                loaderModal.style.display = 'none';
                 console.error('Erreur lors de la récupération des données:', error);
             });
         });

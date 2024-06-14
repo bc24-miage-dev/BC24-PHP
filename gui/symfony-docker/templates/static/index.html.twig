@@ -6,6 +6,7 @@
 {% block body %}
     {% block stylesheets %}
         <link rel="stylesheet" href="{{ asset('css/index.css') }}" />
+        <link rel="stylesheet" href="{{ asset('assets/css/waitModal.css') }}" />
     {% endblock %}
 
     <div id="banner-wrapper">
@@ -26,7 +27,6 @@
 
     <!-- Banner -->
     <div id="hero-wrapper">
-
         <div class="hero-content">
             <h1>Rechercher un produit</h1>
             {{ form_start(form) }}
@@ -36,6 +36,15 @@
             <br>
         </div>
     </div>
+
+    <!-- Loader modal -->
+    <div id="loaderModal" class="loader-modal">
+        <div class="loader-content">
+            <p>Veuillez approcher une ressource près du lecteur</p>
+            <div class="loader"></div>
+        </div>
+    </div>
+    
 
 
 

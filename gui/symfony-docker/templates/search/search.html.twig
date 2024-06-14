@@ -4,6 +4,7 @@
 
 {% block stylesheet %}
     <link rel="stylesheet" href="{{ asset('css/search.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/waitModal.css') }}" />
 {% endblock %}
 
 {% block body %}
@@ -15,6 +16,14 @@
             <button type="button" class="scanner-button" id="scanner-button">Scanner la ressource</button>
             {{ form_end(form) }}
             <br>
+        </div>
+    </div>
+
+    <!-- Loader modal -->
+    <div id="loaderModal" class="loader-modal">
+        <div class="loader-content">
+            <p>Veuillez approcher une ressource près du lecteur</p>
+            <div class="loader"></div>
         </div>
     </div>
 
