@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
 
 #[Route('/pro/equarrisseur')]
 class EquarrisseurController extends AbstractController
@@ -27,14 +28,17 @@ class EquarrisseurController extends AbstractController
     private TransactionHandler $transactionHandler;
     private EquarrisseurHandler $equarrisseurHandler;
     private ResourceRepository $resourceRepository;
+    private BlockChainService $blockChainService;
 
     public function __construct(TransactionHandler $transactionHandler,
                                 EquarrisseurHandler $equarrisseurHandler,
-                                ResourceRepository $resourceRepository)
+                                ResourceRepository $resourceRepository,
+                                BlockChainService $blockChainService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->equarrisseurHandler = $equarrisseurHandler;
         $this->resourceRepository = $resourceRepository;
+        $this->blockChainService = $blockChainService;
     }
 
 
@@ -111,33 +115,50 @@ class EquarrisseurController extends AbstractController
             ]);
     }
 
-    #[Route('/equarrir/{id}', name: 'app_equarrisseur_equarrir')]
+    #[Route('/equarrir/{id}/{tokenID}', name: 'app_equarrisseur_equarrir')]
     public function equarrir(ResourceHandler $handler,
                              Request $request,
-                             $id) : Response
+                             $id, $tokenID) : Response
     {
-        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-        if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
-            $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
-            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
-        }
 
-        $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class,
-            $newCarcasse = $handler->createChildResource($resource, $this->getUser()));
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->equarrisseurHandler->slaughteringProcess($resource, $newCarcasse);
-            } catch (UniqueConstraintViolationException) {
-                $this->addFlash('error', 'Le tag NFC existe déjà');
-                return $this->redirectToRoute('app_equarrisseur_equarrir', ['id' => $id]);
-            }
-            $this->addFlash('success', 'L\'animal a bien été abattu, une carcasse a été créée');
-            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
-        }
-        return $this->render('pro/equarrisseur/equarrir.html.twig', [
-            'form' => $form->createView()
-        ]);
+
+        // if ($form->isSubmitted()) {
+            $walletAddress = $this->getUser()->getWalletAddress();
+            $carcass = $this->blockChainService->getResourceTemplate($id, "SLAUGHTERER");
+            $carcassID = $carcass[0]["resource_id"];
+            // dd($carcass);
+            $ingredient = $tokenID;
+            // dd($carcass);
+            $getMetaData = $this->blockChainService->getStringDataFromTokenID($tokenID);
+            // dd($getMetaData);
+            $mintResource = $this->blockChainService->mintResource($walletAddress,$carcassID,1, $getMetaData, [$ingredient]);
+
+            
+            // $test2 = $this->blockChainService->mintResource();
+            dd($mintResource);
+        // }
+        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
+        // if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
+        //     $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
+        //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
+        // }
+
+        // $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class,
+        //     $newCarcasse = $handler->createChildResource($resource, $this->getUser()));
+        // $form->handleRequest($request);
+        // if ($form->isSubmitted() && $form->isValid()) {
+        //     try {
+        //         $this->equarrisseurHandler->slaughteringProcess($resource, $newCarcasse);
+        //     } catch (UniqueConstraintViolationException) {
+        //         $this->addFlash('error', 'Le tag NFC existe déjà');
+        //         return $this->redirectToRoute('app_equarrisseur_equarrir', ['id' => $id]);
+        //     }
+        //     $this->addFlash('success', 'L\'animal a bien été abattu, une carcasse a été créée');
+        //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
+        // }
+        // return $this->render('pro/equarrisseur/equarrir.html.twig', [
+        //     'form' => $form->createView()
+        // ]);
 
     }
 

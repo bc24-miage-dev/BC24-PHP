@@ -27,7 +27,7 @@ class EleveurBirthType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $resourceTemplates = $this->blockChainService->getResourceTemplate("BREEDER");
+        $resourceTemplates = $this->blockChainService->getResourceIDFromRole("BREEDER");
 
         $builder
         ->add('resourceName', ChoiceType::class, [
