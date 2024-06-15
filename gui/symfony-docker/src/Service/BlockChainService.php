@@ -84,6 +84,7 @@ class BlockChainService
 
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/" . $WalletAddress . "?metaData=true");
         $data = json_decode($response->getContent(), true);
+        // dd($data);
         return $data;
     }
 
@@ -91,6 +92,7 @@ class BlockChainService
     {
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?resource_id=".$resourceId."&required_role=".$role);
         $data = json_decode($response->getContent(), true);
+        // dd($data);
         return $data;
     }
 
@@ -107,9 +109,13 @@ class BlockChainService
         $data = $this->getResourceWalletAddress($WalletAddress);
         $returnData = [];
         foreach ($data as $key => $value) {
+            if ($resourceType != null && "ANIMAL" != $resourceType) {
+                continue;
+            }
             $arrayTMP = [
                 "tokenId" => $value["tokenId"],
                 "resource_name" => $value["metaData"]["resource_name"],
+                "resource_type" => "ANIMAL", //need to be change later
                 "quantity" => $value["balance"],
                 "isContaminated" => $value["metaData"]["data"][0]["stringData"]["isContaminated"],
                 "weight" => $value["metaData"]["data"][0]["stringData"]["weight"],
@@ -126,6 +132,30 @@ class BlockChainService
         return $returnData;
     }
 
+    public function getRessourceFromTokenId(int $tokenId): array
+    {
+        $data = $this->getMetaDataFromTokenId($tokenId);
+        $returnData = [
+            "tokenID" => $tokenId,
+            "resourceID" => $data["resource_id"],
+            "resourceName" => $data["resource_name"],
+            "resourceType" => "ANIMAL", //need to be change later
+            // "quantity" => $data["data"][0]["balance"],
+            "isContaminated" => $data["data"][0]["stringData"]["isContaminated"],
+            "weight" => $data["data"][0]["stringData"]["weight"],
+            "price" => $data["data"][0]["stringData"]["price"],
+            "description" => $data["data"][0]["stringData"]["description"],
+            "genre" => $data["data"][0]["stringData"]["genre"],
+            "address" => $data["data"][0]["stringData"]["address"],
+            "birthDate" => $data["data"][0]["stringData"]["birthDate"],
+            "nutrition" => $data["data"][0]["stringData"]["nutrition"],
+            "vaccin" => $data["data"][0]["stringData"]["vaccin"],
+        ];
+        return $returnData;
+    }
+
+    
+
     public function getStringDataFromTokenID(int $tokenId): array
     {
         $data = $this->getMetaDataFromTokenId($tokenId);
@@ -135,4 +165,40 @@ class BlockChainService
         return $returnData;
     }
 
+    public function getPossibleResourceFromResourceID(int $resourceId, String $role, String $resourceType): array
+    {
+        $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?required_role=".$role);
+        $data = json_decode($response->getContent(), true);
+        $count = 0;
+        $returnData = [];
+        foreach ($data as $numberOfArray => $datas) {
+            if ($datas["needed_resources"][0] == $resourceId && $datas["resource_type"] == $resourceType) {
+                $returnData[$count++] = $datas;
+            }
+        }
+        // dd($returnData);
+        return $data;
+    }
+
+    public function replaceMetaData($walletAddress,int $tokenId, array $metadata): array
+    {
+        $response = $this->getMetaDataFromTokenId($tokenId);
+        $oldMetaData = $response["data"][0]["stringData"];
+        // dd($oldMetaData);
+        $mergedMetaData = array_merge($oldMetaData, $metadata);
+        // dd($mergedMetaData);
+
+        $body = [
+            "from_wallet_address" => $walletAddress,
+            "tokenId" => $tokenId,
+            "metaData" => $mergedMetaData,
+        ];
+        // dd($body);
+        $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/metadata", [
+            'json' => $body,
+        ]);
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData);
+        return $returnData;
+    }
 }

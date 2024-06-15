@@ -4,19 +4,12 @@
     <div class="container-fluid">
         <h1>Enregistrez un vaccin effectué :</h1>
         <br>
-        <form action="{{ path('app_eleveur_vaccine', {'id' : id}) }}" method="post">
-            <label for="vaccine">Vaccin effectué :
-            <select class="custom-select" required name="vaccine" id="vaccine">
-                <option value="Vaccin A" selected>Vaccin A</option>
-                <option value="Vaccin B">Vaccin B</option>
-                <option value="Vaccin C">Vaccin C</option>
-                <option value="Vaccin D">Vaccin D</option>
-                <option value="Vaccin E">Vaccin E</option>
-            </select>
+
+        {{ form_start(form) }}
+            <label> Nouveau poids de l'animal (en grammes) :
+                <input type="number" name="{{ field_name(form.vaccin) }}" class="form-control">
             </label>
-            <br>
-            <input class="btn btn-primary" type="submit" value="Enregistrer">
-        </form>
+        {{ form_end(form) }}
         <br>
         <a href="{{ path('app_eleveur_specific', {'id' : id}) }}"><button class="btn btn-primary">Revenir en arrière</button></a>
     </div>
