@@ -70,7 +70,7 @@ class BlockChainService
     public function getResourceIDFromRole(String $role): array
     {
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?required_role=" . $role);
-        $data = $response->getContent() ;
+        $data = json_decode($response->getContent(), true);
 
         $returnData = [];
         foreach ($data as $numberOfArray => $datas) {
