@@ -26,12 +26,11 @@ class HardwareService
     public function startReader(): JsonResponse
     {
         try {
-            //TO BE DECOMMENTED
-            //$response = $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-            //return $response->getContent(); // Obtenir le JSON brut
+            $response = $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
+            return $response->getContent(); // Obtenir le JSON brut
             
             //TO BE COMMENTED
-            sleep(3);
+            /*sleep(3);
             $data = [
                 "NFT_tokenID" => 11111,
                 "date_creation" => "2024-05-08",
@@ -40,7 +39,7 @@ class HardwareService
                 "temperature" => "28.05",
                 "uid" => "BA:44:47:73",
             ];
-            return new JsonResponse(['data' => $data]);
+            return new JsonResponse(['data' => $data]);*/
 
         } catch (ClientException $e) {
             if ($e->getCode() === 403) {
