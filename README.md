@@ -44,7 +44,7 @@ The webapp consists of two parts:
 - Transaction management (incoming acquisition requests): acceptance, refusal
 - List(s) of resources for which they are owner and information on these resources
 
-#### Specific For breeder :
+#### Specific for breeder :
 - Birth registration of animal
 
 #### Specific for slaughterer :
