@@ -84,7 +84,7 @@ class BlockChainService
 
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/" . $WalletAddress . "?metaData=true");
         $data = json_decode($response->getContent(), true);
-        // dd($data);
+        dd($data);
         return $data;
     }
 
@@ -100,6 +100,7 @@ class BlockChainService
     {
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/".$tokenId."/metadata");
         $data = json_decode($response->getContent(), true);
+        // dd($data);
         return $data;
     }
     // ----------------------------------- Handler ----------------------------------- //
@@ -108,8 +109,10 @@ class BlockChainService
     {
         $data = $this->getResourceWalletAddress($WalletAddress);
         $returnData = [];
+        // dd($data);
         foreach ($data as $key => $value) {
-            if ($resourceType != null && "ANIMAL" != $resourceType) {
+            // dd($resourceType == $value["metaData"]["resource_type"]);
+            if ($resourceType != null && $value["metaData"]["resource_type"] != $resourceType) {
                 continue;
             }
             $arrayTMP = [
@@ -164,7 +167,9 @@ class BlockChainService
         // dd($returnData);
         return $returnData;
     }
-
+    //return all the possible resource from a certain resourceID, role and resourceType
+    //for example, if we want to get all the possible from a certain resourceID,
+    //this function will return all the possible resource from this resourceID
     public function getPossibleResourceFromResourceID(int $resourceId, String $role, String $resourceType): array
     {
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?required_role=".$role);
@@ -172,17 +177,32 @@ class BlockChainService
         $count = 0;
         $returnData = [];
         foreach ($data as $numberOfArray => $datas) {
-            if ($datas["needed_resources"][0] == $resourceId && $datas["resource_type"] == $resourceType) {
-                $returnData[$count++] = $datas;
+            if ($datas["resource_type"] == $resourceType){
+                // dd($datas["needed_resources"]);
+                foreach ($datas["needed_resources"] as $key => $value) {
+                    // dd($value, $resourceId, $key);
+                    if ($value == $resourceId) {
+                        $returnData[$count++] = $datas;
+                    }
+                }
             }
         }
-        // dd($returnData);
-        return $data;
+        if ($count ==0){
+            return [0 => 
+                ["resource_id" => -1]
+            ];
+        }
+        return $returnData;
     }
 
+    //get the metadata of a token and replace the metadata with the new one
+    //merge the old metadata with the new one
+    //in other word, replace the metadata of a token if there is metadata in this section
+    //but fill the metadata if there is no metadata in this section
     public function replaceMetaData($walletAddress,int $tokenId, array $metadata): array
     {
         $response = $this->getMetaDataFromTokenId($tokenId);
+        // dd($response);
         $oldMetaData = $response["data"][0]["stringData"];
         // dd($oldMetaData);
         $mergedMetaData = array_merge($oldMetaData, $metadata);
@@ -197,6 +217,7 @@ class BlockChainService
         $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/metadata", [
             'json' => $body,
         ]);
+        // dd($response->getContent());
         $returnData = json_decode($response->getContent(), true);
         // dd($returnData);
         return $returnData;

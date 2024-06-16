@@ -79,7 +79,10 @@ class EquarrisseurController extends AbstractController
                          String $category,
                          Request $request) : Response
     {
-        $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),"ANIMAL");
+        if ($category === "Demi%20Carcass") {
+            $category = 'Demi Carcass';
+        }
+        $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
         // dd($resources);
 
         // if ($request->isMethod('POST')) {
@@ -96,16 +99,30 @@ class EquarrisseurController extends AbstractController
         // }
 
         return $this->render('pro/equarrisseur/list.html.twig',
-            ['resources' => $resources]
+            ['resources' => $resources,
+                'category' => $category]
         );
     }
 
-    #[Route('/specific/{id}', name: 'app_equarrisseur_job')]
-    public function job($id): Response
+    #[Route('/specific/{id}/{category}', name: 'app_equarrisseur_job')]
+    public function job($id,$category): Response
     {
+        switch (strtolower($category)) {
+            case 'animal':
+                $category = "Carcass";
+                break;
+            case 'carcasse':
+                $category = "Demi Carcass";
+                break;
+            case 'Demi%20Carcasse':
+                $category = "Demi Carcasse";
+                dd($category);
+            break;
+        }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
         // dd($resource);
-        $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", "Carcass");
+        $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $category);
+        // dd($possibleResource);
         // dd($test);
         // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 

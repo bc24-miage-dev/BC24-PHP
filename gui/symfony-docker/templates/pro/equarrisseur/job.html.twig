@@ -17,9 +17,11 @@
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
+        {% if newResourceID != -1 %}
         <a href="{{ path('app_equarrisseur_equarrir', {"newResourceID" : newResourceID , 'tokenIDAnimal' : resource.tokenID}) }}">
             <button class="btn btn-primary">Équarrir</button>
         </a>
+        {% endif %}
 
 
     {% elseif category == 'CARCASSE' %}

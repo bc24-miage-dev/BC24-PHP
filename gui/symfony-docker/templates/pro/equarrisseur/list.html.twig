@@ -16,7 +16,7 @@
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
                         <h5 class="card-title">{{ resource.resource_name }} - {{ resource.tokenId }}</h5>
-                        <a href="{{ path('app_equarrisseur_job', {'id' : resource.tokenId}) }}" class="card-link">Plus de détails</a>
+                        <a href="{{ path('app_equarrisseur_job', {'id' : resource.tokenId, "category" : category}) }}" class="card-link">Plus de détails</a>
                     </div>
                 </div>
             {% endfor %}
