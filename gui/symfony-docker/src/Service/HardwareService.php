@@ -27,7 +27,8 @@ class HardwareService
     {
         try {
             $response = $this->httpClient->request('GET', 'http://127.0.0.1:5000/startReader');
-            return $response->getContent(); // Obtenir le JSON brut
+            $data = json_decode($response->getContent(), true); // Décoder le JSON brut
+            return new JsonResponse(['data' => $data]);
             
             //TO BE COMMENTED
             /*sleep(3);
