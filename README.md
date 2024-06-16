@@ -1,14 +1,27 @@
-# BC24 : Traçabilité alimentaire en Symfony
+# BC24 : Symfony Webapp - Traçabilité alimentaire
 
 ## Présentation
 
-Ce projet est l'interface utilisateur de l'application de traçabilité alimentaire spécialisée dans la viande
-réalisée avec plusieurs groupes
-d'étudiants de différents niveaux de la MIAGE de Paris 1.
-Il est composé de deux parties : Une partie utilisateur,
-permettant de consulter les informations et la traçabilité des produits, et une partie métier,
-permettant tout au long de la chaîne de production de renseigner les informations nécessaires à la traçabilité, tout en
-facilitant la gestion pour les différents acteurs de la chaîne.
+Ce projet correspond à l'interface utilisateur de l'application web de traçabilité alimentaire spécialisée dans la viande.
+Ce projet à été réalisée avec plusieurs groupes d'étudiants de différents niveaux de la MIAGE de Paris 1 Panthéon Sorbonne.
+
+La webapp est composé de deux parties : 
+1. Une partie utilisateur, permettant de consulter les informations et la traçabilité de n'importe quel produit de la chaine de production
+2. Une partie métier, permettant tout au long de la chaîne de production de renseigner les informations nécessaires à la traçabilité, tout en
+facilitant la gestion pour les différents acteurs (éleveur, transporteur, équarrisseur, usine, distributeur, admin) de la chaîne.
+
+## Features
+1. signin/login/access
+2. role (breeder, slaughterer, transporter, manufacturer, distributor) request 
+3. read/write NFC tags to physically identify resources
+4. create/modify resources (NFT on our blockchain) with strict and secure access
+5. find resource metadata and traceability
+6. manage your resources
+7. transfer and acquire resources (with transaction history)
+8. create recipes and create products (combined resources) from them
+9. sell products
+10. report resources and products (bad temperature, disease of animal, etc.)
+
 
 ## Installation
 
