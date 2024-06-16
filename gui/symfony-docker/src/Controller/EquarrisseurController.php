@@ -109,19 +109,19 @@ class EquarrisseurController extends AbstractController
     {
         switch (strtolower($category)) {
             case 'animal':
-                $category = "Carcass";
+                $nextCategory = "Carcass";
                 break;
-            case 'carcasse':
-                $category = "Demi Carcass";
+            case 'carcass':
+                $nextCategory = "Demi Carcass";
                 break;
-            case 'Demi%20Carcasse':
-                $category = "Demi Carcasse";
-                dd($category);
+            case 'demi%20carcasse':
+                $nextCategory = "Demi Carcasse";
             break;
         }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
         // dd($resource);
-        $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $category);
+        // dd($resource["resourceID"], "SLAUGHTERER", $category);
+        $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $nextCategory);
         // dd($possibleResource);
         // dd($test);
         // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
@@ -135,6 +135,7 @@ class EquarrisseurController extends AbstractController
             return $this->render('pro/equarrisseur/job.html.twig', [
                 'resource' => $resource,
                 'newResourceID' => $possibleResource[0]["resource_id"],
+                'category' => $category
             ]);
     }
 

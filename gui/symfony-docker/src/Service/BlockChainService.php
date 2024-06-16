@@ -84,7 +84,7 @@ class BlockChainService
 
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/" . $WalletAddress . "?metaData=true");
         $data = json_decode($response->getContent(), true);
-        dd($data);
+        // dd($data);
         return $data;
     }
 
@@ -118,7 +118,7 @@ class BlockChainService
             $arrayTMP = [
                 "tokenId" => $value["tokenId"],
                 "resource_name" => $value["metaData"]["resource_name"],
-                "resource_type" => "ANIMAL", //need to be change later
+                "resource_type" => $value["metaData"]["resource_type"],
                 "quantity" => $value["balance"],
                 "isContaminated" => $value["metaData"]["data"][0]["stringData"]["isContaminated"],
                 "weight" => $value["metaData"]["data"][0]["stringData"]["weight"],
@@ -138,11 +138,12 @@ class BlockChainService
     public function getRessourceFromTokenId(int $tokenId): array
     {
         $data = $this->getMetaDataFromTokenId($tokenId);
+        // dd($data);
         $returnData = [
             "tokenID" => $tokenId,
             "resourceID" => $data["resource_id"],
             "resourceName" => $data["resource_name"],
-            "resourceType" => "ANIMAL", //need to be change later
+            "resourceType" => $data["resource_type"], 
             // "quantity" => $data["data"][0]["balance"],
             "isContaminated" => $data["data"][0]["stringData"]["isContaminated"],
             "weight" => $data["data"][0]["stringData"]["weight"],
@@ -154,6 +155,7 @@ class BlockChainService
             "nutrition" => $data["data"][0]["stringData"]["nutrition"],
             "vaccin" => $data["data"][0]["stringData"]["vaccin"],
         ];
+        // dd($returnData);
         return $returnData;
     }
 
@@ -176,7 +178,10 @@ class BlockChainService
         $data = json_decode($response->getContent(), true);
         $count = 0;
         $returnData = [];
+        // dd($data);
         foreach ($data as $numberOfArray => $datas) {
+            // dd($datas["resource_id"], $resourceId);
+            // dd($datas["resource_type"] == $resourceType);
             if ($datas["resource_type"] == $resourceType){
                 // dd($datas["needed_resources"]);
                 foreach ($datas["needed_resources"] as $key => $value) {
@@ -187,6 +192,7 @@ class BlockChainService
                 }
             }
         }
+        // dd($returnData);
         if ($count ==0){
             return [0 => 
                 ["resource_id" => -1]
