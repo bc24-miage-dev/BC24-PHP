@@ -1,16 +1,20 @@
-# BC24 : Symfony Webapp - Traçabilité alimentaire
+# BC24 : Symfony Webapp - Food traceability
 
-## Présentation
 
-Ce projet correspond à l'interface utilisateur de l'application web de traçabilité alimentaire spécialisée dans la viande.
-Ce projet à été réalisée avec plusieurs groupes d'étudiants de différents niveaux de la MIAGE de Paris 1 Panthéon Sorbonne.
+## Presentation
 
-La webapp est composé de deux parties : 
-1. Une partie utilisateur, permettant de consulter les informations et la traçabilité de n'importe quel produit de la chaine de production
-2. Une partie métier, permettant tout au long de la chaîne de production de renseigner les informations nécessaires à la traçabilité, tout en
-facilitant la gestion pour les différents acteurs (éleveur, transporteur, équarrisseur, usine, distributeur, admin) de la chaîne.
+This project is the user interface for the food traceability web-application, specialising in meat. 
+This UI is designed to be run locally on a raspberryPi via a touch screen or any other screen format, it is responsive.
+This project was carried out with several groups of students at different levels of the MIAGE at Paris 1 Panthéon Sorbonne.
+
+The webapp consists of two parts: 
+1. A user section, for consulting the information and traceability of any resourse and product in the production chain
+2. A business section, enabling the information required for traceability to be entered throughout the production chain, while facilitating managementof resources for the various actors (breeder, transporter, slaughterer, manufacturer, distributor, admin) in the chain.
+
 
 ## Features
+
+### In a nutshell :
 1. signin/login/access
 2. role (breeder, slaughterer, transporter, manufacturer, distributor) request 
 3. read/write NFC tags to physically identify resources
@@ -22,177 +26,87 @@ facilitant la gestion pour les différents acteurs (éleveur, transporteur, équ
 9. sell products
 10. report resources and products (bad temperature, disease of animal, etc.)
 
+### In full : 
 
-## Installation
+#### For everybody :
+- Customer section (Login, Logout, Change personal details, Delete account)
+- Search for and Find resources and/or products with the full traceability
+- Search history
+- Display of products recently considered dangerous to health
+- Report dangerous products and send alert
+  
+#### Specific for Admin :
+- Resources management : resource creation, modification
+- Management of accounts, roles, production sites, etc.
 
-1. Cloner le projet et se placer à la racine du projet (gui/symfony-docker).
-2. Installer les dépendances avec `composer update`
-3. La BDD se trouve dans le dossier 'var' ; c'est un fichier SQLite nommé "BC24DB.db".
-   Pour faire apparaître les différentes tables, il faut exécuter la commande `php bin/console doctrine:migrations:migrate`
-4. Pour peupler la BDD, exécuter la commande `php bin/console doctrine:fixtures:load --group=app`
-5. Les pages d'erreur 404 et 403 ayant été personnalisées, passer en mode production (sinon Symfony override les pages d'erreur)
-   dans le .env
-6. Les fichiers docker et le dossier frankenphp sont à usage futur, se servir du serveur de Symfony pour le moment : `symfony serve -d`
+#### For all actors (breeder, transporter, slaughterer, manufacturer, distributor), excluding classic user :
+- Request ownership of a resource and history of requests with their status
+- Transaction management (incoming acquisition requests): acceptance, refusal
+- List(s) of resources for which they are owner and information on these resources
+
+#### Specific For breeder :
+- Birth registration of animal
+
+#### Specific for slaughterer :
+- Registration of the slaughter of an animal (creation of a Carcass resource)
+- Registration of the transformation of a carcass into half carcass
+
+#### Specific for manufacturer :
+- Cutting half a carcass into pieces (creation of Piece resources)
+- Creation of proprietary recipes
+- Recipe application (creation of PRODUCT with combined resources, following a predefined recipe)
+
+#### Specific for distributor :
+- Product sales (exit from the production chain)
+
+
+## Local Installation
+prerequisity : your OS distribution must at least allowed the php-8.3 use
+
+1. Clone the directory and get to the root of the project (gui/symfony-docker).
+2. Instal dependencies with the `composer update` command
+3. The DB is located in the 'var' folder; it is a SQLite file named "BC24DB.db".
+   To display the different tables, run the command `php bin/console doctrine:migrations:migrate`.
+4. To populate the DB, run the command `php bin/console doctrine:fixtures:load --group=app`.
+5. The 404 and 403 error pages have been customised, switch to production mode (otherwise Symfony will override the error pages) in the .env file.
+6. To run the webapp use the `symfony serve -d` command
+7. To stop the webapp use the `symfony serve:stop` command
+8. To clean the cache (necessary to see new code updates) use the `php bin/console cache:clear` command
+
+### Common error :
+1. If it tell you : “An exception occurred in the driver: could not find driver”,  then use the `sudo apt-get update` command
+
 
 ## OR run with docker anywhere
-
 1. change the last line in bundles.php
    Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => false],
-
-2. go into the root directory
-
-   ```
-   cd gui/symfony-docker
-   ```
-
-3. run the docker compose command
-
-   ```
-	docker-compose -f compose.yaml up --build -d
-   ```
-
+2. go into the root directory `cd gui/symfony-docker`
+3. run the docker compose command `docker-compose -f compose.yaml up --build -d`
 - dont use `-d` if you want to have docker output
 - first time will take a minute or two
 - will finally launch the application (make sure you check out all the host addresses)
   there are https://localhost:443 (https) and http://localhost:80 (http)
   Both should work but lets just stay with the later (80) one for now.
-
 You will already be able to see the web app but no login is possible, since the DB migration was not yet done
-
-4. enter the docker container comand line interface
-   ```
-   docker exec -ti symfony-docker-php-1 sh
-   ```
-5. in the docker container execute the DB shema creation and migration commands (answer all the questions with y)
-   ```
-   php bin/console doctrine:migrations:migrate
-   php bin/console doctrine:fixtures:load --group=app
-   ```
-
+4. enter the docker container comand line interface `docker exec -ti symfony-docker-php-1 sh`
+5. in the docker container execute the DB shema creation and migration commands (answer all the questions with y) `php bin/console doctrine:migrations:migrate`then `php bin/console doctrine:fixtures:load --group=app`
 If you go back to the web app you will be able to log in now.
 
-## Utilisation
 
-### À savoir :
+## Use
 
-Pour visionner la BDD, nous recommandons d'utiliser SQLiteStudio et d'ouvrir le fichier .db avec ce logiciel.
-Voir la fin de ce document pour un schéma de la BDD.
+### Good to know :
+- To view the DB, we recommend using SQLiteStudio and opening the .db file with this software.
+- The fixture has created several users: Here's how to connect to their accounts:
+The different roles are as follows: admin; breeder; transporter; slaughterer; manufacturer; distributor
+For each of these roles, the email is [french role name]@gmail.com and the password is [french role name].
+Exemple : Email="eleveur@gmail.com" // PWD="eleveur"
 
-La fixture a créé plusieurs utilisateurs : Voici comment se connecter à leurs comptes :
+There are also 100 customer accounts, user0@gmail.com → user99@gmail.com with the password "user".
 
-Les différents rôles sont les suivants :
-admin ; eleveur ; transporteur ; equarrisseur ; usine ; distributeur
 
-Pour chacun de ses rôles, l'email est [nom du role]@gmail.com et le mot de passe est [nom du role].
-Exemple :
 
-#### Email : eleveur@gmail.com
+## Project management
 
-#### MDP : eleveur
-
-Il y a également 100 comptes clients, user0@gmail.com → user99@gmail.com avec le mot de passe "user".
-
-### Fonctionnalités :
-
-Pour tous les rôles :
-
-- Espace client (Connexion, Déconnexion, Modification d'informations personnelles, Suppression de compte)
-- Recherche de produit et suivi de la traçabilité
-- Historique de recherche
-- Affichage des produits récemment considérés dangereux pour la santé
-- Signalement de produit
-
-Pour les admin :
-
-- Gestion des données en base de données : création de ressource, modification, suppression ; gestion des comptes, des rôles etc.
-
-Pour tous les rôles métiers :
-
-- Demande d'acquisition de ressource et liste des demandes avec leur statut
-- Gestion des transactions (demandes d'acquisitions entrantes) : acceptation, refus (Sauf distributeur)
-- Liste(s) des ressources dont ils sont responsables et informations sur ces ressources
-
-Pour les éleveurs :
-
-- Signalement de naissance
-
-Pour les équarrisseurs :
-
-- Enregistrement de la mort d'un animal (création d'une ressource de catégorie Carcasse)
-- Enregistrement de la transformation d'une carcasse en demi-carcasse
-
-Pour les usines :
-
-- Découpe en morceaux d'une demi-carcasse (création de ressources de catégorie Morceau)
-- Création de recette dont l'usine est propriétaire (association entre un nom de recette de catégorie PRODUIT avec des morceaux)
-- Application de recette (création de ressources de catégorie PRODUIT, en suivant une recette prédéfinie)
-
-Pour les distributeurs :
-
-- Vente de ressources (sortie de la chaîne de production)
-
-## Gestion du projet
-
-Le projet a été géré sur un Notion, regroupant tous les différents groupes de travail.
-Il est possible de le consulter [ici](https://www.notion.so/invite/871c052a59e13d1fd9d87985533f88fe1d821b95).
-
-Vous retrouverez un agenda avec les tâches à réaliser, les tâches en cours, les tâches terminées, semaine par semaine,
-ainsi que les réunions, les documents importants, etc.
-
-## Schéma de la BDD
-
-### Explications :
-
-Les normes de représentations classiques de BDD ne sont pas respectées ici, le but étant seulement de donner une idée de comment fonctionne le modèle de données depuis l'extérieur.
-
-La plupart des tables ne nécessitent pas d'explication, mais voici quelques précisions sur les tables et relations les plus complexes :
-
-- RESOURCE_RESOURCE permet de représenter des liens de constitutions entre différentes ressources, avec une relation n-n. C'est cette table qui assure la traçabilité entre les différentes ressources.
-  Par exemple, un produit fini peut être la composition de plusieurs morceaux de viande différents (n-1), et à l'inverse, une carcasse est toujours à l'origine de deux demi-carcasses (1-n).
-- OWNERSHIP_ACQUISITION_REQUEST lie deux Users et une ressource et représente une demande d'acquisition de ressource.
-- RECIPE est l'équivalent d'une table de relation n-n entre RESOURCE NAME et RESOURCE NAME, mais créée à la main avec Doctrine pour permettre d'ajouter un nombre d'ingrédients directement dans la colonne.
-  Ce serait sous forme d'IDs dans la table, mais les enregistrements de cette table ressemblent à :
-
-[NOM DU PRODUIT (de la recette) | INGREDIENT | QUANTITE]
-
-[Kebab | Côte de Boeuf | 1]
-
-[Kebab | Poitrine d'agneau | 3 ]
-
-[Steak AOP Poitou-Charentes | Côte de Boeuf | 1]
-
-.
-.
-.
-
-### Important : Le fonctionnement des Ressources
-
-Une RESOURCE est une ressource qui existe (ou a existé) physiquement, un RESOURCE NAME est un nom possédé par une RESSOURCE.
-Par exemple, un steak en particulier est une RESOURCE, et "Steak" est son RESOURCE NAME.
-
-Une RESOURCE a un unique RESOURCE NAME, mais un RESOURCE NAME peut être partagé par plusieurs ressources.
-
-RESOURCE NAME est donc l'appellation d'une RESOURCE: "Boeuf", "Carcasse de boeuf", "Demi-Carcasse de boeuf", "Côte de boeuf", "Steak de boeuf" sont des exemples de RESOURCE NAME.
-
-À chaque RESOURCE NAME est donc liée une et une seule RESOURCE CATEGORY, qui permet de définir le type de ressource, parmi les choix suivants : "ANIMAL", "CARCASSE", "DEMI-CARCASSE", "MORCEAU", "PRODUIT".
-
-De plus, à chaque RESOURCE NAME est associé une ou plusieurs RESOURCE FAMILY qui représente la famille de viande à laquelle appartient la ressource.
-Par exemple, "Boeuf", "Carcasse de boeuf", etc jusqu'à "Steak de boeuf" appartiennent à la famille "Boeuf".
-Mais par exemple un "Kebab" peut être de plusieurs familles différentes, comme "Boeuf" et "Agneau" par exemple.
-
-Ainsi, seuls les RESOURCE NAMEs de catégorie PRODUIT peuvent être associés à plusieurs RESOURCE FAMILY.
-
-Prenons deux exemples :
-
-- Une vache réelle, dans un champ, est une RESSOURCE. Son RESOURCE NAME est "Vache", RESOURCE NAME fortement lié à la CATEGORY "ANIMAL" et à la FAMILY "Vache".
-  Ainsi, on peut déduire de cette instance de vache que si elle venait à être équarrie, on obtiendrait une "Carcasse de vache", qui est le RESOURCE NAME qui combine la CATEGORY "CARCASSE" et la FAMILY "Vache".
-
-- Un Kebab, dans un restaurant, est une RESSOURCE. Son RESOURCE NAME est "Kebab", RESOURCE NAME fortement lié à la CATEGORY "PRODUIT" et à une ou plusieurs FAMILY, selon la recette de l'usine qui l'a produit.
-
-###### En effet, en créant une recette, l'usine **_crée_** un RESOURCE NAME dont elle a la propriété, forcément de Catégorie PRODUIT, et c'est elle qui choisit les FAMILYs de viande dont le produit est composé.
-
-En résumé, un RESOURCE NAME est un moule qui donne toutes les informations, tandis qu'une RESOURCE est une instance.
-
-### Schéma :
-
-![Schema de la BDD](BC24.png)
+The project was managed using Notion, bringing together all the different working groups and their contributions.
+It is free to consult it [here](https://www.notion.so/invite/871c052a59e13d1fd9d87985533f88fe1d821b95).
