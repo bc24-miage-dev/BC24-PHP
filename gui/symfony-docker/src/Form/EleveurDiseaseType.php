@@ -2,19 +2,20 @@
 
 namespace App\Form;
 
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\ProductionSite;
 use App\Entity\Resource;
 use App\Entity\ResourceName;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use App\Service\BlockChainService;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class EleveurWeightType extends AbstractType
+class EleveurDiseaseType extends AbstractType
 {
     private BlockChainService $blockChainService;
 
@@ -24,22 +25,25 @@ class EleveurWeightType extends AbstractType
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
-    {
-        $weight = $options['weight'];
-        $builder
-            ->add('weight', IntegerType::class, ['data' => $weight,
-            'attr' => ['type' => 'number', 'min' => 0]
-        ],)
-            ->add('Peser', SubmitType::class, [
-            ])
-        ;
-    }
+{
+    $isContaminated = $options['isContaminated'];
+    $builder
+        ->add('isContaminated', ChoiceType::class, [
+            'choices' => [
+                'Yes' => true,
+                'No' => false,
+            ],
+            'data' => $isContaminated,
+        ])
+        ->add("Informer", SubmitType::class, [])
+    ;
+}
         public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             // other defaults...
             'id' => null, // Define the default value or requirement for 'id'
-            'weight' => 0,
+            'isContaminated' => false,
         ]);
     }
 }

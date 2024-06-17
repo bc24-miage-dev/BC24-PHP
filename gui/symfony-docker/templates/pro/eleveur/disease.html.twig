@@ -4,16 +4,11 @@
     <div class="container-fluid">
         <h1>Signaler une maladie</h1>
 
-        <form action="{{ path('app_eleveur_disease', {'id': id }) }}" method="post">
-            <div class="form-group">
-                <label for="disease">Maladie</label>
-                <input type="text" class="form-control" id="disease" name="disease" required>
-            </div>
-            <div class="form-group">
-                <label for="dateBegin">Date début de maladie</label><input type="date" class="form-control" id="dateBegin" name="dateBegin" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Signaler</button>
-        </form>
+        {{ form_start(form) }}
+            <label> Contamination :
+            {{ form_widget(form.isContaminated, {'attr': {'class': 'form-control'}}) }}
+            </label>
+        {{ form_end(form) }}
         <br>
         <a href="{{ path('app_eleveur_specific', {'id' : id}) }}"><button class="btn btn-primary">Revenir en arrière</button></a>
     </div>

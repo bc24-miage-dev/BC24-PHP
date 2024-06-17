@@ -3,20 +3,11 @@
 {% block body %}
     <div class="container-fluid">
         <h1>Enregistrez votre source de Nutrition :</h1>
-        <br>
-        <form action="{{ path('app_eleveur_nutrition', {'id' : id}) }}" method="post">
-            <label for="vaccine">Source de nutrition :
-                <select class="custom-select" required name="nutrition" id="nutrition">
-                    <option value="Nutrition A" selected>Nutrition A</option>
-                    <option value="Nutrition B">Nutrition B</option>
-                    <option value="Nutrition C">Nutrition C</option>
-                    <option value="Nutrition D">Nutrition D</option>
-                    <option value="Nutrition E">Nutrition E</option>
-                </select>
+        {{ form_start(form) }}
+            <label> Nutrition :
+                {{ form_widget(form.nutrition, {'attr': {'class': 'form-control'}}) }}
             </label>
-            <br>
-            <input class="btn btn-primary" type="submit" value="Enregistrer">
-        </form>
+        {{ form_end(form) }}
         <br>
         <a href="{{ path('app_eleveur_specific', {'id' : id}) }}"><button class="btn btn-primary">Revenir en arrière</button></a>
     </div>
