@@ -76,9 +76,8 @@ class  UsineController extends AbstractController
                          Request $request,
                          $category): Response
     {
-
         switch ($category) {
-            case 'Demi20Carcass':
+            case 'Demi%20Carcass' or 'Demi Carcass':
                 $category = 'Demi Carcass';
                 break;
             default:
@@ -90,7 +89,7 @@ class  UsineController extends AbstractController
             $category = 'Demi Carcass';
         }
         $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
-        
+        // dd($resources);
         // if ($request->isMethod('POST')) {
         //     try {
         //         $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
@@ -105,23 +104,37 @@ class  UsineController extends AbstractController
         // }
 
         return $this->render('pro/usine/list.html.twig',
-            ['resources' => $resources]
+            ['resources' => $resources,
+                'category' => $category]
         );
 
     }
 
 
-    #[Route('/specific/{id}', name: 'app_usine_specific')]
+    #[Route('/specific/{id}/{category}', name: 'app_usine_specific')]
     public function specific(ResourceRepository $resourceRepo,
-                             $id): Response
+                             $id, $category): Response
     {
-        $resource = $resourceRepo->find($id);
-        if (!$this->usineHandler->canHaveAccess($resource, $this->getUser())) {
-            $this->addFlash('error', 'Cette ressource ne vous appartient pas');
-            return $this->redirectToRoute('app_usine_list', ['category' => 'MORCEAU']);
-
+        switch ($category) {
+            case 'Demi%20Carcass' or 'Demi Carcass':
+                $nextCategory = 'Meat';
+                break;
+            default:
+                $nextCategory = "Meat";
+                break;
         }
-        $category = $resource->getResourceName()->getResourceCategory()->getCategory();
+        $resource =$this->blockChainService->getRessourceFromTokenId($id);
+        // dd($resource);
+        // dd($resource["resourceID"], "MANUFACTURER", $nextCategory);
+        $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "MANUFACTURER", $nextCategory);
+        // dd($possibleResource);
+        // $resource = $resourceRepo->find($id);
+        // if (!$this->usineHandler->canHaveAccess($resource, $this->getUser())) {
+        //     $this->addFlash('error', 'Cette ressource ne vous appartient pas');
+        //     return $this->redirectToRoute('app_usine_list', ['category' => 'MORCEAU']);
+
+        // }
+        // $category = $resource->getResourceName()->getResourceCategory()->getCategory();
         return $this->render('pro/usine/specific.html.twig', [
             'resource' => $resource,
             'category' => $category
