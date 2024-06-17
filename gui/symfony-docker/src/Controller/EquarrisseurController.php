@@ -79,71 +79,106 @@ class EquarrisseurController extends AbstractController
                          String $category,
                          Request $request) : Response
     {
-        if ($request->isMethod('POST')) {
-            try {
-                $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-            }
-            catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category] );
-            }
+        if ($category === "Demi%20Carcass") {
+            $category = 'Demi Carcass';
         }
-        else{
-            $resources = $listHandler->getResources($this->getUser(), $category);
-        }
+        $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
+        // dd($resources);
+
+        // if ($request->isMethod('POST')) {
+        //     try {
+        //         $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
+        //     }
+        //     catch (\Exception $e) {
+        //         $this->addFlash('error', $e->getMessage());
+        //         return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category] );
+        //     }
+        // }
+        // else{
+        //     $resources = $listHandler->getResources($this->getUser(), $category);
+        // }
 
         return $this->render('pro/equarrisseur/list.html.twig',
-            ['resources' => $resources]
+            ['resources' => $resources,
+                'category' => $category]
         );
     }
 
-    #[Route('/specific/{id}', name: 'app_equarrisseur_job')]
-    public function job($id): Response
+    #[Route('/specific/{id}/{category}', name: 'app_equarrisseur_job')]
+    public function job($id,$category): Response
     {
-
-        $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-
-        if (!$this->equarrisseurHandler->canHaveAccess($resource, $this->getUser())){
-            $this->addFlash('error', 'Ressource introuvable');
-            return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
+        switch (strtolower($category)) {
+            case 'animal':
+                $nextCategory = "Carcass";
+                break;
+            case 'carcass':
+                $nextCategory = "Demi Carcass";
+                break;
+            default:
+                $nextCategory = "Demi Carcass";
+                break;
         }
+        $resource =$this->blockChainService->getRessourceFromTokenId($id);
+        // dd($resource);
+        // dd($resource["resourceID"], "SLAUGHTERER", $category);
+        $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $nextCategory);
+        // dd($possibleResource);
+        // dd($test);
+        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
 
-        $category = $resource->getResourceName()->getResourceCategory()->getCategory();
+        // if (!$this->equarrisseurHandler->canHaveAccess($resource, $this->getUser())){
+        //     $this->addFlash('error', 'Ressource introuvable');
+        //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
+        // }
+
+        // $category = $resource->getResourceName()->getResourceCategory()->getCategory();
             return $this->render('pro/equarrisseur/job.html.twig', [
                 'resource' => $resource,
+                'newResourceID' => $possibleResource[0]["resource_id"],
                 'category' => $category
             ]);
     }
 
-    #[Route('/equarrir/{id}/{tokenID}', name: 'app_equarrisseur_equarrir')]
+    #[Route('/equarrir/{newResourceID}/{tokenIDAnimal}', name: 'app_equarrisseur_equarrir')]
     public function equarrir(ResourceHandler $handler,
                              Request $request,
-                             $id, $tokenID) : Response
+                             $newResourceID, $tokenIDAnimal) : Response
     {
 
-
-        // if ($form->isSubmitted()) {
+        $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class);
+        $form->handleRequest($request);
+        // dd($form);
+        if ($form->isSubmitted()) {
             $walletAddress = $this->getUser()->getWalletAddress();
-            $carcass = $this->blockChainService->getResourceTemplate($id, "SLAUGHTERER");
+            $carcass = $this->blockChainService->getResourceTemplate($newResourceID, "SLAUGHTERER");
             $carcassID = $carcass[0]["resource_id"];
             // dd($carcass);
-            $ingredient = $tokenID;
+            $ingredient = $tokenIDAnimal;
             // dd($carcass);
-            $getMetaData = $this->blockChainService->getStringDataFromTokenID($tokenID);
+            $getMetaData = $this->blockChainService->getStringDataFromTokenID($tokenIDAnimal);
             // dd($getMetaData);
             $mintResource = $this->blockChainService->mintResource($walletAddress,$carcassID,1, $getMetaData, [$ingredient]);
-
-            
+            $responseArray = json_decode($mintResource, true);
+            $this->addFlash('success', 'Votre animal à bien été transformé en : '.$responseArray["ressourceName"].' ! NFT : ' . $responseArray["tokenId"]);
+            return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray['tokenId']]);
             // $test2 = $this->blockChainService->mintResource();
-            dd($mintResource);
-        // }
+            // dd($mintResource);
+
+        }
+        return $this->render('pro/equarrisseur/equarrir.html.twig', [
+            "id" => $newResourceID,
+            "tokenID" => $tokenIDAnimal,
+            'form' => $form->createView()
+        ]);
+
+
         // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
         // if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
         //     $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
         //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
         // }
 
-        // $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class,
+        // $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class);
         //     $newCarcasse = $handler->createChildResource($resource, $this->getUser()));
         // $form->handleRequest($request);
         // if ($form->isSubmitted() && $form->isValid()) {
@@ -156,9 +191,9 @@ class EquarrisseurController extends AbstractController
         //     $this->addFlash('success', 'L\'animal a bien été abattu, une carcasse a été créée');
         //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
         // }
-        // return $this->render('pro/equarrisseur/equarrir.html.twig', [
-        //     'form' => $form->createView()
-        // ]);
+        return $this->render('pro/equarrisseur/equarrir.html.twig', [
+            'form' => $form->createView()
+        ]);
 
     }
 

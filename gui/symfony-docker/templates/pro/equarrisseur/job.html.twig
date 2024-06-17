@@ -2,36 +2,40 @@
 
 {% block body %}
     <div class="container-fluid">
-    {% if category == 'ANIMAL' %}
+    {% if resource.resourceType == 'ANIMAL' %}
         <h1>Informations sur cet animal</h1>
         <br>
 
         <ul class="list-group">
-            <li class="list-group-item">NFC : {{ resource.id }}</li>
-            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
-            <li class="list-group-item">Genre : {{ resource.Genre }}</li>
-            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
-            <li class="list-group-item">Date et heure de naissance : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
+            <li class="list-group-item">NFC : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Genre : {{ resource.genre }}</li>
+            <li class="list-group-item">Lieu de création : {{ resource.address }} 
+            {# | Téléphone : {{ resource.origin.ProductionSiteTel }} #}
+            </li>
+            <li class="list-group-item">Date de création: {{ resource.birthDate}} {# |date('d/m/Y') #} </li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
-        <a href="{{ path('app_equarrisseur_equarrir', {'id' : resource.id}) }}">
+        {% if newResourceID != -1 %}
+        <a href="{{ path('app_equarrisseur_equarrir', {"newResourceID" : newResourceID , 'tokenIDAnimal' : resource.tokenID}) }}">
             <button class="btn btn-primary">Équarrir</button>
         </a>
+        {% endif %}
 
 
-    {% elseif category == 'CARCASSE' %}
+    {% elseif category == 'Carcass' %}
         <h1>Informations sur cette carcasse</h1>
         <br>
         <ul class="list-group">
-            <li class="list-group-item">NFC : {{ resource.id }}</li>
-            <li class="list-group-item">Nom : {{ resource.ResourceName.name }}</li>
-            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
-            <li class="list-group-item">Date et heure d'abattage : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
+            <li class="list-group-item">NFC : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Adresse : {{ resource.address }}</li>
+            <li class="list-group-item">Date d'abattage : {{ resource.birthDate }}</li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
-        <a href="{{ path('app_equarrisseur_decoupe', {'id' : resource.id}) }}">
+        <a href="{{ path('app_equarrisseur_equarrir', {"newResourceID" : newResourceID , 'tokenIDAnimal' : resource.tokenID}) }}">
             <button class="btn btn-primary">Découper</button>
         </a>
     {% else %}
@@ -47,7 +51,7 @@
 
     {% endif %}
         <br><br>
-        <a href="{{ path('app_equarrisseur_list', {'category': category}) }}"><button class="btn btn-primary">Retour à la liste</button></a>
+        <a href="{{ path('app_equarrisseur_list', {'category': resource.resourceType}) }}"><button class="btn btn-primary">Retour à la liste</button></a>
 
     </div>
 

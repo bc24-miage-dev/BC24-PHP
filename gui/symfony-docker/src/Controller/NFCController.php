@@ -24,7 +24,7 @@ class NFCController extends AbstractController
 {
     if ($request->isMethod('POST')) {       //if post method
         $response = $this->hardwareService->write($id);
-        if ($response->getStatusCode() === 200) {
+        if ($response == 200) {
             $this->addFlash('success', 'The NFT ID of the resource has been write on the NFC');
         } 
         else {

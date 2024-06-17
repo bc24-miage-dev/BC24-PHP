@@ -15,8 +15,8 @@
             {% for resource in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
-                        <h5 class="card-title">{{ resource.ResourceName.name }} - {{ resource.id }}</h5>
-                        <a href="{{ path('app_equarrisseur_job', {'id' : resource.id}) }}" class="card-link">Plus de détails</a>
+                        <h5 class="card-title">{{ resource.resource_name }} - {{ resource.tokenId }}</h5>
+                        <a href="{{ path('app_equarrisseur_job', {'id' : resource.tokenId, "category" : category}) }}" class="card-link">Plus de détails</a>
                     </div>
                 </div>
             {% endfor %}

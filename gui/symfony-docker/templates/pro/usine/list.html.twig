@@ -14,8 +14,8 @@
             {% for demiCarcasse in resources %}
                 <div class="card mr-2 mb-2" style="width: 100%;">
                     <div class="card-body ">
-                        <h5 class="card-title">{{ demiCarcasse.ResourceName.name }} - {{ demiCarcasse.id }}</h5>
-                        <a href="{{ path('app_usine_specific', {'id' : demiCarcasse.id}) }}" class="card-link">Plus de détails</a>
+                        <h5 class="card-title">{{ demiCarcasse.resource_name }} - {{ demiCarcasse.tokenId }}</h5>
+                        <a href="{{ path('app_usine_specific', {'id' : demiCarcasse.tokenId, 'category' : category}) }}" class="card-link">Plus de détails</a>
                     </div>
                 </div>
             {% endfor %}
