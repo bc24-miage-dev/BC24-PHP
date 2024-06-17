@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
 
 
 #[Route('/pro/usine')]
@@ -27,11 +28,13 @@ class  UsineController extends AbstractController
 {
     private TransactionHandler $transactionHandler;
     private UsineHandler $usineHandler;
+    private BlockChainService $blockChainService;
 
-    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler)
+    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler, BlockChainService $blockChainService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->usineHandler = $usineHandler;
+        $this->blockChainService = $blockChainService;
     }
 
     
@@ -73,18 +76,33 @@ class  UsineController extends AbstractController
                          Request $request,
                          $category): Response
     {
-        if ($request->isMethod('POST')) {
-            try {
-                $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-            }
-            catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_usine_list', ['category' => $category] );
-            }
+
+        switch ($category) {
+            case 'Demi20Carcass':
+                $category = 'Demi Carcass';
+                break;
+            default:
+                $category = "Meat";
+                break;
         }
-        else{
-            $resources = $listHandler->getResources($this->getUser(), $category);
+        
+        if ($category === "Demi%20Carcass") {
+            $category = 'Demi Carcass';
         }
+        $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
+        
+        // if ($request->isMethod('POST')) {
+        //     try {
+        //         $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
+        //     }
+        //     catch (\Exception $e) {
+        //         $this->addFlash('error', $e->getMessage());
+        //         return $this->redirectToRoute('app_usine_list', ['category' => $category] );
+        //     }
+        // }
+        // else{
+        //     $resources = $listHandler->getResources($this->getUser(), $category);
+        // }
 
         return $this->render('pro/usine/list.html.twig',
             ['resources' => $resources]

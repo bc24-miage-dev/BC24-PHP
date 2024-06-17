@@ -114,9 +114,9 @@ class EquarrisseurController extends AbstractController
             case 'carcass':
                 $nextCategory = "Demi Carcass";
                 break;
-            case 'demi%20carcasse':
-                $nextCategory = "Demi Carcasse";
-            break;
+            default:
+                $nextCategory = "Demi Carcass";
+                break;
         }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
         // dd($resource);
