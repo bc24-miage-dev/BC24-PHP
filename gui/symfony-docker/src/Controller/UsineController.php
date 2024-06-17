@@ -148,30 +148,40 @@ class  UsineController extends AbstractController
                             ResourceNameRepository $nameRepository,
                             $id): Response
     {
-        $demiCarcasse = $resourceRepository->find($id);
-
-        if (!$this->usineHandler->canCutIntoPieces($demiCarcasse, $this->getUser())) {
-            $this->addFlash('error', 'Il y a eu une erreur, veuillez réessayer');
-            return $this->redirectToRoute('app_usine_list', ['category' => 'DEMI-CARCASSE']);
+        $demiCarcasse =$this->blockChainService->getRessourceFromTokenId($id);
+        $walletAddress = $this->getUser()->getWalletAddress();
+        $tokenId = $demiCarcasse["tokenID"];
+        $metaData = $this->blockChainService->getStringDataFromTokenID($tokenId);
+        $morceaux = $this->blockChainService->mintToMany($walletAddress, $tokenId , $metaData);
+        dd($morceaux);
+        foreach ($morceaux as $key => $morceau) {
+            $this->addFlash('success', 'Le morceau '.$morceau["ressourceName"].' a bien été créé avec le tokenID '.$morceau["tokenId"].' et a été ajouté à votre wallet');
+            $this->blockChainService->write($morceau["tokenId"]);
         }
-        $morceaux = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
-            family: $demiCarcasse->getResourceName()->getResourceFamilies()[0]->getName());
-            // Only products can have multiple families
+        // $demiCarcasse = $resourceRepository->find($id);
 
-        if ($request->isMethod('POST')) {
-            $list = $request->request->all()['list'];
-            try {
-                $this->usineHandler->cuttingProcess($demiCarcasse, $morceaux, $list, $this->getUser());
-                $this->addFlash('success', 'La demi-carcasse a bien été découpée');
-            } catch (UniqueConstraintViolationException) {
-                $this->addFlash('error', 'Au moins un tag NFC est déjà utilisé par une autre ressource');
-                return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
-            } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
-                return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
-            }
-            return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
-        }
+        // if (!$this->usineHandler->canCutIntoPieces($demiCarcasse, $this->getUser())) {
+        //     $this->addFlash('error', 'Il y a eu une erreur, veuillez réessayer');
+        //     return $this->redirectToRoute('app_usine_list', ['category' => 'DEMI-CARCASSE']);
+        // }
+        // $morceaux = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
+        //     family: $demiCarcasse->getResourceName()->getResourceFamilies()[0]->getName());
+        //     // Only products can have multiple families
+
+        // if ($request->isMethod('POST')) {
+        //     $list = $request->request->all()['list'];
+        //     try {
+        //         $this->usineHandler->cuttingProcess($demiCarcasse, $morceaux, $list, $this->getUser());
+        //         $this->addFlash('success', 'La demi-carcasse a bien été découpée');
+        //     } catch (UniqueConstraintViolationException) {
+        //         $this->addFlash('error', 'Au moins un tag NFC est déjà utilisé par une autre ressource');
+        //         return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
+        //     } catch (\Exception $e) {
+        //         $this->addFlash('error', $e->getMessage());
+        //         return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
+        //     }
+        //     return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
+        // }
 
         return $this->render('pro/usine/decoupe.html.twig', [
             'demiCarcasse' => $demiCarcasse, // La demi-carcasse à découper
