@@ -67,7 +67,7 @@ class HardwareService
     }
 
 
-    public function write($tokenId): String
+    public function write($tokenID): String
     {
         try {
             $url = 'http://127.0.0.1:5000/write';
@@ -104,7 +104,7 @@ class HardwareService
             $this->logger->error('Erreur inattendue lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
             return new Response('Une erreur inattendue s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return null;
+        return 200; //en attente de trouver une meilleur solution
     }
 
 }
