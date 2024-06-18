@@ -76,18 +76,19 @@ class  UsineController extends AbstractController
                          Request $request,
                          $category): Response
     {
+        // dd($category);
         switch ($category) {
-            case 'Demi%20Carcass' or 'Demi Carcass':
+            case 'Demi%20Carcass':
+            case 'Demi Carcass':
                 $category = 'Demi Carcass';
                 break;
             default:
                 $category = "Meat";
                 break;
         }
-        
-        if ($category === "Demi%20Carcass") {
-            $category = 'Demi Carcass';
-        }
+        // if ($category === "Demi%20Carcass") {
+        //     $category = 'Demi Carcass';
+        // }
         $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
         // dd($resources);
         // if ($request->isMethod('POST')) {
@@ -152,11 +153,12 @@ class  UsineController extends AbstractController
         $walletAddress = $this->getUser()->getWalletAddress();
         $tokenId = $demiCarcasse["tokenID"];
         $metaData = $this->blockChainService->getStringDataFromTokenID($tokenId);
+        // dd($walletAddress, $tokenId , $metaData);
         $morceaux = $this->blockChainService->mintToMany($walletAddress, $tokenId , $metaData);
-        dd($morceaux);
+        // dd($morceaux);
         foreach ($morceaux as $key => $morceau) {
             $this->addFlash('success', 'Le morceau '.$morceau["ressourceName"].' a bien été créé avec le tokenID '.$morceau["tokenId"].' et a été ajouté à votre wallet');
-            $this->blockChainService->write($morceau["tokenId"]);
+            // $this->blockChainService->write($morceau["tokenId"]);
         }
         // $demiCarcasse = $resourceRepository->find($id);
 
@@ -182,11 +184,11 @@ class  UsineController extends AbstractController
         //     }
         //     return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
         // }
-
-        return $this->render('pro/usine/decoupe.html.twig', [
-            'demiCarcasse' => $demiCarcasse, // La demi-carcasse à découper
-            'morceauxPossibles' => $morceaux // Les ressources possibles à partir d'elle
-        ]);
+        return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
+        // return $this->render('pro/usine/decoupe.html.twig', [
+        //     'demiCarcasse' => $demiCarcasse, // La demi-carcasse à découper
+        //     'morceauxPossibles' => $morceaux // Les ressources possibles à partir d'elle
+        // ]);
     }
 
 

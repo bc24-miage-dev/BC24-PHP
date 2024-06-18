@@ -108,9 +108,10 @@ class BlockChainService
     {
         $body = [
             "from_wallet_address" => $walletAddress,
-            "tokenId" => $tokenID,
+            "producer_token_id" => $tokenID,
             "metaData" => $metaData,
         ];
+        // dd($body);
         $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/mintToMany", [
             'json' => $body,
         ]);
