@@ -74,7 +74,6 @@ class EleveurController extends AbstractController
     public function naissance(Request $request,
                               ResourceHandler $handler): Response
     {
-        
         $form = $this->createForm(EleveurBirthType::class);
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
@@ -93,7 +92,12 @@ class EleveurController extends AbstractController
             return $this->redirectToRoute('app_eleveur_naissance');
         }
         $this->addFlash('success', 'La naissance de votre '.$responseArray["ressourceName"].' a bien été enregistrée ! NFT : ' . $responseArray["tokenId"]);
-        return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray['tokenId']]);
+        
+        return $this->render('user/WriteOnNFC.html.twig', [
+            'id' => [$responseArray['tokenId']],
+            'name' =>  [$responseArray['ressourceName']],
+            'resourceType' => 'Animal'
+        ]);
     }
 
     return $this->render('pro/eleveur/naissance.html.twig', [
@@ -108,25 +112,8 @@ class EleveurController extends AbstractController
     public function list(Request $request,
                          ResourcesListHandler $listHandler): Response
     {   
-        // dd($this->getUser()->getWalletAddress());
         $animaux = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
         return $this->render('pro/eleveur/list.html.twig', ['animaux' => $animaux]);
-        // if ($request->isMethod('POST')) {
-        //     try {
-        //         $animaux = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-        //     }
-        //     catch (\Exception $e) {
-        //         $this->addFlash('error', $e->getMessage());
-        //         return $this->redirectToRoute('app_eleveur_list');
-        //     }
-        // }
-        // else{
-        //     $animaux = $listHandler->getResources($this->getUser(), 'ANIMAL');
-        // }
-
-        // return $this->render('pro/eleveur/list.html.twig',
-        //     ['animaux' => $animaux]
-        // );
     }
 
 
@@ -160,32 +147,11 @@ class EleveurController extends AbstractController
     public function weight(Request $request,
                            $id): Response {
         $resource = $this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
         $form = $this->createForm(EleveurWeightType::class, null, ['id' => $id, 'weight' => $resource["weight"]]);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            // dd($form->getData());
-            $test = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["weight" => $form->getData()["weight"]]);
-            // dd($test);
-
-        // dd($resource);
+            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["weight" => $form->getData()["weight"]]);
         }
-
-        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-        // if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser()))
-        // {
-        //     $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
-
-        // $form = $this->createForm(EleveurWeightType::class, $resource);
-        // $form->handleRequest($request);
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     $this->entityManager->persist($resource);
-        //     $this->entityManager->flush();
-        //     $this->addFlash('success', 'L\'animal a bien été pesé');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
         return $this->render('pro/eleveur/weight.html.twig', [
             'form' => $form->createView(),
             'id' => $id
@@ -198,27 +164,11 @@ class EleveurController extends AbstractController
     public function vaccine(Request $request,
                             $id): Response {
         $resource = $this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
-        $form = $this->createForm(EleveurVaccineType::class, null, ['id' => $id, 'Vaccin' => $resource['vaccin']]); //DON T WORK, HAVE TO BE SOLVE TOMORROW
+        $form = $this->createForm(EleveurVaccineType::class, null, ['id' => $id, 'Vaccin' => $resource['vaccin']]);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            // dd($form->getData());
-            $test = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["vaccin" => $form->getData()["Vaccin"]]);
-            // dd($test);
-        // dd($resource);
+            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["vaccin" => $form->getData()["Vaccin"]]);
         }
-        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-
-        // if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser())){
-        //     $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
-
-        // if ($request->isMethod('POST')) {
-        //     $this->eleveurHandler->vaccineAnimal($request->request->get('vaccine'), $resource);
-        //     $this->addFlash('success', 'Le vaccin a bien été enregistré');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
         return $this->render('pro/eleveur/vaccine.html.twig', [
             'form' => $form->createView(),
             'id' => $id,
@@ -232,26 +182,11 @@ class EleveurController extends AbstractController
                               $id): Response
     {
         $resource = $this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
-        $form = $this->createForm(EleveurNutritionType::class, null, ['id' => $id, 'nutrition' => $resource['nutrition']]); //DON T WORK, HAVE TO BE SOLVE TOMORROW
+        $form = $this->createForm(EleveurNutritionType::class, null, ['id' => $id, 'nutrition' => $resource['nutrition']]);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            // dd($form->getData());
-            $test = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["nutrition" => $form->getData()["nutrition"]]);
-            // dd($test);
-        // dd($resource);
+            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["nutrition" => $form->getData()["nutrition"]]);
         }
-        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-
-        // if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser())){
-        //     $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
-        // if ($request->isMethod('POST')) {
-        //     $this->eleveurHandler->addNutrition($request->request->get('nutrition'), $resource);
-        //     $this->addFlash('success', 'Le changement de nutrition de votre animal a bien été enregistré');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
         return $this->render('pro/eleveur/nutrition.html.twig', [
             'id' => $id,
             'form' => $form->createView(),
@@ -265,28 +200,11 @@ class EleveurController extends AbstractController
                             $id): Response
     {
         $resource = $this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
-        $form = $this->createForm(EleveurDiseaseType::class, null, ['id' => $id, 'isContaminated' => $resource['isContaminated']]); //DON T WORK, HAVE TO BE SOLVE TOMORROW
+        $form = $this->createForm(EleveurDiseaseType::class, null, ['id' => $id, 'isContaminated' => $resource['isContaminated']]);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            // dd($form->getData());
-            $test = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["isContaminated" => $form->getData()["isContaminated"]]);
-            // dd($test);
-        // dd($resource);
+            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["isContaminated" => $form->getData()["isContaminated"]]);
         }
-
-        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-        // if (!$this->eleveurHandler->canHaveAccess($resource, $this->getUser())){
-        //     $this->addFlash('error', 'Ce tag NFC ne correspond pas à un de vos animaux');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
-
-        // if ($request->isMethod('POST')) {
-        //     $this->eleveurHandler->addDisease($request->request->get('disease'),
-        //         $request->request->get('dateBegin'), $resource);
-        //     $this->addFlash('success', 'La maladie a bien été enregistrée');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
         return $this->render('pro/eleveur/disease.html.twig', [
             'form' => $form->createView(),
             'id' => $id]);
@@ -299,13 +217,6 @@ class EleveurController extends AbstractController
                              $id) : Response
     {
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
-        // $animal = $resourceRepository->findOneBy(['id' => $id]);
-        // if (!$this->eleveurHandler->canHaveAccess($animal, $this->getUser())){
-        //     $this->addFlash('error', 'Cette ressource ne correspond pas à un de vos animaux');
-        //     return $this->redirectToRoute('app_eleveur_list');
-        // }
-
         return $this->render('pro/eleveur/specific.html.twig', ['animal' => $resource ]);
     }
 
