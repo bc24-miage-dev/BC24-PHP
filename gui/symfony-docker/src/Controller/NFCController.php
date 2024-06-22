@@ -20,19 +20,33 @@ class NFCController extends AbstractController
     }
 
     #[Route('/NFC/write/{id}', name: 'app_nfc_write')]
-    public function startWriteNFC(Request $request, $id): Response
-{
-    if ($request->isMethod('POST')) {       //if post method
-        $response = $this->hardwareService->write($id);
-        if ($response == 200) {
-            $this->addFlash('success', 'The NFT ID of the resource has been write on the NFC');
-        } 
-        else {
-            $this->addFlash('error', 'An error occurred while writing the resource NFT ID on the NFC');
-        }
+    public function startWriteNFC(Request $request, $id): Response //page to render
+    {
+        $arrayList = explode('.', $id);
+        return $this->render('user/WriteOnNFC.html.twig', [
+            'id' => $arrayList,
+        ]);
     }
-    return $this->render('user/WriteOnNFC.html.twig', [
-        'id' => $id,
-    ]);
-}
+
+    #[Route('/writeNFC/{id}', name: 'app_write')]    //called method of JS
+        public function WriteNFC(Request $request, $id): response
+    {
+            $response = $this->hardwareService->write($id);
+            return $this->render("/static/info.html.twig");
+    }
+
+    #[Route('/NFC/test', name: 'app_nfc_read')]
+    public function testNFC(): response
+    {
+        $test = (implode('.', [1,2,3,4,5,6,7,8,9,10]));
+        $test2 = explode('.', $test);
+        return $this->redirectToRoute('app_nfc_write', ['id' => $test]);
+    }
+
+    #[Route('/NFC/{id}', name: 'app_nfc_readjs')]
+    public function testNFCjs($id): response
+    {
+        $this->hardwareService->write($id);
+        return $this->render("/static/info.html.twig");
+    }
 }

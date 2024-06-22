@@ -81,7 +81,6 @@ class BlockChainService
 
     public function getResourceWalletAddress(String $WalletAddress): array
     {
-        // $WalletAddress = "0x9AC65C5FF92e9C52fA342fA9D8e681637A4C80e0";
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/" . $WalletAddress . "?metaData=true");
         $data = json_decode($response->getContent(), true);
         // dd($data);
@@ -195,7 +194,6 @@ class BlockChainService
         $data = json_decode($response->getContent(), true);
         $count = 0;
         $returnData = [];
-        // dd($data);
         foreach ($data as $numberOfArray => $datas) {
             // dd($datas["resource_id"], $resourceId);
             // dd($datas["resource_type"] == $resourceType);
@@ -212,7 +210,7 @@ class BlockChainService
         // dd($returnData);
         if ($count ==0){
             return [0 => 
-                ["resource_id" => -1]
+                ["resource_id" => $resourceId]
             ];
         }
         return $returnData;
@@ -240,7 +238,7 @@ class BlockChainService
         $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/metadata", [
             'json' => $body,
         ]);
-        // dd($response->getContent());
+        
         $returnData = json_decode($response->getContent(), true);
         // dd($returnData);
         return $returnData;
