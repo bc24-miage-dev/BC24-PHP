@@ -9,7 +9,7 @@ This project was carried out with several groups of students at different levels
 
 The webapp consists of two parts: 
 1. A user section, for consulting the information and traceability of any resourse and product in the production chain
-2. A business section, enabling the information required for traceability to be entered throughout the production chain, while facilitating managementof resources for the various actors (breeder, transporter, slaughterer, manufacturer, distributor, admin) in the chain.
+2. A business section, enabling the information required for traceability to be entered throughout the production chain, while facilitating management of resources for the various actors (breeder, transporter, slaughterer, manufacturer, distributor, admin) in the chain.
 
 
 ## Features
