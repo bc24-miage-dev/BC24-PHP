@@ -47,29 +47,7 @@ class AdminController extends AbstractController
     public function add(Request $request,
                         ResourceHandler $handler): Response
     {
-        $resource = $handler->createDefaultNewResource($this->getUser());
-        $form = $this->createForm(ResourceType::class, $resource);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->entityManager->persist($resource);
-                $this->entityManager->flush();
-            } catch (UniqueConstraintViolationException){
-                 $this->addFlash('error', 'Le tag NFC est déjà utilisé');
-                return $this->render('admin/add.html.twig', [
-                    'form' => $form->createView()
-                ]);
-            }
-                $this->addFlash('success', 'Ressource ajoutée avec succès');
-                return $this->render('admin/admin.html.twig');
-
-        } else{
-            $this->addFlash('error', 'Erreur lors de l\'ajout de la ressource');
-        }
-        return $this->render('admin/add.html.twig', [
-            'form' => $form->createView()
-        ]);
+        return $this->render('admin/add.html.twig');
     }
 
 

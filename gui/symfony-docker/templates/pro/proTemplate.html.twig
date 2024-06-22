@@ -80,8 +80,9 @@
             <span class="mr-3 d-none d-lg-inline text-gray-600 small">{{ app.user.firstName }} {{ app.user.lastName }}</span>
             <a href="{{ path('app_logout') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
                 <i class="fas fa-sign-out-alt fa-sm text-white-50"></i> Se déconnecter </a>
-
-
+            {% if is_granted('ROLE_ADMIN') %}
+            <span class="ml-sm-auto"><a href="{{ path('app_admin_index') }}">Interface Admin</a></span>
+            {% endif %}
             <span class="ml-sm-auto"><a href="{{ path('app_index') }}">Retourner à la vue utilisateur</a></span>
 
         </nav>

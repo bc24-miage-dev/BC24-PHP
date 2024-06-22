@@ -4,7 +4,17 @@
 <div class="container-fluid">
         <h1>Création d'une nouvelle ressource</h1><br>
 
-        <label> Nom de la nouvelle ressource :
+        
+        <a href="{{ path('app_eleveur_index') }}" class="btn btn-primary"> Eleveur</a>
+        <br><br><br>
+        <a href="{{ path('app_equarrisseur_index') }}" class="btn btn-primary"> Equarrisseur</a>
+        <br><br><br>
+        <a href="{{ path('app_usine_index') }}" class="btn btn-primary"> Usine</a>
+        {# <br>
+        <a href="{{ path('app_admin_reportList') }}" class="btn btn-secondary btn-icon-split mt-4"> #}
+
+
+        {# <label> Nom de la nouvelle ressource :
             <select name="{{ field_name(form.ResourceName) }}" class="form-control">
                 {% for name, id in field_choices(form.ResourceName) %}
                     <option value="{{ id }}">{{ name }}</option>
@@ -51,6 +61,6 @@
         </label>
 
         <br><br>
-        {{ form_end(form) }}
+        {{ form_end(form) }} #}
 </div>
 {% endblock %}
