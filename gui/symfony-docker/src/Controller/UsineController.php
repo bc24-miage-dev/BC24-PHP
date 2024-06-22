@@ -76,7 +76,6 @@ class  UsineController extends AbstractController
                          Request $request,
                          $category): Response
     {
-        // dd($category);
         switch ($category) {
             case 'Demi%20Carcass':
             case 'Demi Carcass':
@@ -86,23 +85,7 @@ class  UsineController extends AbstractController
                 $category = "Meat";
                 break;
         }
-        // if ($category === "Demi%20Carcass") {
-        //     $category = 'Demi Carcass';
-        // }
         $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
-        // dd($resources);
-        // if ($request->isMethod('POST')) {
-        //     try {
-        //         $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-        //     }
-        //     catch (\Exception $e) {
-        //         $this->addFlash('error', $e->getMessage());
-        //         return $this->redirectToRoute('app_usine_list', ['category' => $category] );
-        //     }
-        // }
-        // else{
-        //     $resources = $listHandler->getResources($this->getUser(), $category);
-        // }
 
         return $this->render('pro/usine/list.html.twig',
             ['resources' => $resources,
@@ -125,17 +108,7 @@ class  UsineController extends AbstractController
                 break;
         }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
-        // dd($resource["resourceID"], "MANUFACTURER", $nextCategory);
         $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "MANUFACTURER", $nextCategory);
-        // dd($possibleResource);
-        // $resource = $resourceRepo->find($id);
-        // if (!$this->usineHandler->canHaveAccess($resource, $this->getUser())) {
-        //     $this->addFlash('error', 'Cette ressource ne vous appartient pas');
-        //     return $this->redirectToRoute('app_usine_list', ['category' => 'MORCEAU']);
-
-        // }
-        // $category = $resource->getResourceName()->getResourceCategory()->getCategory();
         return $this->render('pro/usine/specific.html.twig', [
             'resource' => $resource,
             'category' => $category
@@ -153,42 +126,19 @@ class  UsineController extends AbstractController
         $walletAddress = $this->getUser()->getWalletAddress();
         $tokenId = $demiCarcasse["tokenID"];
         $metaData = $this->blockChainService->getStringDataFromTokenID($tokenId);
-        // dd($walletAddress, $tokenId , $metaData);
         $morceaux = $this->blockChainService->mintToMany($walletAddress, $tokenId , $metaData);
-        // dd($morceaux);
+        $arrayMorceauID= [];
+        $arrayMorceauName = [];
         foreach ($morceaux as $key => $morceau) {
             $this->addFlash('success', 'Le morceau '.$morceau["ressourceName"].' a bien été créé avec le tokenID '.$morceau["tokenId"].' et a été ajouté à votre wallet');
-            // $this->blockChainService->write($morceau["tokenId"]);
+            array_push($arrayMorceauID, $morceau["tokenId"]);
+            array_push($arrayMorceauName, $morceau["ressourceName"]);
         }
-        // $demiCarcasse = $resourceRepository->find($id);
-
-        // if (!$this->usineHandler->canCutIntoPieces($demiCarcasse, $this->getUser())) {
-        //     $this->addFlash('error', 'Il y a eu une erreur, veuillez réessayer');
-        //     return $this->redirectToRoute('app_usine_list', ['category' => 'DEMI-CARCASSE']);
-        // }
-        // $morceaux = $nameRepository->findByCategoryAndFamily(category: 'MORCEAU',
-        //     family: $demiCarcasse->getResourceName()->getResourceFamilies()[0]->getName());
-        //     // Only products can have multiple families
-
-        // if ($request->isMethod('POST')) {
-        //     $list = $request->request->all()['list'];
-        //     try {
-        //         $this->usineHandler->cuttingProcess($demiCarcasse, $morceaux, $list, $this->getUser());
-        //         $this->addFlash('success', 'La demi-carcasse a bien été découpée');
-        //     } catch (UniqueConstraintViolationException) {
-        //         $this->addFlash('error', 'Au moins un tag NFC est déjà utilisé par une autre ressource');
-        //         return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
-        //     } catch (\Exception $e) {
-        //         $this->addFlash('error', $e->getMessage());
-        //         return $this->redirectToRoute('app_usine_decoupe', ['id' => $id]);
-        //     }
-        //     return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
-        // }
-        return $this->redirectToRoute('app_usine_list' , ['category' => 'MORCEAU']);
-        // return $this->render('pro/usine/decoupe.html.twig', [
-        //     'demiCarcasse' => $demiCarcasse, // La demi-carcasse à découper
-        //     'morceauxPossibles' => $morceaux // Les ressources possibles à partir d'elle
-        // ]);
+        return $this->render('user/WriteOnNFC.html.twig', [
+            'id' => $arrayMorceauID,
+            'name' => $arrayMorceauName,
+            'resourceType' => "Meat",
+        ]);
     }
 
 
