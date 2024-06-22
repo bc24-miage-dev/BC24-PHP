@@ -81,7 +81,7 @@ class BlockChainService
 
     public function getResourceWalletAddress(String $WalletAddress): array
     {
-        $WalletAddress = "0x9AC65C5FF92e9C52fA342fA9D8e681637A4C80e0";
+        // $WalletAddress = "0x9AC65C5FF92e9C52fA342fA9D8e681637A4C80e0";
         $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/" . $WalletAddress . "?metaData=true");
         $data = json_decode($response->getContent(), true);
         // dd($data);
@@ -103,6 +103,23 @@ class BlockChainService
         // dd($data);
         return $data;
     }
+
+    public function mintToMany(String $walletAddress,int $tokenID, array $metaData) : array
+    {
+        $body = [
+            "from_wallet_address" => $walletAddress,
+            "producer_token_id" => $tokenID,
+            "metaData" => $metaData,
+        ];
+        // dd($body);
+        $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/mintToMany", [
+            'json' => $body,
+        ]);
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData); 
+        return $returnData;
+    }
+
     // ----------------------------------- Handler ----------------------------------- //
     // i let this here for now but it should be in another service later //
     public function getAllRessourceFromWalletAddress(String $WalletAddress, String $resourceType = null): array

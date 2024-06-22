@@ -132,6 +132,7 @@ class EquarrisseurController extends AbstractController
         // }
 
         // $category = $resource->getResourceName()->getResourceCategory()->getCategory();
+        // dd($category);
             return $this->render('pro/equarrisseur/job.html.twig', [
                 'resource' => $resource,
                 'newResourceID' => $possibleResource[0]["resource_id"],

@@ -5,15 +5,15 @@
         <h1>Informations sur votre {{category|lower}} :</h1>
         <br>
         <ul class="list-group">
-            <li class="list-group-item">NFC : {{ resource.id }}</li>
-            <li class="list-group-item">Nom : {{ resource.resourceName.name }}</li>
-            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
-            <li class="list-group-item">Date et heure de création : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
+            <li class="list-group-item">NFC : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Adresse : {{ resource.address }}</li>
+            <li class="list-group-item">Date et heure de création : {{ resource.birthDate }}</li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>
-        {% if category == 'DEMI-CARCASSE' %}
-        <a href="{{ path('app_usine_decoupe', {'id' : resource.id}) }}"> <button class="btn btn-primary">Découper en morceaux</button> </a>
+        {% if category == 'Demi Carcass' %}
+        <a href="{{ path('app_usine_decoupe', {'id' : resource.tokenID}) }}"> <button class="btn btn-primary">Découper en morceaux</button> </a>
         {% endif %}
 
     <br><br>
