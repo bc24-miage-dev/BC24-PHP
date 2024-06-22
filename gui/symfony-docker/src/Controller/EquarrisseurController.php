@@ -74,7 +74,7 @@ class EquarrisseurController extends AbstractController
     }
 
 
-    #[Route('/list/{category}', name: 'app_equarrisseur_list')] // An 'Equarrisseur' have access to the list of his animals and carcasses
+    #[Route('/list/{category}', name: 'app_equarrisseur_list')]
     public function list(ResourcesListHandler $listHandler,
                          String $category,
                          Request $request) : Response
@@ -83,20 +83,6 @@ class EquarrisseurController extends AbstractController
             $category = 'Demi Carcass';
         }
         $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
-        // dd($resources);
-
-        // if ($request->isMethod('POST')) {
-        //     try {
-        //         $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-        //     }
-        //     catch (\Exception $e) {
-        //         $this->addFlash('error', $e->getMessage());
-        //         return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category] );
-        //     }
-        // }
-        // else{
-        //     $resources = $listHandler->getResources($this->getUser(), $category);
-        // }
 
         return $this->render('pro/equarrisseur/list.html.twig',
             ['resources' => $resources,
@@ -119,20 +105,7 @@ class EquarrisseurController extends AbstractController
                 break;
         }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
-        // dd($resource);
-        // dd($resource["resourceID"], "SLAUGHTERER", $category);
         $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $nextCategory);
-        // dd($possibleResource);
-        // dd($test);
-        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-
-        // if (!$this->equarrisseurHandler->canHaveAccess($resource, $this->getUser())){
-        //     $this->addFlash('error', 'Ressource introuvable');
-        //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
-        // }
-
-        // $category = $resource->getResourceName()->getResourceCategory()->getCategory();
-        // dd($category);
             return $this->render('pro/equarrisseur/job.html.twig', [
                 'resource' => $resource,
                 'newResourceID' => $possibleResource[0]["resource_id"],
@@ -148,54 +121,52 @@ class EquarrisseurController extends AbstractController
 
         $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class);
         $form->handleRequest($request);
-        // dd($form);
         if ($form->isSubmitted()) {
             $walletAddress = $this->getUser()->getWalletAddress();
             $carcass = $this->blockChainService->getResourceTemplate($newResourceID, "SLAUGHTERER");
             $carcassID = $carcass[0]["resource_id"];
-            // dd($carcass);
             $ingredient = $tokenIDAnimal;
-            // dd($carcass);
             $getMetaData = $this->blockChainService->getStringDataFromTokenID($tokenIDAnimal);
-            // dd($getMetaData);
-            $mintResource = $this->blockChainService->mintResource($walletAddress,$carcassID,1, $getMetaData, [$ingredient]);
+            $currentResource = $this->blockChainService->getRessourceFromTokenId($tokenIDAnimal);
+            $resourceType = $carcass[0]["resource_type"];
+            if($newResourceID == $currentResource["resourceID"])// quand il ne trouve pas de resource à fabriquer alors on doit utiliser mintToMany
+            {                                                   // on le sait quand la nouvelle resource théorique est la même que la resource actuelle
+                $newResourceType = "Demi Carcass";
+                //dd($walletAddress, $tokenIDAnimal , $getMetaData);
+                $mintResource = $this->blockChainService->mintToMany($walletAddress, $tokenIDAnimal , $getMetaData);
+                $returnID = [];
+                $returnName = [];
+                foreach ($mintResource as $key => $mintedResource) {
+                    array_push($returnID, $mintedResource["tokenId"]);
+                    array_push($returnName, $mintedResource["ressourceName"]);
+                    $this->addFlash('success', 'Votre animal à bien été transformé en : '.$newResourceType.' ! NFT : ' . $mintedResource["tokenId"]);
+                }
+                return $this->render('user/WriteOnNFC.html.twig', [
+                    'id' => $returnID,
+                    'name' => $returnName,
+                    'resourceType' => $newResourceType,
+                ]);
+                
+            }
+            else
+            {
+                $newResourceType = "Carcass";
+                $mintResource = $this->blockChainService->mintResource($walletAddress,$carcassID,1, $getMetaData, [$ingredient]);
+                
+            }
             $responseArray = json_decode($mintResource, true);
-            $this->addFlash('success', 'Votre animal à bien été transformé en : '.$responseArray["ressourceName"].' ! NFT : ' . $responseArray["tokenId"]);
-            return $this->redirectToRoute('app_nfc_write', ['id' => $responseArray['tokenId']]);
-            // $test2 = $this->blockChainService->mintResource();
-            // dd($mintResource);
-
+            $this->addFlash('success', 'Votre animal à bien été transformé en : animal carcass ! NFT : ' . $responseArray["tokenId"]);
+            return $this->render('user/WriteOnNFC.html.twig', [
+                'id' => [$responseArray['tokenId']],
+                'name' =>  [$responseArray['ressourceName']],
+                'resourceType' => $newResourceType,
+            ]);
         }
         return $this->render('pro/equarrisseur/equarrir.html.twig', [
             "id" => $newResourceID,
             "tokenID" => $tokenIDAnimal,
             'form' => $form->createView()
         ]);
-
-
-        // $resource = $this->resourceRepository->findOneBy(['id' => $id]);
-        // if (!$this->equarrisseurHandler->canSlaughter($resource, $this->getUser())) {
-        //     $this->addFlash('error', 'Une erreur est survenue, veuillez contacter un administrateur');
-        //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'ANIMAL']);
-        // }
-
-        // $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class);
-        //     $newCarcasse = $handler->createChildResource($resource, $this->getUser()));
-        // $form->handleRequest($request);
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     try {
-        //         $this->equarrisseurHandler->slaughteringProcess($resource, $newCarcasse);
-        //     } catch (UniqueConstraintViolationException) {
-        //         $this->addFlash('error', 'Le tag NFC existe déjà');
-        //         return $this->redirectToRoute('app_equarrisseur_equarrir', ['id' => $id]);
-        //     }
-        //     $this->addFlash('success', 'L\'animal a bien été abattu, une carcasse a été créée');
-        //     return $this->redirectToRoute('app_equarrisseur_list', ['category' => 'CARCASSE']);
-        // }
-        return $this->render('pro/equarrisseur/equarrir.html.twig', [
-            'form' => $form->createView()
-        ]);
-
     }
 
     #[Route('/decoupe/{id}', name: 'app_equarrisseur_decoupe')]
