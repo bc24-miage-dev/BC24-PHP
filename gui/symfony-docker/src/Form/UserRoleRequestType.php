@@ -33,7 +33,6 @@ class UserRoleRequestType extends AbstractType
                     'choice_label' => 'ProductionSiteName',
                 ])
                 ->add('Description', null, ['label' => 'Description'])
-                ->add('WalletAddress', null, ['label' => 'Wallet Address'])
                     ->add('Envoyer', SubmitType::class)
                 ;
     }

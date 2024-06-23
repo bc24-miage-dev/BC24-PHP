@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\BlockChainService;
+use App\Handlers\RoleConversionWithBlockChainHandler;
 
 
 #[Route('/admin')]
@@ -210,16 +211,18 @@ class AdminController extends AbstractController
     public function userRequestRoleEdit(UserRoleRequestRepository $roleRequestRepo,
                                         ProductionSiteRepository $productionSiteRepo,
                                         UserRepository $userRepo,
+                                        BlockChainService $blockChainService,
+                                        RoleConversionWithBlockChainHandler $roleConversionWithBlockChainHandler,
                                         $id, $validation, $role): Response
     {
         $userRoleRequest = $roleRequestRepo->find($id);
-        $newWalletAddres = $this->blockChainService->createWalletAddress();
-        dd($newWalletAddres);
         if ($validation == "true") {
             $user = $userRepo->find($userRoleRequest->getUser());
-            $user->setWalletAddress($userRoleRequest->getWalletAddress());
             $this->entityManager->persist($user->setSpecificRole("$role"));
             $user->setProductionSite($productionSiteRepo->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
+            $role = $roleConversionWithBlockChainHandler->convertRoleToBlockchainRole($role);
+            $blockChainService->assignRole($user->getWalletAddress(), $role);
+
         }
         $userRoleRequest->setRead(true);
         $this->entityManager->persist($userRoleRequest);

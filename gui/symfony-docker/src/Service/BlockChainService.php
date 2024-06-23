@@ -124,7 +124,6 @@ class BlockChainService
     {
         $response = $this->httpClient->request('GET', $this->baseURL."wallet/static");
         $data = json_decode($response->getContent(), true);
-        dd($data);
         return $data["wallet_address"];
     }
 
@@ -137,6 +136,21 @@ class BlockChainService
             "to_wallet_address" => $toWalletAddress,
         ];
         $response = $this->httpClient->request('POST', $this->baseURL."resource/transfer", [
+            'json' => $body,
+        ]);
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData);
+        return $returnData;
+    }
+
+    public function assignRole(String $walletAddress, String $role): array
+    {
+        $body = [
+            "from_wallet_address" => "0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73",
+            "target_wallet_address" => $walletAddress,
+            "role" => $role,
+        ];
+        $response = $this->httpClient->request('POST', $this->baseURL."roles/assignRole", [
             'json' => $body,
         ]);
         $returnData = json_decode($response->getContent(), true);
