@@ -235,17 +235,4 @@ class EquarrisseurController extends AbstractController
         }
     }
 
-    #[Route('/transaction/all' , name: 'app_equarrisseur_transferAll')]
-    public function transferAll(): RedirectResponse
-    {
-        try {
-            $this->transactionHandler->acceptAllTransactions($this->getUser());
-            $this->addFlash('success', 'Toutes les transactions ont été effectuées');
-        }
-        catch (\Exception $e) {
-            $this->addFlash('error', $e->getMessage());
-        } finally {
-            return $this->redirectToRoute('app_equarrisseur_transferList');
-        }
-    }
 }
