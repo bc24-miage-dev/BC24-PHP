@@ -22,16 +22,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
 
 
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private BlockChainService $blockChainService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, BlockChainService $blockChainService)
     {
         $this->entityManager = $entityManager;
+        $this->blockChainService = $blockChainService;
     }
 
 
@@ -55,12 +58,6 @@ class AdminController extends AbstractController
     public function modify(ResourceRepository $resourceRepo,
                            Request $request): Response
     {
-        $form = $this->createForm(SearchType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            return $this->redirectToRoute('app_admin_modifySpecific', ['id' => $form->get('id')->getData()]);
-        }
-
         $resources = $resourceRepo->getFewLastResources();
         return $this->render('admin/modify.html.twig', ['resources' => $resources, 'form' => $form->createView()]);
     }
@@ -216,7 +213,8 @@ class AdminController extends AbstractController
                                         $id, $validation, $role): Response
     {
         $userRoleRequest = $roleRequestRepo->find($id);
-
+        $newWalletAddres = $this->blockChainService->createWalletAddress();
+        dd($newWalletAddres);
         if ($validation == "true") {
             $user = $userRepo->find($userRoleRequest->getUser());
             $user->setWalletAddress($userRoleRequest->getWalletAddress());

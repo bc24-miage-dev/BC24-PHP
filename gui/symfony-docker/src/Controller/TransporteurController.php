@@ -14,6 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
 
 #[Route('/pro/transporteur')]
 class TransporteurController extends AbstractController
@@ -21,11 +22,13 @@ class TransporteurController extends AbstractController
 
     private TransactionHandler $transactionHandler;
     private ProHandler $proHandler;
+    private BlockChainService $blockChainService;
 
-    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler)
+    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler, BlockChainService $blockChainService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->proHandler = $proHandler;
+        $this->blockChainService = $blockChainService;
     }
 
     
@@ -45,7 +48,7 @@ class TransporteurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->transactionHandler->askOwnership($form->getData()->getId(), $this->getUser());
+                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['newOwner'], $form->getData()["id"]);
                 $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
@@ -75,7 +78,7 @@ class TransporteurController extends AbstractController
             }
         }
         else{
-            $resources = $listHandler->getResources($this->getUser());
+            $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
         }
         return $this->render('pro/transporteur/list.html.twig',
             ['resources' => $resources]
@@ -87,11 +90,12 @@ class TransporteurController extends AbstractController
     public function specific(ResourceRepository $resourceRepository,
                              $id): Response
     {
-        $resource = $resourceRepository->find($id);
-        if (!$this->proHandler->canHaveAccess($resource, $this->getUser())){
-            $this->addFlash('error', 'Cette ressource ne vous appartient pas');
-            return $this->redirectToRoute('app_transporteur_list');
-        }
+        $resource =$this->blockChainService->getRessourceFromTokenId($id);
+        // $resource = $resourceRepository->find($id);
+        // if (!$this->proHandler->canHaveAccess($resource, $this->getUser())){
+        //     $this->addFlash('error', 'Cette ressource ne vous appartient pas');
+        //     return $this->redirectToRoute('app_transporteur_list');
+        // }
         return $this->render('pro/transporteur/specific.html.twig', [
             'resource' => $resource
         ]);

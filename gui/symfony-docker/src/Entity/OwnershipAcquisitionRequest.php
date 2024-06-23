@@ -25,12 +25,15 @@ class OwnershipAcquisitionRequest
     #[ORM\JoinColumn(nullable: false)]
     private ?User $initialOwner = null;
 
-    #[ORM\ManyToOne(inversedBy: 'ownershipAcquisitionRequestsRelated')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Resource $resource = null;
+    // #[ORM\ManyToOne(inversedBy: 'ownershipAcquisitionRequestsRelated')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?Resource $resource = null;
 
     #[ORM\Column(length: 15)]
     private ?string $state = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $resourceTokenID = null;
 
     public function getId(): ?int
     {
@@ -93,6 +96,18 @@ class OwnershipAcquisitionRequest
     public function setState(string $state): static
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getResourceTokenID(): ?int
+    {
+        return $this->resourceTokenID;
+    }
+
+    public function setResourceTokenID(?int $resourceTokenID): static
+    {
+        $this->resourceTokenID = $resourceTokenID;
 
         return $this;
     }

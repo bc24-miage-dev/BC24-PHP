@@ -10,7 +10,7 @@
         {% for request in requests %}
             <div class="card">
                 <p class="card-header">
-                    Ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}
+                    Ressource {{ request.resourceTokenID }}
                 <p>
                 <div class="card-body">
                     <p class="card-text">
@@ -35,7 +35,7 @@
         {% for request in pastTransactions %}
             <div class="card">
                 <p class="card-header">
-                    Ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}
+                    Ressource {{ request.resourceTokenID }}
                 <p>
                 <div class="card-body">
                     <p class="card-text">

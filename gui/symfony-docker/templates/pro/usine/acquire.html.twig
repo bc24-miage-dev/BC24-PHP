@@ -1,41 +1,42 @@
 {% extends 'pro/usine/index.html.twig' %}
 
 {% block body %}
-    <div class="container-fluid">
-        <h1>Réception de demi-carcasses</h1>
-        <br>
-        
-        {{ form_start(form) }}
+<div class="container-fluid">
+    <h1>Envoyer les resources</h1>
+    <br>
+    {{ form_start(form) }}
         <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="Entrez le NFT ID ou scanner la ressource" type="number" required>
         <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br></br>
-        <button type="submit" class="btn btn-primary" value="Demander la propriété">Demander la propriété</button>
-        {{ form_end(form) }}
+        {{ form_row(form.newOwner) }}
+        <button name= "{{ field_name(form.Demander) }}"type="submit" class="btn btn-primary" value="Demander la propriété">Envoyer la resource</button>
+    {{ form_end(form) }}
 
-        <!-- Loader modal -->
-        <div id="loaderModal" class="loader-modal">
-            <div class="loader-content">
-                <p>Veuillez approcher une ressource près du lecteur</p>
-                <div class="loader"></div>
-            </div>
+    <!-- Loader modal -->
+    <div id="loaderModal" class="loader-modal">
+        <div class="loader-content">
+            <p>Veuillez approcher une ressource près du lecteur</p>
+            <div class="loader"></div>
         </div>
-
-        <br>
-        <br>
-
-        <h1>Requêtes envoyées</h1>
-        {% if requests %}
-            {% for request in requests %}
-                <div class="card">
-                    <p class="card-header">Requête pour la ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}</p>
-                    <br>
-                    <p class="card-text ml-3">Envoyée le {{ request.requestDate|date('d/m/Y') }} à {{ request.requestDate|date('H:i') }}</p>
-                    <p class="card-text ml-3">Propriétaire : {{ request.initialOwner.firstName }} {{ request.initialOwner.lastName }} (Wallet Address : {{ request.initialOwner.walletAddress }})</p>
-                    <p class="card-footer">Statut : {{ request.state }}</p>
-                </div>
-                <br>
-            {% endfor %}
-        {% else %}
-            <p>Aucune requête en attente</p>
-        {% endif %}
     </div>
+    
+    <br>
+    <br>
+
+    <h1>Requêtes envoyées</h1>
+    {% if requests %}
+        {% for request in requests %}
+            <div class="card">
+                <p class="card-header">Requête pour la ressource {{ request.resourceTokenId }}</p>
+                <br>
+                <p class="card-text ml-3">Envoyée le {{ request.requestDate|date('d/m/Y') }} à {{ request.requestDate|date('H:i') }}</p>
+                <p class="card-text ml-3">Propriétaire : {{ request.initialOwner.firstName }} {{ request.initialOwner.lastName }} (Wallet Address : {{ request.initialOwner.walletAddress }})</p>
+                <p class="card-footer">Statut : {{ request.state }}</p>
+            </div>
+            <br>
+        {% endfor %}
+    {% else %}
+        <p>Aucune requête en attente</p>
+    {% endif %}
+
+</div>
 {% endblock %}
