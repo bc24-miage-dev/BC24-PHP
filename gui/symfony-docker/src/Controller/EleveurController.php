@@ -134,7 +134,7 @@ class EleveurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['newOwner'], $form->getData()["id"]);
+                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['Owner'], $form->getData()["id"]);
 
                 $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             } catch (\Exception $e) {
@@ -276,32 +276,17 @@ class EleveurController extends AbstractController
 
 
 
-    // #[Route('/transaction/all' , name: 'app_eleveur_transferAll')]
-    // public function transferAll(): RedirectResponse
-    // {
-    //     try {
-    //         $this->transactionHandler->acceptAllTransactions($this->getUser());
-    //         $this->addFlash('success', 'Toutes les transactions ont été effectuées');
-    //     }
-    //     catch (\Exception $e) {
-    //         $this->addFlash('error', $e->getMessage());
-    //     } finally {
-    //         return $this->redirectToRoute('app_eleveur_transferList');
-    //     }
-    // }
-
-    // #[Route('/transaction/ask/{id}', name: 'app_eleveur_transferAsk')]
-    // public function transferAsk($id): RedirectResponse
-    // {
-    //     try {
-    //         $this->transactionHandler->askTransaction($id, $this->getUser());
-    //         $this->addFlash('success', 'Demande de transaction effectuée');
-    //     }
-    //     catch (\Exception $e) {
-    //         $this->addFlash('error', $e->getMessage());
-    //     }
-    //     finally {
-    //         return $this->redirectToRoute('app_eleveur_list');
-    //     }
-    // }
+    #[Route('/transaction/all' , name: 'app_eleveur_transferAll')]
+    public function transferAll(): RedirectResponse
+    {
+        try {
+            $this->transactionHandler->acceptAllTransactions($this->getUser());
+            $this->addFlash('success', 'Toutes les transactions ont été effectuées');
+        }
+        catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+        } finally {
+            return $this->redirectToRoute('app_eleveur_transferList');
+        }
+    }
 }

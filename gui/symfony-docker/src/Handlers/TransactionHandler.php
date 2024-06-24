@@ -77,12 +77,18 @@ class TransactionHandler
         if (!$requests){
             throw new Exception('Il n\'y a pas de transaction à effectuer');
         }
+        $ListeResource = $this->blockChainService->getResourceWalletAddress($user->getWalletAddress());
         foreach ($requests as $request){
-            $resource = $request->getResource();
-            $resource->setCurrentOwner($request->getRequester());
-            $request->setState('Validé');
-            $this->entityManager->persist($resource);
-            $this->entityManager->persist($request);
+            $quantity = 0;
+        
+        foreach ($ListeResource as $key => $resource) {
+            if($resource['tokenId'] == $request->getResourceTokenID()){
+                $quantity = $resource['balance'];
+            }
+        }
+        $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
+        $request->setState('Validé');
+        $this->entityManager->persist($request);
         }
         $this->entityManager->flush();
     }
@@ -90,25 +96,24 @@ class TransactionHandler
     /**
      * @throws Exception
      */
-    public function askOwnership( UserInterface $userID, UserInterface $receiverID, int $tokenID ) : void
+    public function askOwnership( UserInterface $receiverID, UserInterface $currentOwnerID, int $tokenID ) : void
     {
-        $listResources = $this->blockChainService->getAllRessourceFromWalletAddress($userID->getWalletAddress());
+        if ($this->requestRepository->findOneBy(['requester' => $currentOwnerID, 'resourceTokenID' => $tokenID, 'state' => 'En attente'])){
+            throw new Exception('Vous avez déjà demandé la propriété de cette ressource');
+        }
+        $listResources = $this->blockChainService->getAllRessourceFromWalletAddress($currentOwnerID->getWalletAddress());
         foreach ($listResources as $key => $value) {
             if ($tokenID ==  $value['tokenId']) {
                 $request = new OwnershipAcquisitionRequest();
                 $request->setRequestDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
                 $request->setRequester($receiverID);
-                $request->setInitialOwner($userID);
+                $request->setInitialOwner($currentOwnerID);
                 $request->setResourceTokenID($tokenID);
                 $request->setState('En attente');
                 $this->entityManager->persist($request);
                 $this->entityManager->flush();
                 return;
             }
-        }
-    
-        if ($this->requestRepository->findOneBy(['requester' => $userID, 'resourceTokenID' => $tokenID, 'state' => 'En attente'])){
-            throw new Exception('Vous avez déjà demandé la propriété de cette ressource');
         }
 
         throw new Exception('Vous ne pouvez pas envoyer cette ressource');

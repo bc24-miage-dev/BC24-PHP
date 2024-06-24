@@ -2,13 +2,13 @@
 
 {% block body %}
 <div class="container-fluid">
-    <h1>Envoyer la resource</h1>
+    <h1>Demander l'acquisition</h1>
     <br>
     {{ form_start(form) }}
         <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="Entrez le NFT ID ou scanner la ressource" type="number" required>
         <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br></br>
-        {{ form_row(form.newOwner) }}
-        <button name= "{{ field_name(form.Demander) }}"type="submit" class="btn btn-primary" value="Demander la propriété">Envoyer la resource</button>
+        {{ form_row(form.Owner) }}
+        <button name= "{{ field_name(form.Demander) }}"type="submit" class="btn btn-primary" value="Demander la propriété">Demander la resource</button>
     {{ form_end(form) }}
 
     <!-- Loader modal -->

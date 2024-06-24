@@ -23,7 +23,7 @@ class ResourceOwnerChangerType extends AbstractType
     {
         $builder
             ->add('id', IntegerType::class)
-            ->add('newOwner', EntityType::class, [
+            ->add('Owner', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'id',
                 'label' => 'Envoyer à :'
