@@ -4,53 +4,33 @@
 <div class="container-fluid">
         <h1>Création d'une nouvelle ressource</h1><br>
 
-        <label> Nom de la nouvelle ressource :
-            <select name="{{ field_name(form.ResourceName) }}" class="form-control">
-                {% for name, id in field_choices(form.ResourceName) %}
-                    <option value="{{ id }}">{{ name }}</option>
-                {% endfor %}
-            </select>
-        </label>
+        <table class="table table-striped">
+        <tr>
+            <td>
+                <a href="{{ path('app_eleveur_index') }}" class="btn btn-primary"> Eleveur</a>
+            </td>
+            <td>
+                Animal
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="{{ path('app_equarrisseur_index') }}" class="btn btn-primary"> Equarrisseur</a>
+            </td>
+            <td>
+                Carcass , demi-carcass
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="{{ path('app_usine_index') }}" class="btn btn-primary"> Usine</a>
+            </td>
+            <td>
+                morceaux, produit
+            </td>
+        </tr>
+    </tbody>
+</table>
 
-        <label> WalletAdress du Propriétaire :
-            <select name="{{ field_name(form.currentOwner) }}" class="form-control">
-                {% for name, id in field_choices(form.currentOwner) %}
-                    <option value="{{ id }}">{{ name }}</option>
-                {% endfor %}
-            </select>
-        </label>
-
-        {{ form_row(form.isContamined, {
-            label: 'Est dangereux'
-        }) }}
-
-        {{ form_row(form.weight, {
-            label: 'Poids en grammes'
-        })
-        }}
-       {{ form_row(form.price, {
-            label: 'Prix en euros'
-        })
-        }}
-
-        <label> NFT des Composants :
-            {% for i in 0..5 %}
-            <input class="ml-3" type="number" name="{{ field_name(form.components) }}">
-            {% endfor %}
-
-        </label>
-
-        <br>
-
-        <label> Lieu d'origine :
-            <select name="{{ field_name(form.origin) }}" class="form-control">
-                {% for name, id in field_choices(form.origin) %}
-                    <option value="{{ id }}">{{ name }}</option>
-                {% endfor %}
-            </select>
-        </label>
-
-        <br><br>
-        {{ form_end(form) }}
 </div>
 {% endblock %}
