@@ -45,26 +45,26 @@ class HardwareService
         } catch (ClientException $e) {
             if ($e->getCode() === 403) {
                 // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
-                return new Response("Le scanner n'est pas activé, veuillez vérifier que le serveur run puis rafraîchir la page", Response::HTTP_FORBIDDEN);
+                return new JsonResponse(["message" => "Le scanner n'est pas activé, veuillez vérifier que le serveur run puis rafraîchir la page"], JsonResponse::HTTP_FORBIDDEN);
             } else {
                 // Pour d'autres types d'erreurs de client
                 $this->logger->error('Erreur client lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-                return new Response('Une erreur s\'est produite lors de la requête HTTP (client error).', Response::HTTP_BAD_REQUEST);
+                return new JsonResponse(["message" => "Une erreur s'est produite lors de la requête HTTP (client error)."], JsonResponse::HTTP_BAD_REQUEST);
             }
         } catch (ServerException $e) {
             // Pour les erreurs serveur
             $this->logger->error('Erreur serveur lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-            return new Response('Une erreur s\'est produite lors de la requête HTTP (server error).', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(["message" => "Une erreur s'est produite lors de la requête HTTP (server error)."], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         } catch (NetworkException $e) {
             // Pour les erreurs de réseau
             $this->logger->error('Erreur réseau lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-            return new Response('Une erreur réseau s\'est produite lors de la requête HTTP.', Response::HTTP_SERVICE_UNAVAILABLE);
+            return new JsonResponse(["message" => "Une erreur réseau s'est produite lors de la requête HTTP."], JsonResponse::HTTP_SERVICE_UNAVAILABLE);
         } catch (\Exception $e) {
             // Pour toutes les autres erreurs
             $this->logger->error('Erreur inattendue lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
-            return new Response('Une erreur inattendue s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(["message" => "Une erreur inattendue s'est produite lors de la requête HTTP."], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return null;
+        return null;        
     }
 
 
