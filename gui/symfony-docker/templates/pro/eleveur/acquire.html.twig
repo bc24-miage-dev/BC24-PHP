@@ -2,13 +2,13 @@
 
 {% block body %}
 <div class="container-fluid">
-    <h1>Indiquez la ressource reçue</h1>
+    <h1>Demander l'acquisition</h1>
     <br>
-
     {{ form_start(form) }}
-    <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="Entrez le NFT ID ou scanner la ressource" type="number" required>
-    <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br></br>
-    <button type="submit" class="btn btn-primary" value="Demander la propriété">Demander la propriété</button>
+        <input name="{{ field_name(form.id) }}" class="form-control search-input" placeholder="Entrez le NFT ID ou scanner la ressource" type="number" required>
+        <button id="scanner-button" class="btn btn-primary scanner-button">Scanner</button><br></br>
+        {{ form_row(form.Owner) }}
+        <button name= "{{ field_name(form.Demander) }}"type="submit" class="btn btn-primary" value="Demander la propriété">Demander la resource</button>
     {{ form_end(form) }}
 
     <!-- Loader modal -->
@@ -26,7 +26,7 @@
     {% if requests %}
         {% for request in requests %}
             <div class="card">
-                <p class="card-header">Requête pour la ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}</p>
+                <p class="card-header">Requête pour la ressource {{ request.resourceTokenId }}</p>
                 <br>
                 <p class="card-text ml-3">Envoyée le {{ request.requestDate|date('d/m/Y') }} à {{ request.requestDate|date('H:i') }}</p>
                 <p class="card-text ml-3">Propriétaire : {{ request.initialOwner.firstName }} {{ request.initialOwner.lastName }} (Wallet Address : {{ request.initialOwner.walletAddress }})</p>

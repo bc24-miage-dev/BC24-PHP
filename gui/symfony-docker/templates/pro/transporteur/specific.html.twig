@@ -5,13 +5,13 @@
         <h1>Informations sur cette ressource :</h1>
         <br>
         <ul class="list-group">
-            <li class="list-group-item">NFC : {{ resource.id }}</li>
-            <li class="list-group-item">Nom de la ressource : {{ resource.ResourceName.name }}</li>
-            {% if resource.ResourceName.resourceCategory.category == 'ANIMAL' %}
-                <li class="list-group-item">Genre : {{ resource.Genre }}</li>
+            <li class="list-group-item">NFC : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom de la ressource : {{ resource.resourceName }}</li>
+            {% if resource.resourceType == 'Animal' %}
+                <li class="list-group-item">Genre : {{ resource.genre }}</li>
             {% endif %}
-            <li class="list-group-item">Origine : {{ resource.origin.ProductionSiteName }} | Adresse : {{ resource.origin.Address }} | Téléphone : {{ resource.origin.ProductionSiteTel }}</li>
-            <li class="list-group-item">Date et heure de création de la ressource : {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Adresse : {{ resource.address }}</li>
+            <li class="list-group-item">Date de création de la ressource : {{ resource.birthDate }}</li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
         </ul>
         <br>

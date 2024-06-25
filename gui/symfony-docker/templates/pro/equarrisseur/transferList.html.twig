@@ -3,14 +3,14 @@
 {% block body %}
     <div class="container-fluid">
         <h1>
-            Demandes d'acquisition :
+            Demandes d'acquisitions :
         </h1>
         <a class="btn btn-primary" href="{{ path('app_equarrisseur_transferAll') }}">Tout accepter</a>
         <br><br>
         {% for request in requests %}
             <div class="card">
                 <p class="card-header">
-                    Ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}
+                    Ressource {{ request.resourceTokenID }}
                 <p>
                 <div class="card-body">
                     <p class="card-text">
@@ -35,7 +35,7 @@
         {% for request in pastTransactions %}
             <div class="card">
                 <p class="card-header">
-                    Ressource {{ request.resource.id }} : {{ request.resource.ResourceName.name }}
+                    Ressource {{ request.resourceTokenID }}
                 <p>
                 <div class="card-body">
                     <p class="card-text">

@@ -22,16 +22,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
+use App\Handlers\RoleConversionWithBlockChainHandler;
 
 
 #[Route('/admin')]
 class AdminController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
+    private BlockChainService $blockChainService;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, BlockChainService $blockChainService)
     {
         $this->entityManager = $entityManager;
+        $this->blockChainService = $blockChainService;
     }
 
 
@@ -55,12 +59,6 @@ class AdminController extends AbstractController
     public function modify(ResourceRepository $resourceRepo,
                            Request $request): Response
     {
-        $form = $this->createForm(SearchType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            return $this->redirectToRoute('app_admin_modifySpecific', ['id' => $form->get('id')->getData()]);
-        }
-
         $resources = $resourceRepo->getFewLastResources();
         return $this->render('admin/modify.html.twig', ['resources' => $resources, 'form' => $form->createView()]);
     }
@@ -213,15 +211,18 @@ class AdminController extends AbstractController
     public function userRequestRoleEdit(UserRoleRequestRepository $roleRequestRepo,
                                         ProductionSiteRepository $productionSiteRepo,
                                         UserRepository $userRepo,
+                                        BlockChainService $blockChainService,
+                                        RoleConversionWithBlockChainHandler $roleConversionWithBlockChainHandler,
                                         $id, $validation, $role): Response
     {
         $userRoleRequest = $roleRequestRepo->find($id);
-
         if ($validation == "true") {
             $user = $userRepo->find($userRoleRequest->getUser());
-            $user->setWalletAddress($userRoleRequest->getWalletAddress());
             $this->entityManager->persist($user->setSpecificRole("$role"));
             $user->setProductionSite($productionSiteRepo->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
+            $role = $roleConversionWithBlockChainHandler->convertRoleToBlockchainRole($role);
+            $blockChainService->assignRole($user->getWalletAddress(), $role);
+
         }
         $userRoleRequest->setRead(true);
         $this->entityManager->persist($userRoleRequest);

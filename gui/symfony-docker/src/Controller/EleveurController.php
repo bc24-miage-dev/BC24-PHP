@@ -29,6 +29,8 @@ use Psr\Log\LoggerInterface;
 use App\Form\EleveurVaccineType;
 use App\Form\EleveurNutritionType;
 use App\Form\EleveurDiseaseType;
+use App\Repository\UserRepository;
+use App\Entity\OwnershipAcquisitionRequest;
 
 
 #[Route('/pro/eleveur')]
@@ -41,6 +43,9 @@ class EleveurController extends AbstractController
     private HttpClientInterface $httpClient;
     private BlockChainService $blockChainService;
     private HardwareService $hardwareService;
+    private UserRepository $userRepository;
+    private OwnershipAcquisitionRequest $ownershipAcquisitionRequest;
+    
 
     public function __construct(TransactionHandler $handler,
                                 EleveurHandler $eleveurHandler,
@@ -48,7 +53,9 @@ class EleveurController extends AbstractController
                                 ResourceRepository $resourceRepository,
                                 HttpClientInterface $httpClient,
                                 HardwareService $hardwareService,
-                                BlockChainService $blockChainService,)
+                                BlockChainService $blockChainService,
+                                UserRepository $userRepository,
+)
     {
         $this->transactionHandler = $handler;
         $this->eleveurHandler = $eleveurHandler;
@@ -57,6 +64,7 @@ class EleveurController extends AbstractController
         $this->httpClient = $httpClient;
         $this->hardwareService = $hardwareService;
         $this->blockChainService = $blockChainService;
+        $this->userRepository = $userRepository;;
 
     }
 
@@ -121,12 +129,13 @@ class EleveurController extends AbstractController
     #[Route('/arrivage', name: 'app_eleveur_acquire')]
     public function acquisition(Request $request,
                                 OwnershipAcquisitionRequestRepository $ownershipRepo): Response {
-
+        
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->transactionHandler->askOwnership($form->getData()->getId(), $this->getUser());
+                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['Owner'], $form->getData()["id"]);
+
                 $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
@@ -238,6 +247,7 @@ class EleveurController extends AbstractController
     public function transfer($id): RedirectResponse
     {
         try {
+
             $this->transactionHandler->acceptTransaction($id, $this->getUser());
             $this->addFlash('success', 'Transaction effectuée');
         }

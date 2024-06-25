@@ -7,6 +7,9 @@ use App\Repository\ResourceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Service\BlockChainService;
+use App\Repository\UserRepository;
+use App\Entity\OwnershipAcquisitionRequest;
 
 class TransactionHandler
 {
@@ -14,16 +17,19 @@ class TransactionHandler
     private EntityManagerInterface $entityManager;
     private OwnershipHandler $ownershipHandler;
     private ResourceRepository $resourceRepo;
+    private BlockChainService $blockChainService;
 
     public function __construct(EntityManagerInterface $entityManager,
                                 OwnershipAcquisitionRequestRepository $requestRepository,
                                 OwnershipHandler $ownershipHandler,
-                                ResourceRepository $resourceRepo)
+                                ResourceRepository $resourceRepo,
+                                BlockChainService $blockChainService)
     {
         $this->requestRepository = $requestRepository;
         $this->entityManager = $entityManager;
         $this->ownershipHandler = $ownershipHandler;
         $this->resourceRepo = $resourceRepo;
+        $this->blockChainService = $blockChainService;
     }
 
     /**
@@ -35,10 +41,15 @@ class TransactionHandler
         if (!$request || $request->getInitialOwner() != $user || $request->getState() != 'En attente') {
             throw new Exception('Erreur lors de la transaction');
         }
-        $resource = $request->getResource();
-        $resource->setCurrentOwner($request->getRequester());
+        $quantity = 0;
+        $ListeResource = $this->blockChainService->getResourceWalletAddress($request->getInitialOwner()->getWalletAddress());
+        foreach ($ListeResource as $key => $resource) {
+            if($resource['tokenId'] == $request->getResourceTokenID()){
+                $quantity = $resource['balance'];
+            }
+        }
+        $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
         $request->setState('Validé');
-        $this->entityManager->persist($resource);
         $this->entityManager->persist($request);
         $this->entityManager->flush();
     }
@@ -66,12 +77,18 @@ class TransactionHandler
         if (!$requests){
             throw new Exception('Il n\'y a pas de transaction à effectuer');
         }
+        $ListeResource = $this->blockChainService->getResourceWalletAddress($user->getWalletAddress());
         foreach ($requests as $request){
-            $resource = $request->getResource();
-            $resource->setCurrentOwner($request->getRequester());
-            $request->setState('Validé');
-            $this->entityManager->persist($resource);
-            $this->entityManager->persist($request);
+            $quantity = 0;
+        
+        foreach ($ListeResource as $key => $resource) {
+            if($resource['tokenId'] == $request->getResourceTokenID()){
+                $quantity = $resource['balance'];
+            }
+        }
+        $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
+        $request->setState('Validé');
+        $this->entityManager->persist($request);
         }
         $this->entityManager->flush();
     }
@@ -79,17 +96,26 @@ class TransactionHandler
     /**
      * @throws Exception
      */
-    public function askOwnership(int $id, UserInterface $user) : void
+    public function askOwnership( UserInterface $receiverID, UserInterface $currentOwnerID, int $tokenID ) : void
     {
-        $resource = $this->resourceRepo->find($id);
-        if (!$resource || $resource->getCurrentOwner()->getWalletAddress() == $user->getWalletAddress() || $resource->isIsLifeCycleOver()){
-            throw new Exception('Vous ne pouvez pas demander la propriété de cette ressource');
-
-        }
-        if ($this->requestRepository->findOneBy(['requester' => $user, 'resource' => $resource, 'state' => 'En attente'])){
+        if ($this->requestRepository->findOneBy(['requester' => $currentOwnerID, 'resourceTokenID' => $tokenID, 'state' => 'En attente'])){
             throw new Exception('Vous avez déjà demandé la propriété de cette ressource');
-
         }
-        $this->ownershipHandler->ownershipRequestCreate($user, $this->entityManager, $resource);
+        $listResources = $this->blockChainService->getAllRessourceFromWalletAddress($currentOwnerID->getWalletAddress());
+        foreach ($listResources as $key => $value) {
+            if ($tokenID ==  $value['tokenId']) {
+                $request = new OwnershipAcquisitionRequest();
+                $request->setRequestDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+                $request->setRequester($receiverID);
+                $request->setInitialOwner($currentOwnerID);
+                $request->setResourceTokenID($tokenID);
+                $request->setState('En attente');
+                $this->entityManager->persist($request);
+                $this->entityManager->flush();
+                return;
+            }
+        }
+
+        throw new Exception('Vous ne pouvez pas envoyer cette ressource');
     }
 }

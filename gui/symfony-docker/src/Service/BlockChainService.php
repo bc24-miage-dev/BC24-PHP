@@ -11,6 +11,7 @@ class BlockChainService
 
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
+    private String $baseURL = "http://127.0.0.1:8080/";
 
     public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger)
     {
@@ -33,7 +34,7 @@ class BlockChainService
                 'metaData' => $metadata,
                 'ingredients' => $ingredients, 
             ];
-            $response = $this->httpClient->request('POST', 'http://127.0.0.1:8080/resource/mint', [
+            $response = $this->httpClient->request('POST', $this->baseURL."resource/mint", [
                 'json' => $body,
             ]);
 
@@ -69,7 +70,7 @@ class BlockChainService
 
     public function getResourceIDFromRole(String $role): array
     {
-        $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?required_role=" . $role);
+        $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?required_role=" . $role);
         $data = json_decode($response->getContent(), true);
 
         $returnData = [];
@@ -81,7 +82,7 @@ class BlockChainService
 
     public function getResourceWalletAddress(String $WalletAddress): array
     {
-        $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/" . $WalletAddress . "?metaData=true");
+        $response = $this->httpClient->request('GET', $this->baseURL."resource/" . $WalletAddress . "?metaData=true");
         $data = json_decode($response->getContent(), true);
         // dd($data);
         return $data;
@@ -89,7 +90,7 @@ class BlockChainService
 
     public function getResourceTemplate(int $resourceId , String $role) : array
     {
-        $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?resource_id=".$resourceId."&required_role=".$role);
+        $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?resource_id=".$resourceId."&required_role=".$role);
         $data = json_decode($response->getContent(), true);
         // dd($data);
         return $data;
@@ -97,7 +98,7 @@ class BlockChainService
 
     public function getMetaDataFromTokenId(int $tokenId) : array
     {
-        $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/".$tokenId."/metadata");
+        $response = $this->httpClient->request('GET', $this->baseURL."resource/".$tokenId."/metadata");
         $data = json_decode($response->getContent(), true);
         // dd($data);
         return $data;
@@ -111,7 +112,7 @@ class BlockChainService
             "metaData" => $metaData,
         ];
         // dd($body);
-        $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/mintToMany", [
+        $response = $this->httpClient->request('POST', $this->baseURL."resource/mintToMany", [
             'json' => $body,
         ]);
         $returnData = json_decode($response->getContent(), true);
@@ -119,8 +120,47 @@ class BlockChainService
         return $returnData;
     }
 
+    public function createWalletAddress(): String
+    {
+        $response = $this->httpClient->request('GET', $this->baseURL."wallet/static");
+        $data = json_decode($response->getContent(), true);
+        return $data["wallet_address"];
+    }
+
+    public function TransferResource(int $tokenId, int $quantity, String $fromWalletAddress, String $toWalletAddress): array
+    {
+        $body = [
+            "tokenId" => $tokenId,
+            "quantity" => $quantity,
+            "from_wallet_address" => $fromWalletAddress,
+            "to_wallet_address" => $toWalletAddress,
+        ];
+        $response = $this->httpClient->request('POST', $this->baseURL."resource/transfer", [
+            'json' => $body,
+        ]);
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData);
+        return $returnData;
+    }
+
+    public function assignRole(String $walletAddress, String $role): array
+    {
+        $body = [
+            "from_wallet_address" => "0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73",
+            "target_wallet_address" => $walletAddress,
+            "role" => $role,
+        ];
+        $response = $this->httpClient->request('POST', $this->baseURL."roles/assignRole", [
+            'json' => $body,
+        ]);
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData);
+        return $returnData;
+    }
+
     // ----------------------------------- Handler ----------------------------------- //
     // i let this here for now but it should be in another service later //
+    
     public function getAllRessourceFromWalletAddress(String $WalletAddress, String $resourceType = null): array
     {
         $data = $this->getResourceWalletAddress($WalletAddress);
@@ -190,7 +230,7 @@ class BlockChainService
     //this function will return all the possible resource from this resourceID
     public function getPossibleResourceFromResourceID(int $resourceId, String $role, String $resourceType): array
     {
-        $response = $this->httpClient->request('GET', "http://127.0.0.1:8080/resource/templates?required_role=".$role);
+        $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?required_role=".$role);
         $data = json_decode($response->getContent(), true);
         $count = 0;
         $returnData = [];
@@ -235,7 +275,7 @@ class BlockChainService
             "metaData" => $mergedMetaData,
         ];
         // dd($body);
-        $response = $this->httpClient->request('POST', "http://127.0.0.1:8080/resource/metadata", [
+        $response = $this->httpClient->request('POST', $this->baseURL."resource/metadata", [
             'json' => $body,
         ]);
         
