@@ -5,8 +5,7 @@
         <link rel="stylesheet" href="{{ asset('assets/css/waitModal.css') }}" />
     {% endblock %}
 
-<div class="container-fluid">
-    <h1>Présentez un tag NFC à proximité du scanner, puis cliquez sur le bouton "Ecriture" pour y associer le nouveau NFT crée</h1><br>
+<div class="container-fluid"><br>
 
 
 <script src="{{ asset('assets/js/scanner.js') }}" defer></script>
@@ -53,14 +52,14 @@
 </div>
     <div id="success-modal" class="loader-modal" type="hidden">
         <div class="loader-content">
-            <p>Félicitation, votre enregistrement c'est bien effectué</p>
+            <p>Félicitation, votre enregistrement est bien effectué</p>
             <button type="button" id='success'class="btn btn-primary writer-modal">Retour</button>
         </div>
     </div>
     
     <div id="failure-modal" class="loader-modal" type="hidden">
         <div class="loader-content">
-            <p>Veuiller vous assurer que le tag est proche du scanner</p>
+            <p>Veuiller vous assurer que le tag est proche du scanner, puis veuillez réssayer</p>
             <button type="button" id='failure'class="btn btn-primary writer-modal">Retour</button>
         </div>
     </div>
