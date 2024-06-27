@@ -45,27 +45,41 @@ class BlockChainService
         }
     }
 
-    public function metadataTemplate(
-        int $weight = 0,
-        int $price = 0,
-        String $description = "NAN",
-        String $genre = "NAN",
-        bool $isContaminated = false,
-        String $address = "NAN",
-        String $birthDate = "NAN",
-        array $nutrition = [],
-        array $vaccin = []): array {
-        return [
-            'isContaminated' => $isContaminated,
-            'weight' => $weight,
-            'price' => $price,
-            'description' => $description,
-            'genre' => $genre,
-            'address' => $address,
-            'birthDate' => $birthDate,
-            'nutrition' => $nutrition,
-            'vaccin' => $vaccin
-        ];
+    public function metadataTemplate(array $information): array {
+
+            $templateArray = [
+                'isContaminated' => false,
+                'disease' => null,
+                'weight' => null,
+                'price' => null,
+                'description' => null,
+                'genre' => null,
+                'address' => null,
+                'birthPlace' => null,
+                'birthDate' => null,
+                'nutrition' => null,
+                'vaccin' => null,
+                'approvalNumberBreeder' => null,
+                //----------------------------------Animal----------------------------------//
+                'slaughteringPlace' => null,
+                'carcassDate' => null,
+                'slaughtererCountry' => null,
+                'approvalNumberSlaughterer' => null,
+                //----------------------------------Carcass----------------------------------//
+                'demiCarcassDate' => null,
+                //----------------------------------DemiCarcass----------------------------------//
+                'manufacturingPlace' => null,
+                'meatDate' => null,
+                'manufactureingCountry' => null,
+                'approvalNumberManufacturer' => null,
+                //----------------------------------Manufacturing----------------------------------//
+                'transportDate1' => null,
+                'transportDate2' => null,
+                'travelTime' => null,
+                //----------------------------------Transport----------------------------------//
+            ];
+            $mergedMetaData = array_merge($templateArray, $information);
+        return $mergedMetaData;
     }
 
     public function getResourceIDFromRole(String $role): array
@@ -99,6 +113,10 @@ class BlockChainService
     public function getMetaDataFromTokenId(int $tokenId) : array
     {
         $response = $this->httpClient->request('GET', $this->baseURL."resource/".$tokenId."/metadata");
+        
+        if($response->getStatusCode() == 500){
+            return [];
+        }
         $data = json_decode($response->getContent(), true);
         // dd($data);
         return $data;
@@ -158,6 +176,28 @@ class BlockChainService
         return $returnData;
     }
 
+    public function getRole(String $walletAddress): array
+    {
+        $response = $this->httpClient->request('GET', $this->baseURL."roles/".$walletAddress);
+        $data = json_decode($response->getContent(), true);
+        // dd($data);
+        return $data;
+    }
+
+    public function giveETHToWalletAddress(String $walletAddress) : array
+    {
+        $body = [
+            "sender_address" => "0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73",
+            "receiver_address" => $walletAddress,
+            "amount" => 10,
+        ];
+        $response = $this->httpClient->request('POST', $this->baseURL."wallet/send-eth", [
+            'json' => $body,
+        ]);
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData);
+        return $returnData;
+    }
     // ----------------------------------- Handler ----------------------------------- //
     // i let this here for now but it should be in another service later //
     
@@ -165,26 +205,43 @@ class BlockChainService
     {
         $data = $this->getResourceWalletAddress($WalletAddress);
         $returnData = [];
-        // dd($data);
+        
         foreach ($data as $key => $value) {
             // dd($resourceType == $value["metaData"]["resource_type"]);
             if ($resourceType != null && $value["metaData"]["resource_type"] != $resourceType) {
                 continue;
             }
+            
+            $stringDataPath = $value["metaData"]["data"][count($value["metaData"]["data"])-1]["stringData"];
             $arrayTMP = [
                 "tokenId" => $value["tokenId"],
                 "resource_name" => $value["metaData"]["resource_name"],
                 "resource_type" => $value["metaData"]["resource_type"],
                 "quantity" => $value["balance"],
-                "isContaminated" => $value["metaData"]["data"][0]["stringData"]["isContaminated"],
-                "weight" => $value["metaData"]["data"][0]["stringData"]["weight"],
-                "price" => $value["metaData"]["data"][0]["stringData"]["price"],
-                "description" => $value["metaData"]["data"][0]["stringData"]["description"],
-                "genre" => $value["metaData"]["data"][0]["stringData"]["genre"],
-                "address" => $value["metaData"]["data"][0]["stringData"]["address"],
-                "birthDate" => $value["metaData"]["data"][0]["stringData"]["birthDate"],
-                "nutrition" => $value["metaData"]["data"][0]["stringData"]["nutrition"],
-                "vaccin" => $value["metaData"]["data"][0]["stringData"]["vaccin"],
+                "isContaminated" => $stringDataPath["isContaminated"],
+                "disease" => $stringDataPath["disease"],
+                "weight" => $stringDataPath["weight"],
+                "price" => $stringDataPath["price"],
+                "description" => $stringDataPath["description"],
+                "genre" => $stringDataPath["genre"],
+                "address" => $stringDataPath["address"],
+                "birthPlace" => $stringDataPath["birthPlace"],
+                "birthDate" => $stringDataPath["birthDate"]["date"],
+                "nutrition" => $stringDataPath["nutrition"],
+                "vaccin" => $stringDataPath["vaccin"],
+                "approvalNumberBreeder" => $stringDataPath["approvalNumberBreeder"],
+                'slaughteringPlace' => $stringDataPath["slaughteringPlace"],
+                'carcassDate' => $stringDataPath["carcassDate"],
+                'slaughtererCountry' => $stringDataPath["slaughtererCountry"],
+                'approvalNumberSlaughterer' => $stringDataPath["approvalNumberSlaughterer"],
+                'demiCarcassDate' => $stringDataPath["demiCarcassDate"],
+                'meatDate' => $stringDataPath["meatDate"],
+                'manufacturingPlace' => $stringDataPath["manufacturingPlace"],
+                'manufactureingCountry' => $stringDataPath["manufactureingCountry"],
+                'approvalNumberManufacturer' => $stringDataPath["approvalNumberManufacturer"],
+                'transportDate1' => $stringDataPath["transportDate1"],
+                'transportDate2' => $stringDataPath["transportDate2"],
+                'travelTime' => $stringDataPath["travelTime"],
             ];
             $returnData[$key] = $arrayTMP;
         }
@@ -195,21 +252,38 @@ class BlockChainService
     {
         $data = $this->getMetaDataFromTokenId($tokenId);
         // dd($data);
+        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
+        
         $returnData = [
             "tokenID" => $tokenId,
             "resourceID" => $data["resource_id"],
             "resourceName" => $data["resource_name"],
             "resourceType" => $data["resource_type"], 
             // "quantity" => $data["data"][0]["balance"],
-            "isContaminated" => $data["data"][0]["stringData"]["isContaminated"],
-            "weight" => $data["data"][0]["stringData"]["weight"],
-            "price" => $data["data"][0]["stringData"]["price"],
-            "description" => $data["data"][0]["stringData"]["description"],
-            "genre" => $data["data"][0]["stringData"]["genre"],
-            "address" => $data["data"][0]["stringData"]["address"],
-            "birthDate" => $data["data"][0]["stringData"]["birthDate"],
-            "nutrition" => $data["data"][0]["stringData"]["nutrition"],
-            "vaccin" => $data["data"][0]["stringData"]["vaccin"],
+            "isContaminated" => $stringDataPath["isContaminated"],
+            "disease" => $stringDataPath["disease"],
+            "weight" => $stringDataPath["weight"],
+            "price" => $stringDataPath["price"],
+            "description" => $stringDataPath["description"],
+            "genre" => $stringDataPath["genre"],
+            "address" => $stringDataPath["address"],
+            "birthPlace" => $stringDataPath["birthPlace"],
+            "birthDate" => $stringDataPath["birthDate"]["date"],
+            "nutrition" => $stringDataPath["nutrition"],
+            "vaccin" => $stringDataPath["vaccin"],
+            "approvalNumberBreeder" => $stringDataPath["approvalNumberBreeder"],
+            'slaughteringPlace' => $stringDataPath["slaughteringPlace"],
+            'carcassDate' => $stringDataPath["carcassDate"],
+            'slaughtererCountry' => $stringDataPath["slaughtererCountry"],
+            'approvalNumberSlaughterer' => $stringDataPath["approvalNumberSlaughterer"],
+            'demiCarcassDate' => $stringDataPath["demiCarcassDate"],
+            'meatDate' => $stringDataPath["meatDate"],
+            'manufacturingPlace' => $stringDataPath["manufacturingPlace"],
+            'manufactureingCountry' => $stringDataPath["manufactureingCountry"],
+            'approvalNumberManufacturer' => $stringDataPath["approvalNumberManufacturer"],
+            'transportDate1' => $stringDataPath["transportDate1"],
+            'transportDate2' => $stringDataPath["transportDate2"],
+            'travelTime' => $stringDataPath["travelTime"],
         ];
         // dd($returnData);
         return $returnData;
@@ -221,7 +295,7 @@ class BlockChainService
     {
         $data = $this->getMetaDataFromTokenId($tokenId);
         // dd($data);
-        $returnData = $data["data"][0]["stringData"];
+        $returnData = $data["data"][count($data["data"])-1]["stringData"];
         // dd($returnData);
         return $returnData;
     }
@@ -264,7 +338,7 @@ class BlockChainService
     {
         $response = $this->getMetaDataFromTokenId($tokenId);
         // dd($response);
-        $oldMetaData = $response["data"][0]["stringData"];
+        $oldMetaData = $response["data"][count($response["data"])-1]["stringData"];
         // dd($oldMetaData);
         $mergedMetaData = array_merge($oldMetaData, $metadata);
         // dd($mergedMetaData);
@@ -277,8 +351,48 @@ class BlockChainService
         // dd($body);
         $response = $this->httpClient->request('POST', $this->baseURL."resource/metadata", [
             'json' => $body,
-        ]);
+        ]);        
+        $returnData = json_decode($response->getContent(), true);
+        // dd($returnData, $body);
+        return $returnData;
+    }
+
+    public function replaceMetaDataTransport($walletAddress,int $tokenId): array
+    {
+        $response = $this->getMetaDataFromTokenId($tokenId);
+        $roleReceiver = $this->getRole($walletAddress);
+
+        if($roleReceiver["role"] == "TRANSPORTER"){
+            $metadata["transportDate1"] = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+            // sleep(5);
+            // $metadata["transportDate2"] = json_decode(json_encode(new \DateTime('now', new \DateTimeZone('Europe/Paris')),true),true);
+            // $metadata["travelTime"] = $metadata["transportDate2"]->diff($metadata["transportDate1"])->format('%a days %H:%I:%S');
+        }
+        else{
+            $metadata["transportDate2"] = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+        }
         
+        // dd($response);
+        $oldMetaData = $response["data"][count($response["data"])-1]["stringData"];
+        // dd($oldMetaData);
+        $mergedMetaData = array_merge($oldMetaData, $metadata);
+        // dd($mergedMetaData);
+        if(isset($mergedMetaData["transportDate1"]) && isset($mergedMetaData["transportDate2"])){
+            // Ensure both dates are DateTime objects
+            $date1 = $mergedMetaData["transportDate1"] instanceof \DateTime ? $mergedMetaData["transportDate1"] : new \DateTime($mergedMetaData["transportDate1"]["date"], new \DateTimeZone('Europe/Paris'));
+            $date2 = $mergedMetaData["transportDate2"] instanceof \DateTime ? $mergedMetaData["transportDate2"] : new \DateTime($mergedMetaData["transportDate2"]["date"]);
+            // Now calculate the difference
+            $mergedMetaData["travelTime"] = $date2->diff($date1)->format('%a days %H:%I:%S');
+        }
+        $body = [
+            "from_wallet_address" => $walletAddress,
+            "tokenId" => $tokenId,
+            "metaData" => $mergedMetaData,
+        ];
+
+        $response = $this->httpClient->request('POST', $this->baseURL."resource/metadata", [
+            'json' => $body,
+        ]);
         $returnData = json_decode($response->getContent(), true);
         // dd($returnData);
         return $returnData;

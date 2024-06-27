@@ -38,6 +38,12 @@ class ProductionSite
     #[ORM\OneToMany(mappedBy: 'productionSiteOwner', targetEntity: ResourceName::class)]
     private Collection $resourceNamesOwned;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Country = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $approvalNumber = null;
+    
     public function __construct()
     {
         $this->resources = new ArrayCollection();
@@ -218,4 +224,29 @@ class ProductionSite
 
         return $this;
     }
+
+    public function getCountry(): ?string
+    {
+        return $this->Country;
+    }
+
+    public function setCountry(?string $Country): static
+    {
+        $this->Country = $Country;
+
+        return $this;
+    }
+
+    public function getApprovalNumber(): ?string
+    {
+        return $this->approvalNumber;
+    }
+
+    public function setApprovalNumber(?string $approvalNumber): static
+    {
+        $this->approvalNumber = $approvalNumber;
+
+        return $this;
+    }
+
 }

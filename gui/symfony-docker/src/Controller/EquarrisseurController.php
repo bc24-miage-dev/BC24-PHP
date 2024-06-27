@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\BlockChainService;
+use App\Repository\ProductionSiteRepository;
 
 #[Route('/pro/equarrisseur')]
 class EquarrisseurController extends AbstractController
@@ -29,16 +30,19 @@ class EquarrisseurController extends AbstractController
     private EquarrisseurHandler $equarrisseurHandler;
     private ResourceRepository $resourceRepository;
     private BlockChainService $blockChainService;
+    private ProductionSiteRepository $productionSiteRepository;
 
     public function __construct(TransactionHandler $transactionHandler,
                                 EquarrisseurHandler $equarrisseurHandler,
                                 ResourceRepository $resourceRepository,
-                                BlockChainService $blockChainService)
+                                BlockChainService $blockChainService,
+                                ProductionSiteRepository $productionSiteRepository)
     {
         $this->transactionHandler = $transactionHandler;
         $this->equarrisseurHandler = $equarrisseurHandler;
         $this->resourceRepository = $resourceRepository;
         $this->blockChainService = $blockChainService;
+        $this->productionSiteRepository = $productionSiteRepository;
     }
 
 
@@ -58,7 +62,7 @@ class EquarrisseurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['Owner'], $form->getData()["id"]);
+                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()["id"]);
                 $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
@@ -106,10 +110,12 @@ class EquarrisseurController extends AbstractController
         }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
         $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $nextCategory);
+
             return $this->render('pro/equarrisseur/job.html.twig', [
                 'resource' => $resource,
                 'newResourceID' => $possibleResource[0]["resource_id"],
-                'category' => $category
+                'category' => $category,
+                'country' => $this->getUser()->getProductionSite()->getCountry()
             ]);
     }
 
@@ -121,26 +127,42 @@ class EquarrisseurController extends AbstractController
 
         $form = $this->createForm(EquarrisseurAnimalAbattageFormType::class);
         $form->handleRequest($request);
+        $currentResource = $this->blockChainService->getRessourceFromTokenId($tokenIDAnimal);
+        $type = $currentResource["resourceType"];
         if ($form->isSubmitted()) {
             $walletAddress = $this->getUser()->getWalletAddress();
             $carcass = $this->blockChainService->getResourceTemplate($newResourceID, "SLAUGHTERER");
             $carcassID = $carcass[0]["resource_id"];
             $ingredient = $tokenIDAnimal;
             $getMetaData = $this->blockChainService->getStringDataFromTokenID($tokenIDAnimal);
-            $currentResource = $this->blockChainService->getRessourceFromTokenId($tokenIDAnimal);
+            // $currentResource = $this->blockChainService->getRessourceFromTokenId($tokenIDAnimal);
             $resourceType = $carcass[0]["resource_type"];
+            
             if($newResourceID == $currentResource["resourceID"])// quand il ne trouve pas de resource à fabriquer alors on doit utiliser mintToMany
             {                                                   // on le sait quand la nouvelle resource théorique est la même que la resource actuelle
                 $newResourceType = "Demi Carcass";
                 //dd($walletAddress, $tokenIDAnimal , $getMetaData);
                 $mintResource = $this->blockChainService->mintToMany($walletAddress, $tokenIDAnimal , $getMetaData);
+                sleep(7);
+                // $mintResource = json_decode($mintResource, true);
+
+
                 $returnID = [];
                 $returnName = [];
                 foreach ($mintResource as $key => $mintedResource) {
+                    $newTokenID = $mintedResource["tokenId"];
                     array_push($returnID, $mintedResource["tokenId"]);
                     array_push($returnName, $mintedResource["ressourceName"]);
-                    $this->addFlash('success', 'Votre animal à bien été transformé en : '.$newResourceType.' ! NFT : ' . $mintedResource["tokenId"]);
+
+                    $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(),$newTokenID,[
+                        "demiCarcassDate" => new \DateTime('now', new \DateTimeZone('Europe/Paris'))
+                    
+                    ]);
+                    sleep(7);
+
+                    $this->addFlash('success', 'Votre carcass à bien été découpée en : '.$newResourceType.' ! NFT : ' . $mintedResource["tokenId"]);
                 }
+
                 return $this->render('user/WriteOnNFC.html.twig', [
                     'id' => $returnID,
                     'name' => $returnName,
@@ -150,12 +172,24 @@ class EquarrisseurController extends AbstractController
             }
             else
             {
-                $newResourceType = "Carcass";
-                $mintResource = $this->blockChainService->mintResource($walletAddress,$carcassID,1, $getMetaData, [$ingredient]);
                 
+                $newResourceType = "Carcass";
+                // dd($walletAddress, $carcassID, $getMetaData, [$ingredient]);
+                $mintResource = $this->blockChainService->mintResource($walletAddress,$carcassID,1, $getMetaData, [$ingredient]);
             }
+            sleep(7);
             $responseArray = json_decode($mintResource, true);
-            $this->addFlash('success', 'Votre animal à bien été transformé en : animal carcass ! NFT : ' . $responseArray["tokenId"]);
+            $newTokenID = $responseArray["tokenId"];
+            $productionSite = $this->productionSiteRepository->findOneby(["id" => $this->getUser()->getProductionSite()->getId()]);
+            $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(),$newTokenID,[
+                "slaughteringPlace" => $this->getUser()->getProductionSite()->getAddress(),
+                "carcassDate" => new \DateTime('now', new \DateTimeZone('Europe/Paris')),
+                "slaughtererCountry" => $this->getUser()->getProductionSite()->getCountry(),
+                "approvalNumberSlaughterer" => $productionSite->getApprovalNumber(),
+
+            
+            ]);
+            $this->addFlash('success', 'Votre animal à bien été transformé en : carcass ! NFT : ' . $responseArray["tokenId"]);
             return $this->render('user/WriteOnNFC.html.twig', [
                 'id' => [$responseArray['tokenId']],
                 'name' =>  [$responseArray['ressourceName']],
@@ -165,7 +199,8 @@ class EquarrisseurController extends AbstractController
         return $this->render('pro/equarrisseur/equarrir.html.twig', [
             "id" => $newResourceID,
             "tokenID" => $tokenIDAnimal,
-            'form' => $form->createView()
+            'form' => $form->createView(),
+            'resourceType' => $type
         ]);
     }
 

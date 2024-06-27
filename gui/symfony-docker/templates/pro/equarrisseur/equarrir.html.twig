@@ -2,24 +2,17 @@
 
 {% block body %}
     <div class="container-fluid">
+    {% if resourceType == 'Animal' %}
         <h1>Équarrir la bête :</h1>
         <p>Valider pour équarrir la bête définitivement</p>
         <br>
-        {{ form_start(form) }}
-        {# <label> Le nouveau tag NFC pour la carcasse :
-            <input type="number" name="{{ field_name(form.id) }}" class="form-control" placeholder="UID du tag NFC nécéssaire ici">
-        </label>
+    {% else %}
+        <h1>Découper en 2 la carcassee :</h1>
+        <p>Valider pour découper la carcasse en demi-carcasses</p>
         <br>
-        <label> Poids de la carcasse (en grammes) :
-            <input type="number" name="{{ field_name(form.weight) }}" class="form-control">
-        </label>
-        <br><br> #}
+    {% endif %}
+        {{ form_start(form) }}
         <input type="submit" name="{{ field_name(form.submit) }}" value="Valider" class="btn btn-primary">
         {{ form_end(form) }}
-
-        {# <form action="{{ path('app_equarrisseur_equarrir', {'id': id, 'tokenID': tokenID}) }}" method="post">
-            <br><br>
-            <input type="submit" value="Valider" class="btn btn-primary">
-        </form> #}
     </div>
 {% endblock %}

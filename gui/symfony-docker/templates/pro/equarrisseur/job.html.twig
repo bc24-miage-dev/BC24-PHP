@@ -10,11 +10,26 @@
             <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
             <li class="list-group-item">Genre : {{ resource.genre }}</li>
-            <li class="list-group-item">Lieu de création : {{ resource.address }} 
-            {# | Téléphone : {{ resource.origin.ProductionSiteTel }} #}
+            <li class="list-group-item">Lieu de création : {{ resource.address }}</li>
+            <li class="list-group-item">Date de naissance : {{ resource.birthDate|date('d/m/Y') }} , {{ resource.birthDate|date('H:i:s') }}</li>
+            <li class="list-group-item">Nutrition : {{ resource.nutrition }}</li>
+            <li class="list-group-item">Vaccin : <br>
+            {# {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li> #}
+            {% for key, value in resource.vaccin %}
+                {{ key }} : {{ value.date|date('d/m/Y') }} , {{ value.date|date('H:i:s') }}
+                <br>
+            {% endfor %}
             </li>
-            <li class="list-group-item">Date de création: {{ resource.birthDate}} {# |date('d/m/Y') #} </li>
+            <li class="list-group-item">Maladie : <br>
+            {# {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li> #}
+            {% for key, value in resource.disease %}
+                {{ key }} : {{ value.date|date('d/m/Y') }} , {{ value.date|date('H:i:s') }}
+                <br>
+            {% endfor %}
+            </li>
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+            <li class="list-group-item">Numéro d'approbation de ferme: {{ resource.approvalNumberBreeder }}</li>
+            <li class="list-group-item">Temps de trajet : {{ resource.travelTime }}</li>
         </ul>
         <br>
         {% if newResourceID != -1 %}
@@ -30,9 +45,11 @@
         <ul class="list-group">
             <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
-            <li class="list-group-item">Adresse : {{ resource.address }}</li>
-            <li class="list-group-item">Date d'abattage : {{ resource.birthDate }}</li>
-            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+            <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }}</li>
+            <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
         </ul>
         <br>
         <a href="{{ path('app_equarrisseur_equarrir', {"newResourceID" : newResourceID , 'tokenIDAnimal' : resource.tokenID}) }}">
@@ -45,8 +62,9 @@
             <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
             <li class="list-group-item">Adresse : {{ resource.address }} </li>
-            <li class="list-group-item">Date découpe : {{ resource.birthDate }}</li>
-            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+            <li class="list-group-item">Date découpe : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
         </ul>
 
     {% endif %}

@@ -48,7 +48,7 @@ class TransporteurController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['Owner'], $form->getData()["id"]);
+                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()["id"]);
                 $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());

@@ -23,11 +23,6 @@ class ResourceOwnerChangerType extends AbstractType
     {
         $builder
             ->add('id', IntegerType::class)
-            ->add('Owner', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
-                'label' => 'Envoyer à :'
-            ])
             ->add('Demander', SubmitType::class, [
                 'attr' => ['class' => 'btn btn-primary'],
             ]);
