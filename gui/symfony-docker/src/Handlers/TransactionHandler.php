@@ -18,18 +18,21 @@ class TransactionHandler
     private OwnershipHandler $ownershipHandler;
     private ResourceRepository $resourceRepo;
     private BlockChainService $blockChainService;
+    private UserRepository $userRepository;
 
     public function __construct(EntityManagerInterface $entityManager,
                                 OwnershipAcquisitionRequestRepository $requestRepository,
                                 OwnershipHandler $ownershipHandler,
                                 ResourceRepository $resourceRepo,
-                                BlockChainService $blockChainService)
+                                BlockChainService $blockChainService,
+                                UserRepository $userRepository)
     {
         $this->requestRepository = $requestRepository;
         $this->entityManager = $entityManager;
         $this->ownershipHandler = $ownershipHandler;
         $this->resourceRepo = $resourceRepo;
         $this->blockChainService = $blockChainService;
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -49,6 +52,8 @@ class TransactionHandler
             }
         }
         $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
+        sleep(7);
+        $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
         $request->setState('Validé');
         $this->entityManager->persist($request);
         $this->entityManager->flush();
@@ -96,11 +101,21 @@ class TransactionHandler
     /**
      * @throws Exception
      */
-    public function askOwnership( UserInterface $receiverID, UserInterface $currentOwnerID, int $tokenID ) : void
+    public function askOwnership( UserInterface $receiverID, int $tokenID ) : void
     {
-        if ($this->requestRepository->findOneBy(['requester' => $currentOwnerID, 'resourceTokenID' => $tokenID, 'state' => 'En attente'])){
+        $MetaDataTokenID = $this->blockChainService->getMetaDataFromTokenId($tokenID);
+        if($MetaDataTokenID == []){ //case of ou bound API side (no resource found with this tokenID)
+            throw new Exception('La ressource n\'existe pas');
+        }   
+        $currentOwnerWalletAddress = $MetaDataTokenID['current_owner'];
+        $currentOwnerID = $this->userRepository->findOneBy(['WalletAddress' => $currentOwnerWalletAddress]);
+        if ($this->requestRepository->findOneBy(['requester' => $receiverID, 'resourceTokenID' => $tokenID, 'state' => 'En attente'])){ 
             throw new Exception('Vous avez déjà demandé la propriété de cette ressource');
         }
+        if($receiverID->getWalletAddress() == $currentOwnerWalletAddress){
+            throw new Exception('Vous êtes déjà propriétaire de cette ressource');
+        }
+        
         $listResources = $this->blockChainService->getAllRessourceFromWalletAddress($currentOwnerID->getWalletAddress());
         foreach ($listResources as $key => $value) {
             if ($tokenID ==  $value['tokenId']) {
@@ -116,6 +131,6 @@ class TransactionHandler
             }
         }
 
-        throw new Exception('Vous ne pouvez pas envoyer cette ressource');
+        throw new Exception('Vous ne pouvez pas demander cette ressource');
     }
 }

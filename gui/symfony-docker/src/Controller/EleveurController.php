@@ -11,6 +11,7 @@ use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceRepository;
+use App\Repository\ProductionSiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -31,6 +32,7 @@ use App\Form\EleveurNutritionType;
 use App\Form\EleveurDiseaseType;
 use App\Repository\UserRepository;
 use App\Entity\OwnershipAcquisitionRequest;
+use App\Form\EleveurDisease2Type;
 
 
 #[Route('/pro/eleveur')]
@@ -45,6 +47,7 @@ class EleveurController extends AbstractController
     private HardwareService $hardwareService;
     private UserRepository $userRepository;
     private OwnershipAcquisitionRequest $ownershipAcquisitionRequest;
+    private ProductionSiteRepository $productionSiteRepository;
     
 
     public function __construct(TransactionHandler $handler,
@@ -55,6 +58,7 @@ class EleveurController extends AbstractController
                                 HardwareService $hardwareService,
                                 BlockChainService $blockChainService,
                                 UserRepository $userRepository,
+                                ProductionSiteRepository $productionSiteRepository
 )
     {
         $this->transactionHandler = $handler;
@@ -64,7 +68,8 @@ class EleveurController extends AbstractController
         $this->httpClient = $httpClient;
         $this->hardwareService = $hardwareService;
         $this->blockChainService = $blockChainService;
-        $this->userRepository = $userRepository;;
+        $this->userRepository = $userRepository;
+        $this->productionSiteRepository = $productionSiteRepository;
 
     }
 
@@ -85,20 +90,26 @@ class EleveurController extends AbstractController
         $form = $this->createForm(EleveurBirthType::class);
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
-        try {
+        // try {
             // dd($form->getData());
-            $metadata = $this->blockChainService->metadataTemplate((int)$form->getData()["weight"],
-                                                                (int)$form->getData()["price"],
-                                                                $form->getData()["description"],
-                                                                $form->getData()["Genre"],
-                                                                false
+            $productionSite = $this->productionSiteRepository->findOneby(["id" => $this->getUser()->getProductionSite()->getId()]);
+            $metadata = $this->blockChainService->metadataTemplate([
+                                                                "weight" => (int)$form->getData()["weight"],
+                                                                "price" => (int)$form->getData()["price"],
+                                                                "description" => $form->getData()["description"],
+                                                                "genre" => $form->getData()["Genre"],
+                                                                "address" => $productionSite->getAddress(),
+                                                                "birthPlace" => $productionSite->getCountry(),
+                                                                "birthDate" => new \DateTime('now', new \DateTimeZone('Europe/Paris')),
+                                                                "approvalNumberBreeder"=> $productionSite->getApprovalNumber(),
+                                                                ]
                                                             );
             $response = $this->blockChainService->mintResource($this->getUser()->getWalletAddress(),(int)$form->getData()["resourceName"],1,  $metadata);
             $responseArray = json_decode($response, true);
-        } catch (UniqueConstraintViolationException){
-            $this->addFlash('error', 'Le NFT existe déjà');
-            return $this->redirectToRoute('app_eleveur_naissance');
-        }
+        // } catch (UniqueConstraintViolationException){
+        //     $this->addFlash('error', 'Le NFT existe déjà');
+        //     return $this->redirectToRoute('app_eleveur_naissance');
+        // }
         $this->addFlash('success', 'La naissance de votre '.$responseArray["ressourceName"].' a bien été enregistrée ! NFT : ' . $responseArray["tokenId"]);
         
         return $this->render('user/WriteOnNFC.html.twig', [
@@ -160,6 +171,9 @@ class EleveurController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["weight" => $form->getData()["weight"]]);
+            sleep(7);
+            $this->addFlash('success', 'Poids mise à jour');
+            return $this->redirectToRoute('app_eleveur_specific', ['id' => $id]);
         }
         return $this->render('pro/eleveur/weight.html.twig', [
             'form' => $form->createView(),
@@ -173,10 +187,16 @@ class EleveurController extends AbstractController
     public function vaccine(Request $request,
                             $id): Response {
         $resource = $this->blockChainService->getRessourceFromTokenId($id);
-        $form = $this->createForm(EleveurVaccineType::class, null, ['id' => $id, 'Vaccin' => $resource['vaccin']]);
+        $form = $this->createForm(EleveurVaccineType::class, null, ['id' => $id]);
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
-            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["vaccin" => $form->getData()["Vaccin"]]);
+            $vaccin = $resource["vaccin"];
+            $vaccin[$form->getData()["Vaccin"]] = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+            // dd($vaccin);
+            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["vaccin" => $vaccin]);
+            sleep(7);
+            $this->addFlash('success', 'Vaccin mise à jour');
+            return $this->redirectToRoute('app_eleveur_specific', ['id' => $id]);
         }
         return $this->render('pro/eleveur/vaccine.html.twig', [
             'form' => $form->createView(),
@@ -195,6 +215,8 @@ class EleveurController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["nutrition" => $form->getData()["nutrition"]]);
+            $this->addFlash('success', 'Nutrition mise à jour');
+            return $this->redirectToRoute('app_eleveur_specific', ['id' => $id]);
         }
         return $this->render('pro/eleveur/nutrition.html.twig', [
             'id' => $id,
@@ -213,8 +235,32 @@ class EleveurController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["isContaminated" => $form->getData()["isContaminated"]]);
+            $this->addFlash('success', 'Maladie mise à jour');
+            return $this->redirectToRoute('app_eleveur_specific', ['id' => $id]);
         }
         return $this->render('pro/eleveur/disease.html.twig', [
+            'form' => $form->createView(),
+            'id' => $id]);
+    }
+
+    #[Route('/disease2/{id}', name: 'app_eleveur_disease2')]
+    public function disease2(Request $request,
+                            $id): Response
+    {
+        $resource = $this->blockChainService->getRessourceFromTokenId($id);
+        $form = $this->createForm(EleveurDisease2Type::class);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+    
+            $Disease2 = $resource["disease"];
+            $Disease2[$form->getData()["Disease2"]] = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
+            // dd($Disease2);
+            $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress() ,$id,["disease" => $Disease2]);
+            sleep(7);
+            $this->addFlash('success', 'Maladie mise à jour');
+            return $this->redirectToRoute('app_eleveur_specific', ['id' => $id]);
+        }
+        return $this->render('pro/eleveur/disease2.html.twig', [
             'form' => $form->createView(),
             'id' => $id]);
     }

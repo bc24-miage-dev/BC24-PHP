@@ -1,0 +1,16 @@
+{% extends 'pro/eleveur/index.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>Signaler une maladie</h1>
+
+        {{ form_start(form) }}
+            <label> Contamination à la maladie suivante:
+            {{ form_widget(form.Disease2, {'attr': {'class': 'form-control'}}) }}
+            </label>
+        {{ form_end(form) }}
+        <br>
+        <a href="{{ path('app_eleveur_specific', {'id' : id}) }}"><button class="btn btn-primary">Revenir en arrière</button></a>
+    </div>
+
+{% endblock %}

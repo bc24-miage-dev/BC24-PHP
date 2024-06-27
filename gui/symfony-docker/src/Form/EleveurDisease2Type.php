@@ -14,26 +14,19 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Service\BlockChainService;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class EleveurVaccineType extends AbstractType
+class EleveurDisease2Type extends AbstractType
 {
-    private BlockChainService $blockChainService;
-    public function __construct(BlockChainService $blockChainService)
-    {
-        $this->blockChainService = $blockChainService;
-    }
     public function configureOptions(OptionsResolver $resolver)
 {
     $resolver->setDefaults([
-        // other defaults...
-        'id' => null, // Define the default value or requirement for 'id'
     ]);
 }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-        ->add('Vaccin', TextType::class)
-        ->add('Vacciner', SubmitType::class, [])
+        ->add('Disease2', TextType::class)
+        ->add('Ajouter', SubmitType::class, [])
         ;
     }
 }

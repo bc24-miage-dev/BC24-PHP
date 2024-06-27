@@ -2,14 +2,25 @@
 
 {% block body %}
     <div class="container-fluid">
-        <h1>Informations sur votre {{category|lower}} :</h1>
+        <h1>Informations sur votre {{category}} :</h1>
         <br>
         <ul class="list-group">
             <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
-            <li class="list-group-item">Adresse : {{ resource.address }}</li>
-            <li class="list-group-item">Date et heure de création : {{ resource.birthDate }}</li>
-            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+            {% if category == 'Demi Carcass' %}
+            <li class="list-group-item">Date de naissance : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            <li class="list-group-item">Adresse de découpe : {{ resource.slaughteringPlace }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            {% else %}
+            <li class="list-group-item">Date de création : {{ resource.meatDate.date|date('d/m/Y') }} , {{ resource.meatDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
+            {% endif %}
+            <li class="list-group-item">Pay de découpe : {{ resource.weight }}</li>
+            <li class="list-group-item">Nom de site de production : {{ productionSiteName }}</li>
+            
         </ul>
         <br>
         {% if category == 'Demi Carcass' %}

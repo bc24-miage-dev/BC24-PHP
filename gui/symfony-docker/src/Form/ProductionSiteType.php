@@ -16,6 +16,8 @@ class ProductionSiteType extends AbstractType
             ->add('ProductionSiteName')
             ->add('Address')
             ->add('ProductionSiteTel')
+            ->add('Country')
+            ->add('approvalNumber')
             ->add('submit' , SubmitType::class, ['label' => 'Créer un site de production']);
     }
 

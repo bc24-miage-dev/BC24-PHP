@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\BlockChainService;
+use App\Repository\ProductionSiteRepository;
 
 
 #[Route('/pro/usine')]
@@ -29,12 +30,18 @@ class  UsineController extends AbstractController
     private TransactionHandler $transactionHandler;
     private UsineHandler $usineHandler;
     private BlockChainService $blockChainService;
+    private ProductionSiteRepository $productionSiteRepository;
 
-    public function __construct(TransactionHandler $transactionHandler, UsineHandler $usineHandler, BlockChainService $blockChainService)
+    public function __construct(
+                                TransactionHandler $transactionHandler,
+                                UsineHandler $usineHandler,
+                                BlockChainService $blockChainService,
+                                ProductionSiteRepository $productionSiteRepository)
     {
         $this->transactionHandler = $transactionHandler;
         $this->usineHandler = $usineHandler;
         $this->blockChainService = $blockChainService;
+        $this->productionSiteRepository = $productionSiteRepository;
     }
 
     
@@ -55,7 +62,7 @@ class  UsineController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()['Owner'], $form->getData()["id"]);
+                $this->transactionHandler->askOwnership($this->getUser(), $form->getData()["id"]);
                 $this->addFlash('success', 'La demande de propriété a bien été envoyée');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
@@ -86,7 +93,6 @@ class  UsineController extends AbstractController
                 break;
         }
         $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(),$category);
-
         return $this->render('pro/usine/list.html.twig',
             ['resources' => $resources,
                 'category' => $category]
@@ -109,9 +115,12 @@ class  UsineController extends AbstractController
         }
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
         $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "MANUFACTURER", $nextCategory);
+        // dd($resource);
+
         return $this->render('pro/usine/specific.html.twig', [
             'resource' => $resource,
-            'category' => $category
+            'category' => $category,
+            'productionSiteName' => $this->getUser()->getProductionSite()->getProductionSiteName(),
         ]);
     }
 
@@ -133,6 +142,16 @@ class  UsineController extends AbstractController
             $this->addFlash('success', 'Le morceau '.$morceau["ressourceName"].' a bien été créé avec le tokenID '.$morceau["tokenId"].' et a été ajouté à votre wallet');
             array_push($arrayMorceauID, $morceau["tokenId"]);
             array_push($arrayMorceauName, $morceau["ressourceName"]);
+            $newTokenID = $morceau["tokenId"];
+            sleep(7);
+            $productionSite = $this->productionSiteRepository->findOneby(["id" => $this->getUser()->getProductionSite()->getId()]);
+            $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(),$newTokenID,[
+                "meatDate" => new \DateTime('now', new \DateTimeZone('Europe/Paris')),
+                "manufacturingPlace" => $this->getUser()->getProductionSite()->getAddress(),
+                "manufactureingCountry" => $this->getUser()->getProductionSite()->getCountry(),
+                "approvalNumberManufacturer" => $productionSite->getApprovalNumber(),
+
+            ]);
         }
         return $this->render('user/WriteOnNFC.html.twig', [
             'id' => $arrayMorceauID,

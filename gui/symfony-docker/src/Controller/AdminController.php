@@ -222,6 +222,7 @@ class AdminController extends AbstractController
             $user->setProductionSite($productionSiteRepo->findOneBy(["id" => $userRoleRequest->getProductionSite()]));
             $role = $roleConversionWithBlockChainHandler->convertRoleToBlockchainRole($role);
             $blockChainService->assignRole($user->getWalletAddress(), $role);
+            $blockChainService->giveETHToWalletAddress($user->getWalletAddress());
 
         }
         $userRoleRequest->setRead(true);

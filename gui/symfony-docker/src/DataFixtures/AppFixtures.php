@@ -87,9 +87,11 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         foreach ($productionSites as $productionSite) {
             $pS = new ProductionSite();
             $pS->setProductionSiteName($productionSite);
-            $pS->setAddress('22 rue Nationale');
+            $pS->setAddress('22 rue Nationale'. $productionSite);
             $pS->setProductionSiteTel('0123456789');
             $pS->setValidate(true);
+            $pS->setCountry('France'.$productionSite);
+            $pS->setApprovalNumber('123456'.$productionSite);
             $manager->persist($pS);
             $manager->flush();
         }
@@ -106,24 +108,32 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
         // Users
         $users = ['admin', 'eleveur', 'transporteur', 'equarrisseur', 'usine', 'distributeur'];
-
-        foreach ($users as $userName) {
+        $userWalletAddress = [
+            "0xFE3B557E8Fb62b89F4916B721be55cEb828dBd73",
+            "0x2DFc6e58d8a388cE38b5413ca2458a7b59d1B844",
+            "0xeb754AE8d476b90e1021002A0f8DA4EC5870e0a0",
+            "0x9F6C344071C0FDf43132eEfA8309a770A063D82D",
+            "0x0b97F7B3FC38bF1DFf740d65B582c61b3E84FfC6",
+            "0x03B950EC5b1D893CDEB5d9A8A9165FeC3eF7914e"
+        ];
+        for($i = 0; $i<count($users);$i++ ){
             $newUser = new User();
-            $newUser->setEmail($userName . '@gmail.com');
-            $newUser->setPassword($this->passwordHasher->hashPassword($newUser, $userName));
-            $newUser->setRoles(["ROLE_" . strtoupper($userName), "ROLE_PRO"]);
-            $newUser->setFirstname(ucfirst($userName));
-            $newUser->setLastname("The" . ucfirst($userName));
-            $newUser->setWalletAddress('Wallet'. $userName);
+            $newUser->setEmail($users[$i] . '@gmail.com');
+            $newUser->setPassword($this->passwordHasher->hashPassword($newUser, $users[$i]));
+            $newUser->setRoles(["ROLE_" . strtoupper($users[$i]), "ROLE_PRO"]);
+            $newUser->setFirstname(ucfirst($users[$i]));
+            $newUser->setLastname("The" . ucfirst($users[$i]));
+            $newUser->setWalletAddress($userWalletAddress[$i]);
+            
 
-            if (isset($productionSites[$userName])) { // If the user is a professional with a production site
-                $newUser->setProductionSite($manager->getRepository(ProductionSite::class)->findOneBy(['ProductionSiteName' => $productionSites[$userName]]));
+            if (isset($productionSites[$users[$i]])) { // If the user is a professional with a production site
+                $newUser->setProductionSite($manager->getRepository(ProductionSite::class)->findOneBy(['ProductionSiteName' => $productionSites[$users[$i]]]));
             }
             $manager->persist($newUser);
             $manager->flush();
         }
 
-        for($i = 0; $i < 100; $i++) {
+        for($i = 0; $i < 10; $i++) {
             $newUser = new User();
             $newUser->setEmail('user' . $i . '@gmail.com');
             $newUser->setPassword($this->passwordHasher->hashPassword($newUser, 'user'));
