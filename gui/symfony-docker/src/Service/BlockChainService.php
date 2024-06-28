@@ -82,6 +82,96 @@ class BlockChainService
         return $mergedMetaData;
     }
 
+    public function metadataTemplateAnimal(array $information) : array {
+        $templateArray = [
+            'isContaminated' => false,
+            'disease' => null,
+            'weight' => null,
+            'price' => null,
+            'description' => null,
+            'genre' => null,
+            'address' => null,
+            'birthPlace' => null,
+            'birthDate' => null,
+            'nutrition' => null,
+            'vaccin' => null,
+            'approvalNumberBreeder' => null,
+            'slaughteringPlace' => null,
+            'carcassDate' => null,
+            'slaughtererCountry' => null,
+            'approvalNumberSlaughterer' => null,
+            'transportDate1' => null,
+            'transportDate2' => null,
+            'travelTime' => null,
+        ];
+        $mergedMetaData = array_merge($templateArray, $information);
+        return $mergedMetaData;
+    }
+
+    public function metadataTemplateCarcass(array $information) : array {
+        $templateArray = [
+            'isContaminated' => false,
+            'slaughteringPlace' => null,
+            'carcassDate' => null,
+            'slaughtererCountry' => null,
+            'approvalNumberSlaughterer' => null,
+            'demiCarcassDate' => null,
+            'transportDate1' => null,
+            'transportDate2' => null,
+            'travelTime' => null,
+        ];
+        $mergedMetaData = array_merge($templateArray, $information);
+        return $mergedMetaData;
+    }
+
+    public function metadataTemplateDemiCarcass(array $information) : array {
+        $templateArray = [
+            'isContaminated' => false,
+            'demiCarcassDate' => null,
+            'manufacturingPlace' => null,
+            'slaughtererCountry' => null,
+            'meatDate' => null,
+            'manufactureingCountry' => null,
+            'approvalNumberManufacturer' => null,
+            'transportDate1' => null,
+            'transportDate2' => null,
+            'travelTime' => null,
+        ];
+        $mergedMetaData = array_merge($templateArray, $information);
+        return $mergedMetaData;
+    }
+
+    public function metadataTemplateMeat(array $information) : array {
+        $templateArray = [
+            'isContaminated' => false,
+            'manufacturingPlace' => null,
+            'meatDate' => null,
+            'manufactureingCountry' => null,
+            'approvalNumberManufacturer' => null,
+            'recipeDate' => null,
+            'transportDate1' => null,
+            'transportDate2' => null,
+            'travelTime' => null,
+        ];
+        $mergedMetaData = array_merge($templateArray, $information);
+        return $mergedMetaData;
+    }
+    
+    public function metadataTemplateRecipe(array $information) : array {
+        $templateArray = [
+            'isContaminated' => false,
+            'manufacturingPlace' => null,
+            'recipeDate' => null,
+            'manufactureingCountry' => null,
+            'approvalNumberManufacturer' => null,
+            'transportDate1' => null,
+            'transportDate2' => null,
+            'travelTime' => null,
+        ];
+        $mergedMetaData = array_merge($templateArray, $information);
+        return $mergedMetaData;
+    }
+
     public function getResourceIDFromRole(String $role): array
     {
         $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?required_role=" . $role);
@@ -102,9 +192,20 @@ class BlockChainService
         return $data;
     }
 
-    public function getResourceTemplate(int $resourceId , String $role) : array
+    public function getResourceTemplate(int $resourceId , String $role = null) : array
     {
-        $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?resource_id=".$resourceId."&required_role=".$role);
+        if( $role == null && $resourceId == 0){
+            $response = $this->httpClient->request('GET', $this->baseURL."resource/templates");
+        }
+        elseif ($resourceId == 0){
+            $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?required_role=".$role);
+        }
+        elseif ($role == null){
+            $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?resource_id=".$resourceId);
+        }
+        else{
+            $response = $this->httpClient->request('GET', $this->baseURL."resource/templates?resource_id=".$resourceId."&required_role=".$role);
+        }
         $data = json_decode($response->getContent(), true);
         // dd($data);
         return $data;
@@ -214,34 +315,9 @@ class BlockChainService
             
             $stringDataPath = $value["metaData"]["data"][count($value["metaData"]["data"])-1]["stringData"];
             $arrayTMP = [
-                "tokenId" => $value["tokenId"],
+                "tokenId" => $value["tokenId"] ,
                 "resource_name" => $value["metaData"]["resource_name"],
-                "resource_type" => $value["metaData"]["resource_type"],
-                "quantity" => $value["balance"],
-                "isContaminated" => $stringDataPath["isContaminated"],
-                "disease" => $stringDataPath["disease"],
-                "weight" => $stringDataPath["weight"],
-                "price" => $stringDataPath["price"],
-                "description" => $stringDataPath["description"],
-                "genre" => $stringDataPath["genre"],
-                "address" => $stringDataPath["address"],
-                "birthPlace" => $stringDataPath["birthPlace"],
-                "birthDate" => $stringDataPath["birthDate"]["date"],
-                "nutrition" => $stringDataPath["nutrition"],
-                "vaccin" => $stringDataPath["vaccin"],
-                "approvalNumberBreeder" => $stringDataPath["approvalNumberBreeder"],
-                'slaughteringPlace' => $stringDataPath["slaughteringPlace"],
-                'carcassDate' => $stringDataPath["carcassDate"],
-                'slaughtererCountry' => $stringDataPath["slaughtererCountry"],
-                'approvalNumberSlaughterer' => $stringDataPath["approvalNumberSlaughterer"],
-                'demiCarcassDate' => $stringDataPath["demiCarcassDate"],
-                'meatDate' => $stringDataPath["meatDate"],
-                'manufacturingPlace' => $stringDataPath["manufacturingPlace"],
-                'manufactureingCountry' => $stringDataPath["manufactureingCountry"],
-                'approvalNumberManufacturer' => $stringDataPath["approvalNumberManufacturer"],
-                'transportDate1' => $stringDataPath["transportDate1"],
-                'transportDate2' => $stringDataPath["transportDate2"],
-                'travelTime' => $stringDataPath["travelTime"],
+                "resource_type" => $value["metaData"]["resource_type"]
             ];
             $returnData[$key] = $arrayTMP;
         }
@@ -252,14 +328,32 @@ class BlockChainService
     {
         $data = $this->getMetaDataFromTokenId($tokenId);
         // dd($data);
-        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
-        
+        if ($data == []){
+            return [];
+        }
         $returnData = [
             "tokenID" => $tokenId,
             "resourceID" => $data["resource_id"],
             "resourceName" => $data["resource_name"],
+            "resourceType" => $data["resource_type"],
+            "current_owner" => $data["current_owner"],
+
+        ];
+        // dd($returnData);
+        return $returnData;
+    }
+
+    
+
+    public function getResourceFromTokenIDAnimal(int $tokenID) : array
+    {
+        $data = $this->getMetaDataFromTokenId($tokenID);
+        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
+        $returnData = [
+            "tokenID" => $tokenID,
+            "resourceID" => $data["resource_id"],
+            "resourceName" => $data["resource_name"],
             "resourceType" => $data["resource_type"], 
-            // "quantity" => $data["data"][0]["balance"],
             "isContaminated" => $stringDataPath["isContaminated"],
             "disease" => $stringDataPath["disease"],
             "weight" => $stringDataPath["weight"],
@@ -268,28 +362,123 @@ class BlockChainService
             "genre" => $stringDataPath["genre"],
             "address" => $stringDataPath["address"],
             "birthPlace" => $stringDataPath["birthPlace"],
-            "birthDate" => $stringDataPath["birthDate"]["date"],
+            "birthDate" => $stringDataPath["birthDate"],
             "nutrition" => $stringDataPath["nutrition"],
             "vaccin" => $stringDataPath["vaccin"],
             "approvalNumberBreeder" => $stringDataPath["approvalNumberBreeder"],
-            'slaughteringPlace' => $stringDataPath["slaughteringPlace"],
-            'carcassDate' => $stringDataPath["carcassDate"],
-            'slaughtererCountry' => $stringDataPath["slaughtererCountry"],
-            'approvalNumberSlaughterer' => $stringDataPath["approvalNumberSlaughterer"],
-            'demiCarcassDate' => $stringDataPath["demiCarcassDate"],
-            'meatDate' => $stringDataPath["meatDate"],
-            'manufacturingPlace' => $stringDataPath["manufacturingPlace"],
-            'manufactureingCountry' => $stringDataPath["manufactureingCountry"],
-            'approvalNumberManufacturer' => $stringDataPath["approvalNumberManufacturer"],
-            'transportDate1' => $stringDataPath["transportDate1"],
-            'transportDate2' => $stringDataPath["transportDate2"],
-            'travelTime' => $stringDataPath["travelTime"],
+            "slaughteringPlace" => $stringDataPath["slaughteringPlace"],
+            "carcassDate" => $stringDataPath["carcassDate"],
+            "slaughtererCountry" => $stringDataPath["slaughtererCountry"],
+            "approvalNumberSlaughterer" => $stringDataPath["approvalNumberSlaughterer"],
+            "transportDate1" => $stringDataPath["transportDate1"],
+            "transportDate2" => $stringDataPath["transportDate2"],
+            "travelTime" => $stringDataPath["travelTime"],
+            "listOfIngredients" => $data["ingredients"],
         ];
-        // dd($returnData);
+        // if($data["ingredients"] == []){ // if there is no ingredients
+        //     $returnData["listOfIngredients"] = null;
+        // }
+        // else{
+        //     $returnData["listOfIngredients"] => $data["ingredients"]:
+        // }
+        return $returnData;
+    }
+    
+    public function getResourceFromTokenIDCarcass(int $tokenID) : array
+    {
+        $data = $this->getMetaDataFromTokenId($tokenID);
+        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
+        $returnData = [
+            "tokenID" => $tokenID,
+            "resourceID" => $data["resource_id"],
+            "resourceName" => $data["resource_name"],
+            "resourceType" => $data["resource_type"], 
+            "isContaminated" => $stringDataPath["isContaminated"],
+            "slaughteringPlace" => $stringDataPath["slaughteringPlace"],
+            "carcassDate" => $stringDataPath["carcassDate"],
+            "slaughtererCountry" => $stringDataPath["slaughtererCountry"],
+            "approvalNumberSlaughterer" => $stringDataPath["approvalNumberSlaughterer"],
+            "demiCarcassDate" => $stringDataPath["demiCarcassDate"],
+            "transportDate1" => $stringDataPath["transportDate1"],
+            "transportDate2" => $stringDataPath["transportDate2"],
+            "travelTime" => $stringDataPath["travelTime"],
+            "listOfIngredients" => $data["ingredients"],
+        ];
         return $returnData;
     }
 
-    
+    public function getResourceFromTokenIDDemiCarcass(int $tokenID) : array
+    {
+        $data = $this->getMetaDataFromTokenId($tokenID);
+        // dd($data);
+        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
+        $returnData = [
+            "tokenID" => $tokenID,
+            "resourceID" => $data["resource_id"],
+            "resourceName" => $data["resource_name"],
+            "resourceType" => $data["resource_type"], 
+            "isContaminated" => $stringDataPath["isContaminated"],
+            "demiCarcassDate" => $stringDataPath["demiCarcassDate"],
+            "slaughteringPlace" => $stringDataPath["slaughteringPlace"],
+            "slaughtererCountry" => $stringDataPath["slaughtererCountry"],
+            "approvalNumberSlaughterer" => $stringDataPath["approvalNumberSlaughterer"],
+            "manufacturingPlace" => $stringDataPath["manufacturingPlace"],
+            "meatDate" => $stringDataPath["meatDate"],
+            "manufactureingCountry" => $stringDataPath["manufactureingCountry"],
+            "approvalNumberManufacturer" => $stringDataPath["approvalNumberManufacturer"],
+            "transportDate1" => $stringDataPath["transportDate1"],
+            "transportDate2" => $stringDataPath["transportDate2"],
+            "travelTime" => $stringDataPath["travelTime"],
+            "listOfIngredients" => $data["ingredients"],
+        ];
+        return $returnData;
+    }
+
+    public function getResourceFromTokenIDMeat(int $tokenID) : array
+    {
+        $data = $this->getMetaDataFromTokenId($tokenID);
+        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
+        $returnData = [
+            "tokenID" => $tokenID,
+            "resourceID" => $data["resource_id"],
+            "resourceName" => $data["resource_name"],
+            "resourceType" => $data["resource_type"], 
+            "isContaminated" => $stringDataPath["isContaminated"],
+            "manufacturingPlace" => $stringDataPath["manufacturingPlace"],
+            "meatDate" => $stringDataPath["meatDate"],
+            "manufactureingCountry" => $stringDataPath["manufactureingCountry"],
+            "approvalNumberManufacturer" => $stringDataPath["approvalNumberManufacturer"],
+            "recipeDate" => $stringDataPath["recipeDate"],
+            "transportDate1" => $stringDataPath["transportDate1"],
+            "transportDate2" => $stringDataPath["transportDate2"],
+            "travelTime" => $stringDataPath["travelTime"],
+            "listOfIngredients" => $data["ingredients"],
+        ];
+        return $returnData;
+    }
+
+    public function getResourceFromTokenIDRecipe(int $tokenID) : array
+    {
+        $data = $this->getMetaDataFromTokenId($tokenID);
+        $stringDataPath = $data["data"][count($data["data"])-1]["stringData"];
+        $returnData = [
+            "tokenID" => $tokenID,
+            "resourceID" => $data["resource_id"],
+            "resourceName" => $data["resource_name"],
+            "resourceType" => $data["resource_type"], 
+            "isContaminated" => $stringDataPath["isContaminated"],
+            "manufacturingPlace" => $stringDataPath["manufacturingPlace"],
+            "recipeDate" => $stringDataPath["recipeDate"],
+            "manufactureingCountry" => $stringDataPath["manufactureingCountry"],
+            "approvalNumberManufacturer" => $stringDataPath["approvalNumberManufacturer"],
+            "transportDate1" => $stringDataPath["transportDate1"],
+            "transportDate2" => $stringDataPath["transportDate2"],
+            "travelTime" => $stringDataPath["travelTime"],
+            "listOfIngredients" => $data["ingredients"],
+        ];
+        return $returnData;
+    }
+
 
     public function getStringDataFromTokenID(int $tokenId): array
     {
@@ -397,4 +586,33 @@ class BlockChainService
         // dd($returnData);
         return $returnData;
     }
+
+    public function getAllRecipe($role){
+        $data = $this->getResourceTemplate(0 , $role);
+        $returnData = [];
+        foreach ($data as $numberOfArray => $datas) {
+            if($datas["resource_type"] == "Product"){
+                array_push($returnData, $datas);
+            }
+        }
+        return $returnData;
+    }
+
+    public function getRecipe(int $resourceId): array
+    {
+        $data = $this->getResourceTemplate($resourceId , "MANUFACTURER"); //return only one recipe
+        // dd($data[0]);
+        return $data[0];
+    }
+
+    public function getResourceListInformation(array $listOfTokenId): array
+    {
+        $returnData = [];
+        foreach ($listOfTokenId as $key => $value) {
+            $data = $this->getResourceTemplate($value);
+            array_push($returnData, $data);
+        }
+        return $returnData;
+    }
+    
 }

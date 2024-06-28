@@ -69,16 +69,19 @@ class TransporteurController extends AbstractController
                          Request $request) : Response
     {
         if ($request->isMethod('POST')) {
-            try {
-                $resources = $listHandler->getSpecificResource($request->request->get('NFC'), $this->getUser());
-            }
-            catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+            $resources = $this->blockChainService->getRessourceFromTokenId($request->request->get('NFC'));
+            $category = $resources["resourceType"];
+            if ($resources == []) {
+                $this->addFlash('error', 'Aucune ressource trouvée');
                 return $this->redirectToRoute('app_transporteur_list');
             }
-        }
-        else{
-            $resources =$this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
+            if($resources['current_owner'] != $this->getUser()->getWalletAddress()){
+                $this->addFlash('error', 'Vous n\'êtes pas le propriétaire de cette ressource');
+                return $this->redirectToRoute('app_transporteur_list');
+            }
+            return $this->redirectToRoute('app_transporteur_specific', ['id' => $resources["tokenID"]]);
+        } else {
+            $resources = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
         }
         return $this->render('pro/transporteur/list.html.twig',
             ['resources' => $resources]
@@ -91,13 +94,31 @@ class TransporteurController extends AbstractController
                              $id): Response
     {
         $resource =$this->blockChainService->getRessourceFromTokenId($id);
-        // $resource = $resourceRepository->find($id);
-        // if (!$this->proHandler->canHaveAccess($resource, $this->getUser())){
-        //     $this->addFlash('error', 'Cette ressource ne vous appartient pas');
-        //     return $this->redirectToRoute('app_transporteur_list');
-        // }
+
+        switch ($resource["resourceType"]) {
+            case 'Animal':
+                $resources = $this->blockChainService->getResourceFromTokenIDAnimal($id);
+                break;
+            case "Carcass":
+                $resources = $this->blockChainService->getResourceFromTokenIDCarcass($id);
+                break;
+            case "Demi Carcass":
+                $resources = $this->blockChainService->getResourceFromTokenIDDemiCarcass($id);
+                break;
+            case "Meat":
+                $resources = $this->blockChainService->getResourceFromTokenIDMeat($id);
+                break;
+            case "Product":
+                $resources = $this->blockChainService->getResourceFromTokenIDProduct($id);
+                break;
+            default:
+                $this->addFlash('error', 'Ressource non reconnue');
+                return $this->redirectToRoute('app_transporteur_list');
+                break;
+        }
+
         return $this->render('pro/transporteur/specific.html.twig', [
-            'resource' => $resource
+            'resource' => $resources,
         ]);
     }
 

@@ -2,19 +2,83 @@
 
 {% block body %}
     <div class="container-fluid">
-        <h1>Informations sur cette ressource :</h1>
+{% if resource.resourceType == 'Animal' %}
+        <h1>Informations sur cet animal</h1>
+        <br>
+
+        <ul class="list-group">
+            <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Genre : {{ resource.genre }}</li>
+            <li class="list-group-item">Lieu de création : {{ resource.address }}</li>
+            <li class="list-group-item">Date de naissance : {{ resource.birthDate.date|date('d/m/Y') }} , {{ resource.birthDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Nutrition : {{ resource.nutrition }}</li>
+            <li class="list-group-item">Vaccin : <br>
+            {% for key, value in resource.vaccin %}
+                {{ key }} : {{ value.date|date('d/m/Y') }} , {{ value.date|date('H:i:s') }}
+                <br>
+            {% endfor %}
+            </li>
+            <li class="list-group-item">Maladie : <br>
+            {% for key, value in resource.disease %}
+                {{ key }} : {{ value.date|date('d/m/Y') }} , {{ value.date|date('H:i:s') }}
+                <br>
+            {% endfor %}
+            </li>
+            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
+            <li class="list-group-item">Numéro d'approbation de ferme: {{ resource.approvalNumberBreeder }}</li>
+            <li class="list-group-item">Temps de trajet : {{ resource.travelTime }}</li>
+        
+        <br>
+
+    {% elseif resource.resourceType == 'Carcass' %}
+        <h1>Informations sur cette carcasse</h1>
         <br>
         <ul class="list-group">
-            <li class="list-group-item">NFC : {{ resource.tokenID }}</li>
-            <li class="list-group-item">Nom de la ressource : {{ resource.resourceName }}</li>
-            {% if resource.resourceType == 'Animal' %}
-                <li class="list-group-item">Genre : {{ resource.genre }}</li>
-            {% endif %}
-            <li class="list-group-item">Adresse : {{ resource.address }}</li>
-            <li class="list-group-item">Date de création de la ressource : {{ resource.birthDate }}</li>
-            <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
-        </ul>
+            <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }}</li>
+            <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+        
         <br>
+    {% elseif resource.resourceType == 'Demi Carcass' %}
+    <h1>Informations sur cette demi-carcasse</h1>
+        <br>
+        <ul class="list-group">
+            <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }} </li>
+            <li class="list-group-item">Date découpe : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+        
+
+    {% elseif resource.resourceType == 'Meat' %}
+    <h1>Informations sur votre morceau :</h1>
+        <br>
+        <ul class="list-group">
+            <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
+            <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
+            <li class="list-group-item">Date de création : {{ resource.meatDate.date|date('d/m/Y') }} , {{ resource.meatDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
+            <li class="list-group-item">Pay de découpe : {{ resource.manufactureingCountry }}</li>
+        
+    {% else %}
+    <h1>Informations sur votre ressource :</h1>
+        <br>
+    {% endif %}
+    <li class="list-group-item">Liste des ingrédients (NFT) :
+    {% for parentResource, value in resource.listOfIngredients %}
+        <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+    {% endfor %}
+    </li>
+    </ul>
+        <br><br>
         <a href="{{ path('app_transporteur_list') }}"><button class="btn btn-primary">Retour à la liste</button></a>
     </div>
 {% endblock %}

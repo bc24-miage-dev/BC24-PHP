@@ -12,14 +12,14 @@
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
             <li class="list-group-item">Adresse de découpe : {{ resource.slaughteringPlace }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            <li class="list-group-item">Pay de découpe : {{ resource.slaughtererCountry }}</li>
             {% else %}
             <li class="list-group-item">Date de création : {{ resource.meatDate.date|date('d/m/Y') }} , {{ resource.meatDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
             <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
             <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
+            <li class="list-group-item">Pay de découpe : {{ resource.manufactureingCountry }}</li>
             {% endif %}
-            <li class="list-group-item">Pay de découpe : {{ resource.weight }}</li>
-            <li class="list-group-item">Nom de site de production : {{ productionSiteName }}</li>
             
         </ul>
         <br>

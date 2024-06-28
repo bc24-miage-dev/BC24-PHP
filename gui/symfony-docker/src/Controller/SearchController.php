@@ -11,11 +11,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Handlers\UserResearchHandler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use App\Service\BlockChainService;
 
 
 #[Route('/search')]
 class SearchController extends AbstractController
-{
+{   
+    private BlockChainService $blockChainService;
+
+    public function __construct(BlockChainService $blockChainService)
+    {
+        $this->blockChainService = $blockChainService;
+    }
     
     #[Route('/', name: 'app_search')]
     public function search(Request $request): Response
@@ -44,24 +51,36 @@ class SearchController extends AbstractController
     {
         $form = $this->createForm(SearchType::class);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $id = $form->getData()->getId();
             return $this->redirect($this->generateUrl('app_search_result', ['id' => $id]));
         }
+        $resource =$this->blockChainService->getRessourceFromTokenId($id);
 
-        $resource = $resourceRepository->find($id);
-        if (!$resource) {
-            $this->addFlash('error', 'Aucune ressource trouvée avec cet identifiant');
-            return $this->redirectToRoute('app_search');
+        switch ($resource["resourceType"]) {
+            case 'Animal':
+                $resources = $this->blockChainService->getResourceFromTokenIDAnimal($id);
+                break;
+            case "Carcass":
+                $resources = $this->blockChainService->getResourceFromTokenIDCarcass($id);
+                break;
+            case "Demi Carcass":
+                $resources = $this->blockChainService->getResourceFromTokenIDDemiCarcass($id);
+                break;
+            case "Meat":
+                $resources = $this->blockChainService->getResourceFromTokenIDMeat($id);
+                break;
+            case "Product":
+                $resources = $this->blockChainService->getResourceFromTokenIDProduct($id);
+                break;
+            default:
+                $this->addFlash('error', 'Ressource non reconnue');
+                return $this->redirectToRoute('app_transporteur_list');
+                break;
         }
-        $userResearchHandler->userResearchRecordingProcess($this->getUser(), $resource);
-
         return $this->render('search/result.html.twig', [
             'form' => $form -> createView(),
-            'resource' => $resource,
-            'imagePath' => $pictureHandler->getImageForCategory(
-                $resource->getResourceName()->getResourceCategory()->getCategory())
+            'resource' => $resources,
         ]);
     }
 
