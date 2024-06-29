@@ -28,6 +28,12 @@
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
             <li class="list-group-item">Numéro d'approbation de ferme: {{ resource.approvalNumberBreeder }}</li>
             <li class="list-group-item">Temps de trajet : {{ resource.travelTime }}</li>
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
+
         </ul>
         <br>
         {% if newResourceID != -1 %}
@@ -47,6 +53,11 @@
             <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
         </ul>
         <br>
         <a href="{{ path('app_equarrisseur_equarrir', {"newResourceID" : newResourceID , 'tokenIDAnimal' : resource.tokenID}) }}">
@@ -62,6 +73,11 @@
             <li class="list-group-item">Date découpe : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
         </ul>
 
     {% endif %}

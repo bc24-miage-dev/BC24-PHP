@@ -156,10 +156,12 @@ class EleveurController extends AbstractController
         $form = $this->createForm(EleveurWeightType::class, null, ['id' => $id, 'weight' => $resource["weight"]]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+
             $replaceMetaData = $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $id, ["weight" => $form->getData()["weight"]]);
             sleep(5);
             $this->addFlash('success', 'Poids mise à jour');
             return $this->redirectToRoute('app_eleveur_specific', ['id' => $id]);
+            
         }
         return $this->render('pro/eleveur/weight.html.twig', [
             'form' => $form->createView(),

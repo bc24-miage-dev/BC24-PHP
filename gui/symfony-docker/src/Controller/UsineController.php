@@ -75,8 +75,11 @@ class UsineController extends AbstractController
             case 'Demi Carcass':
                 $category = 'Demi Carcass';
                 break;
-            default:
+            case 'morceau':
                 $category = "Meat";
+                break;
+            default:
+                $category = "Product";
                 break;
         }
         if ($request->isMethod('POST')) {
@@ -86,7 +89,7 @@ class UsineController extends AbstractController
                 $this->addFlash('error', 'Aucune ressource trouvée');
                 return $this->redirectToRoute('app_usine_list', ['category' => $category]);
             }
-            if($resources['current_owner'] != $this->getUser()->getWalletAddress()){
+            if ($resources['current_owner'] != $this->getUser()->getWalletAddress()) {
                 $this->addFlash('error', 'Vous n\'êtes pas le propriétaire de cette ressource');
                 return $this->redirectToRoute('app_usine_list', ['category' => $category]);
             }
@@ -107,12 +110,13 @@ class UsineController extends AbstractController
         switch ($category) {
             case 'Demi%20Carcass':
             case 'Demi Carcass':
-                $nextCategory = 'Meat';
                 $resource = $this->blockChainService->getResourceFromTokenIDDemiCarcass($id);
                 break;
-            default:
-                $nextCategory = "Meat";
+            case 'Meat':
                 $resource = $this->blockChainService->getResourceFromTokenIDMeat($id);
+                break;
+            default:
+                $resource = $this->blockChainService->getResourceFromTokenIDRecipe($id);
                 break;
         }
 
@@ -232,17 +236,42 @@ class UsineController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $morceaux = $request->request->all()['morceaux'];
-            
+            $template = [
+                "manufacturingPlace" => $this->getUser()->getProductionSite()->getAddress(),
+                "recipeDate" => new \DateTime('now', new \DateTimeZone('Europe/Paris')),
+                "manufactureingCountry" => $this->getUser()->getProductionSite()->getCountry(),
+                "approvalNumberManufacturer" => $this->getUser()->getProductionSite()->getApprovalNumber(),
+            ];
 
             try {
-                $this->usineHandler->recipeApplication($recipeTitle, $ingredients, $morceaux, $this->getUser(),
-                    $newProductId, $weight);
+                
+
+                $mintResource = $this->blockChainService->mintResource($this->getUser()->getWalletAddress(),
+                                                                        $id,
+                                                                        1, 
+                                                                        $this->blockChainService->metadataTemplateRecipe($template),
+                                                                        $morceaux);
+                $mintResource = json_decode($mintResource, true);
+                // dd($mintResource);
+                foreach ($morceaux as $key => $morceau) {
+                    sleep(5);
+                    $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $morceau,
+                        $this->blockChainService->metadataTemplateMeat($template));
+                }
+
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                $this->addFlash('error', "Vérifiez votre stock et le NFT" );
                 return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
             }
-            $this->addFlash('success', 'La recette a bien été appliquée');
-            return $this->redirectToRoute('app_usine_choixRecette');
+            $returnID = [$mintResource["tokenId"]];
+            $returnName = [$mintResource["ressourceName"]];
+            $this->addFlash('success', 'Recette bien appliquée, vous avez crée : ' . $mintResource["ressourceName"] . ' ! NFT : ' . $mintResource["tokenId"]);
+
+            return $this->render('user/WriteOnNFC.html.twig', [
+                'id' => $returnID,
+                'name' => $returnName,
+                'resourceType' => "Product",
+            ]);
         }
         return $this->render('pro/usine/appliRecette.html.twig',
             ['ingredients' => $ingredients, 'product' => $recipeTitle]);

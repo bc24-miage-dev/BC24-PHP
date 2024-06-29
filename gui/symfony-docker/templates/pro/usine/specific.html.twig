@@ -13,13 +13,24 @@
             <li class="list-group-item">Adresse de découpe : {{ resource.slaughteringPlace }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
             <li class="list-group-item">Pay de découpe : {{ resource.slaughtererCountry }}</li>
-            {% else %}
+            {% elseif category == 'Meat' %}
             <li class="list-group-item">Date de création : {{ resource.meatDate.date|date('d/m/Y') }} , {{ resource.meatDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
             <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
             <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
             <li class="list-group-item">Pay de découpe : {{ resource.manufactureingCountry }}</li>
+            {% else %}
+            <li class="list-group-item">Date de création : {{ resource.recipeDate.date|date('d/m/Y') }} , {{ resource.recipeDate.date|date('H:i:s') }}</li>
+            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
+            <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
+            <li class="list-group-item">Pay de découpe : {{ resource.manufactureingCountry }}</li>
             {% endif %}
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
             
         </ul>
         <br>
