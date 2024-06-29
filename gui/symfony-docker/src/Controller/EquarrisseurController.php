@@ -78,7 +78,6 @@ class EquarrisseurController extends AbstractController
         }
         if ($request->isMethod('POST')) {
             $resources = $this->blockChainService->getRessourceFromTokenId($request->request->get('NFC'));
-            $category = $resources["resourceType"];
             if ($resources == []) {
                 $this->addFlash('error', 'Aucune ressource trouvée');
                 return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category]);
@@ -87,6 +86,7 @@ class EquarrisseurController extends AbstractController
                 $this->addFlash('error', 'Vous n\'êtes pas le propriétaire de cette ressource');
                 return $this->redirectToRoute('app_equarrisseur_list', ['category' => $category]);
             }
+            $category = $resources["resourceType"];
             return $this->redirectToRoute('app_equarrisseur_job', ['id' => $resources["tokenID"], 'category' => $category]);
         } else {
             $resources = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress(), $category);
@@ -116,7 +116,7 @@ class EquarrisseurController extends AbstractController
                 break;
         }
         $possibleResource = $this->blockChainService->getPossibleResourceFromResourceID($resource["resourceID"], "SLAUGHTERER", $nextCategory);
-
+        
         return $this->render('pro/equarrisseur/job.html.twig', [
             'resource' => $resource,
             'newResourceID' => $possibleResource[0]["resource_id"],
@@ -160,7 +160,6 @@ class EquarrisseurController extends AbstractController
                     ]
                     )
                 );
-                sleep(5);
                 $returnID = [];
                 $returnName = [];
                 foreach ($mintResource as $key => $mintedResource) {
@@ -194,7 +193,6 @@ class EquarrisseurController extends AbstractController
                         'slaughtererCountry' => $productionSite->getCountry(),
                     ]), [$ingredient]);
             }
-            sleep(5);
             $responseArray = json_decode($mintResource, true);
             $newTokenID = $responseArray["tokenId"];
             $this->addFlash('success', 'Votre animal à bien été transformé en : carcass ! NFT : ' . $responseArray["tokenId"]);
