@@ -43,6 +43,8 @@
                                         <td>
                                         {% if "ROLE_ADMIN" in user.roles %}
                                             <p> Aucune action possible </p>
+                                        {% elseif user.walletAddress == null %}
+                                            <p> walletAddress manquant </p>
                                         {% else %}
                                             <div class="dropdown">
                                             <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Assigner Rôle
