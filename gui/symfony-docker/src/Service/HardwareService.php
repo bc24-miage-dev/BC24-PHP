@@ -71,7 +71,7 @@ class HardwareService
     public function write($tokenID): JsonResponse
     {
         try {
-            $url = 'http://127.0.0.1:5000/write';
+            $url = 'https://cryptic-headland-94862.herokuapp.com/http://127.0.0.1:5000/write';
             $data = [
             'NFT_tokenID' => $tokenID,
         ];
