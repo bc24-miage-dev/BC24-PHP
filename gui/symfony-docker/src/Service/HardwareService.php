@@ -45,6 +45,7 @@ class HardwareService
         } catch (ClientException $e) {
             if ($e->getCode() === 403) {
                 // Si l'erreur est une HTTP 403 (Forbidden), afficher un message personnalisé à l'utilisateur
+
                 return new JsonResponse("Le scanner n'est pas activé, veuillez vérifier que le serveur run puis rafraîchir la page", Response::HTTP_FORBIDDEN);
             } else {
                 // Pour d'autres types d'erreurs de client
@@ -64,7 +65,7 @@ class HardwareService
             $this->logger->error('Erreur inattendue lors de la requête HTTP : ' . $e->getMessage(), ['exception' => $e]);
             return new JsonResponse('Une erreur inattendue s\'est produite lors de la requête HTTP.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        return null;
+        return null;        
     }
 
 
