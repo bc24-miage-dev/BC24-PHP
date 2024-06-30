@@ -4,6 +4,13 @@
     <div class="container-fluid">
         <h1 class="mt-4">Votre cargaison :</h1>
         <br>
+        <h3> Présenter un tag NFT près du lecteur et appuyer sur le bouton pour démarrer/arrêter le transport </h3>
+        <br>
+        <a class="btn btn-primary" href="{{ path('app_transporteur_start') }}">Démarrer le transport</a>
+        <br><br>
+        <a class="btn btn-primary" href="{{ path('app_transporteur_end') }}">Arrêter le transport</a>
+
+        <br><br><br>
         <form action="" method="post" class="search-form">
             <label for="NFC">Entrez le NFT ID ou scanner la ressource</label><br>
             <input class="search-input" id="NFC" name="NFC" type="number" required>

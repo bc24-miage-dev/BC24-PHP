@@ -103,6 +103,10 @@ class BlockChainService
             'transportDate1' => null,
             'transportDate2' => null,
             'travelTime' => null,
+            "gpsStart" => null,
+            "gpsEnd" => null,
+            "temperatureStart" => null,
+            "temperatureEnd" => null,
         ];
         $mergedMetaData = array_merge($templateArray, $information);
         return $mergedMetaData;
@@ -119,6 +123,10 @@ class BlockChainService
             'transportDate1' => null,
             'transportDate2' => null,
             'travelTime' => null,
+            "gpsStart" => null,
+            "gpsEnd" => null,
+            "temperatureStart" => null,
+            "temperatureEnd" => null,
         ];
         $mergedMetaData = array_merge($templateArray, $information);
         return $mergedMetaData;
@@ -136,6 +144,10 @@ class BlockChainService
             'transportDate1' => null,
             'transportDate2' => null,
             'travelTime' => null,
+            "gpsStart" => null,
+            "gpsEnd" => null,
+            "temperatureStart" => null,
+            "temperatureEnd" => null,
         ];
         $mergedMetaData = array_merge($templateArray, $information);
         return $mergedMetaData;
@@ -148,10 +160,13 @@ class BlockChainService
             'meatDate' => null,
             'manufactureingCountry' => null,
             'approvalNumberManufacturer' => null,
-            'recipeDate' => null,
             'transportDate1' => null,
             'transportDate2' => null,
             'travelTime' => null,
+            "gpsStart" => null,
+            "gpsEnd" => null,
+            "temperatureStart" => null,
+            "temperatureEnd" => null,
         ];
         $mergedMetaData = array_merge($templateArray, $information);
         return $mergedMetaData;
@@ -167,6 +182,10 @@ class BlockChainService
             'transportDate1' => null,
             'transportDate2' => null,
             'travelTime' => null,
+            "gpsStart" => null,
+            "gpsEnd" => null,
+            "temperatureStart" => null,
+            "temperatureEnd" => null,
         ];
         $mergedMetaData = array_merge($templateArray, $information);
         return $mergedMetaData;
@@ -374,6 +393,10 @@ class BlockChainService
             "transportDate2" => $stringDataPath["transportDate2"],
             "travelTime" => $stringDataPath["travelTime"],
             "listOfIngredients" => $data["ingredients"],
+            "gpsStart" => $stringDataPath["gpsStart"],
+            "gpsEnd" => $stringDataPath["gpsEnd"],
+            "temperatureStart" => $stringDataPath["temperatureStart"],
+            "temperatureEnd" => $stringDataPath["temperatureEnd"],
         ];
         // if($data["ingredients"] == []){ // if there is no ingredients
         //     $returnData["listOfIngredients"] = null;
@@ -403,6 +426,10 @@ class BlockChainService
             "transportDate2" => $stringDataPath["transportDate2"],
             "travelTime" => $stringDataPath["travelTime"],
             "listOfIngredients" => $data["ingredients"],
+            "gpsStart" => $stringDataPath["gpsStart"],
+            "gpsEnd" => $stringDataPath["gpsEnd"],
+            "temperatureStart" => $stringDataPath["temperatureStart"],
+            "temperatureEnd" => $stringDataPath["temperatureEnd"],
         ];
         return $returnData;
     }
@@ -430,6 +457,10 @@ class BlockChainService
             "transportDate2" => $stringDataPath["transportDate2"],
             "travelTime" => $stringDataPath["travelTime"],
             "listOfIngredients" => $data["ingredients"],
+            "gpsStart" => $stringDataPath["gpsStart"],
+            "gpsEnd" => $stringDataPath["gpsEnd"],
+            "temperatureStart" => $stringDataPath["temperatureStart"],
+            "temperatureEnd" => $stringDataPath["temperatureEnd"],
         ];
         return $returnData;
     }
@@ -448,11 +479,14 @@ class BlockChainService
             "meatDate" => $stringDataPath["meatDate"],
             "manufactureingCountry" => $stringDataPath["manufactureingCountry"],
             "approvalNumberManufacturer" => $stringDataPath["approvalNumberManufacturer"],
-            "recipeDate" => $stringDataPath["recipeDate"],
             "transportDate1" => $stringDataPath["transportDate1"],
             "transportDate2" => $stringDataPath["transportDate2"],
             "travelTime" => $stringDataPath["travelTime"],
             "listOfIngredients" => $data["ingredients"],
+            "gpsStart" => $stringDataPath["gpsStart"],
+            "gpsEnd" => $stringDataPath["gpsEnd"],
+            "temperatureStart" => $stringDataPath["temperatureStart"],
+            "temperatureEnd" => $stringDataPath["temperatureEnd"],
         ];
         return $returnData;
     }
@@ -468,13 +502,16 @@ class BlockChainService
             "resourceType" => $data["resource_type"], 
             "isContaminated" => $stringDataPath["isContaminated"],
             "manufacturingPlace" => $stringDataPath["manufacturingPlace"],
-            "recipeDate" => $stringDataPath["recipeDate"],
             "manufactureingCountry" => $stringDataPath["manufactureingCountry"],
             "approvalNumberManufacturer" => $stringDataPath["approvalNumberManufacturer"],
             "transportDate1" => $stringDataPath["transportDate1"],
             "transportDate2" => $stringDataPath["transportDate2"],
             "travelTime" => $stringDataPath["travelTime"],
             "listOfIngredients" => $data["ingredients"],
+            "gpsStart" => $stringDataPath["gpsStart"],
+            "gpsEnd" => $stringDataPath["gpsEnd"],
+            "temperatureStart" => $stringDataPath["temperatureStart"],
+            "temperatureEnd" => $stringDataPath["temperatureEnd"],
         ];
         return $returnData;
     }
@@ -523,7 +560,7 @@ class BlockChainService
     //merge the old metadata with the new one
     //in other word, replace the metadata of a token if there is metadata in this section
     //but fill the metadata if there is no metadata in this section
-    public function replaceMetaData($walletAddress,int $tokenId, array $metadata): array
+    public function replaceMetaData(String $walletAddress,int $tokenId, array $metadata): array
     {
         $response = $this->getMetaDataFromTokenId($tokenId);
         // dd($response);
@@ -537,7 +574,6 @@ class BlockChainService
             "tokenId" => $tokenId,
             "metaData" => $mergedMetaData,
         ];
-        // dd($body);
         $response = $this->httpClient->request('POST', $this->baseURL."resource/metadata", [
             'json' => $body,
         ]);        

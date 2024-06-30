@@ -15,6 +15,7 @@ use App\Form\ResourceOwnerChangerType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\BlockChainService;
+use App\Service\HardwareService;
 
 #[Route('/pro/transporteur')]
 class TransporteurController extends AbstractController
@@ -23,12 +24,17 @@ class TransporteurController extends AbstractController
     private TransactionHandler $transactionHandler;
     private ProHandler $proHandler;
     private BlockChainService $blockChainService;
+    private HardwareService $hardwareService;
 
-    public function __construct(TransactionHandler $transactionHandler, ProHandler $proHandler, BlockChainService $blockChainService)
+    public function __construct(TransactionHandler $transactionHandler,
+                                ProHandler $proHandler,
+                                BlockChainService $blockChainService,
+                                HardwareService $hardwareService)
     {
         $this->transactionHandler = $transactionHandler;
         $this->proHandler = $proHandler;
         $this->blockChainService = $blockChainService;
+        $this->hardwareService = $hardwareService;
     }
 
     
@@ -174,5 +180,55 @@ class TransporteurController extends AbstractController
         } finally {
             return $this->redirectToRoute('app_transporteur_transferList');
         }
+    }
+
+    #[Route('/start', name: 'app_transporteur_start')]
+    public function start(): Response
+    {
+        try {
+            $readerData = $this->hardwareService->startReader();
+        $readerData = json_decode($readerData->getContent() , true);
+        //dd($readerData);
+        $resourcesTransported = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
+        //dd($resourcesTransported);
+        $arrayAddMetadata = [
+            "gpsStart" => $readerData["data"]["gps"],
+            "temperatureStart" => $readerData["data"]["temperature"],
+        ];
+        foreach ($resourcesTransported as $resource) {
+            $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
+            sleep(5);
+        }
+        $this->addFlash('success', 'Lecture et enregistrement bien effectué');
+
+        } catch (Exeption $th) {
+            $this->addFlash('error', 'Erreur lors de la lecture du lecteur');
+        }
+        return $this->redirectToRoute('app_transporteur_list');
+    }
+
+    #[Route('/end', name: 'app_transporteur_end')]
+    public function end(): Response
+    {
+        try {
+            $readerData = $this->hardwareService->startReader();
+        $readerData = json_decode($readerData->getContent() , true);
+        //dd($readerData);
+        $resourcesTransported = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
+        //dd($resourcesTransported);
+        $arrayAddMetadata = [
+            "gpsEnd" => $readerData["data"]["gps"],
+            "temperatureEnd" => $readerData["data"]["temperature"],
+        ];
+        foreach ($resourcesTransported as $resource) {
+            $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
+            sleep(5);
+        }
+        $this->addFlash('success', 'Lecture et enregistrement bien effectué');
+
+        } catch (Exeption $th) {
+            $this->addFlash('error', 'Erreur lors de la lecture du lecteur');
+        }
+        return $this->redirectToRoute('app_transporteur_list');
     }
 }
