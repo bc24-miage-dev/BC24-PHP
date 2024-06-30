@@ -180,15 +180,12 @@ class TransporteurController extends AbstractController
                 "gpsStart" => $readerData["data"]["gps"],
                 "temperatureStart" => $readerData["data"]["temperature"],
             ];
-            $request = $this->requestRepository->find($this->getUser()->getId());
-            if (!$request || $request->getInitialOwner() != $user || $request->getState() != 'En attente') {
-                throw new Exception('Erreur lors de la transaction');
-            }
+
 
             foreach ($resourcesTransported as $resource) {
-                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata,"start");
+                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
                 sleep(5);
-                $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(), $request->getResourceTokenID());
+                $this->blockChainService->replaceMetaDataTransport($this->getUser()->getWalletAddress(), $resource["tokenId"], "start");
                 sleep(5);
             }
             $this->addFlash('success', 'Le transport à démaré');
@@ -212,14 +209,10 @@ class TransporteurController extends AbstractController
                 "gpsEnd" => $readerData["data"]["gps"],
                 "temperatureEnd" => $readerData["data"]["temperature"],
             ];
-            $request = $this->requestRepository->find($this->getUser()->getId());
-            if (!$request || $request->getInitialOwner() != $user || $request->getState() != 'En attente') {
-                throw new Exception('Erreur lors de la transaction');
-            }
             foreach ($resourcesTransported as $resource) {
-                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata, "end");
+                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
                 sleep(5);
-                $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(), $request->getResourceTokenID());
+                $this->blockChainService->replaceMetaDataTransport($this->getUser()->getWalletAddress(), $resource["tokenId"], "end");
                 sleep(5);
             }
             $this->addFlash('success', 'Le transport s\'est terminé');
