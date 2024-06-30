@@ -98,7 +98,7 @@ class AdminController extends AbstractController
     #[Route('/reportList', name: 'app_admin_reportList')]
     public function reportList(ReportRepository $reportRepo): Response
     {
-        $report = $reportRepo->findBy(criteria:['read' => false], orderBy:['date' => 'DESC']);
+        $report = $reportRepo->findBy(criteria:['Readed' => false], orderBy:['date' => 'DESC']);
         return $this->render('admin/reportList.html.twig', ['report' => $report]);
     }
 
@@ -124,7 +124,7 @@ class AdminController extends AbstractController
         if ($action == 'delete') {
             $resource->setIsContamined(true);
         }
-        $report->setRead(true);
+        $report->setReaded(true);
 
         $this->entityManager->persist($resource);
         $this->entityManager->persist($report);
@@ -204,7 +204,7 @@ class AdminController extends AbstractController
     #[Route('/request/check', name: 'app_admin_request_check')]
     public function userRequestCheck(UserRoleRequestRepository $roleRequestRepo): Response
     {
-        $UserRoleRequest = $roleRequestRepo->findBy(['Read' => false]); // Select all unread requests
+        $UserRoleRequest = $roleRequestRepo->findBy(['Readed' => false]); // Select all unread requests
         return $this->render('admin/requestList.html.twig', ['UserRoleRequest' => $UserRoleRequest]);
     }
 
@@ -227,7 +227,7 @@ class AdminController extends AbstractController
             $blockChainService->giveETHToWalletAddress($user->getWalletAddress());
 
         }
-        $userRoleRequest->setRead(true);
+        $userRoleRequest->setReaded(true);
         $this->entityManager->persist($userRoleRequest);
         $this->entityManager->flush();
 
@@ -257,7 +257,7 @@ class AdminController extends AbstractController
     #[Route('/request/productionSiteRequest', name: 'app_admin_request_productionSiteRequest')]
     public function usineRequest(UserRoleRequestRepository $roleRequestRepo): Response
     {
-        $productionSite = $roleRequestRepo->findBy(['Read' => false]);
+        $productionSite = $roleRequestRepo->findBy(['Readed' => false]);
         return $this->render('admin/productionSiteRequestList.html.twig', ['productionSiteList' => $productionSite]);
     }
 
@@ -274,7 +274,7 @@ class AdminController extends AbstractController
             $productionSite->setValidate(true);
         }
         else {
-            $userRoleRequest->setRead(true);
+            $userRoleRequest->setReaded(true);
         }
         $this->entityManager->persist($userRoleRequest);
         $this->entityManager->flush();

@@ -91,7 +91,6 @@ class UserController extends AbstractController
 
         $repoRequest = $requestRepository->findOneBy(['User' => $this->getUser()]);
         $repoRequest ? $UserRoleRequest = $repoRequest : $UserRoleRequest = new UserRoleRequest();
-
         $form = $this->createForm(UserRoleRequestType::class, $UserRoleRequest);
         $form->handleRequest($request);
 

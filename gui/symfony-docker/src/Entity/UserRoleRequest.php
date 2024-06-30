@@ -24,8 +24,8 @@ class UserRoleRequest
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateRoleRequest = null;
 
-    #[ORM\Column]
-    private ?bool $Read = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $Readed = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $Description = null;
@@ -77,14 +77,14 @@ class UserRoleRequest
         return $this;
     }
 
-    public function isRead(): ?bool
+    public function isReaded(): ?bool
     {
-        return $this->Read;
+        return $this->Readed;
     }
 
-    public function setRead(bool $Read): static
+    public function setReaded(bool $Readed): static
     {
-        $this->Read = $Read;
+        $this->Readed = $Readed;
 
         return $this;
     }

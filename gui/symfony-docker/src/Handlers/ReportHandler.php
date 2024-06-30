@@ -13,7 +13,7 @@ class ReportHandler
         $report = new Report();
         $report->setDate(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
         $report->setUser($user);
-        $report->setRead(false);
+        $report->setReaded(false);
         $report->setResource($resource);
         $report->setDescription($description);
         return $report;

@@ -25,8 +25,9 @@ class UserRoleRequestHandler
     public function initializeRoleRequest(UserRoleRequest $userRoleRequest, UserInterface $user): bool
     {
         $userRoleRequest->setUser($user);
-        $userRoleRequest->setRead(false);
+        $userRoleRequest->setReaded(false);
         $userRoleRequest->setDateRoleRequest(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        // dd($userRoleRequest);
         $this->entityManager->persist($userRoleRequest);
         $this->entityManager->flush();
         return true;
@@ -41,7 +42,7 @@ class UserRoleRequestHandler
             throw new Exception('Utilisateur non trouvé');
         }
         $user->setDeletedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')));
-        $relatedRequests = $this->userRoleRequestRepository->findBy(['User' => $user, 'Read' => false]);
+        $relatedRequests = $this->userRoleRequestRepository->findBy(['User' => $user, 'Readed' => false]);
         foreach ($relatedRequests as $request) {
             if (!($request->getProductionSite()->isValidate())) {
                 $this->entityManager->remove($request->getProductionSite());

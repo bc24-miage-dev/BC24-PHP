@@ -29,7 +29,7 @@ class Report
     private ?User $User = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $read = null;
+    private ?bool $Readed = null;
 
     public function getId(): ?int
     {
@@ -84,14 +84,14 @@ class Report
         return $this;
     }
 
-    public function isRead(): ?bool
+    public function isReaded(): ?bool
     {
-        return $this->read;
+        return $this->Readed;
     }
 
-    public function setRead(?bool $read): static
+    public function setReaded(?bool $Readed): static
     {
-        $this->read = $read;
+        $this->Readed = $Readed;
 
         return $this;
     }
