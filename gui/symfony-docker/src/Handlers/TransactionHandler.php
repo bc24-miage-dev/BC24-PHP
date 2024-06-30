@@ -51,24 +51,11 @@ class TransactionHandler
                 $quantity = $resource['balance'];
             }
         }
+
         $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
-        sleep(7);
+
         $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
         $request->setState('Validé');
-        $this->entityManager->persist($request);
-        $this->entityManager->flush();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function refuseTransaction(int $id, UserInterface $user) : void
-    {
-        $request = $this->requestRepository->find($id);
-        if (!$request || $request->getInitialOwner() != $user || $request->getState() != 'En attente'){
-            throw new Exception('Erreur lors de la transaction');
-        }
-        $request->setState('Refusé');
         $this->entityManager->persist($request);
         $this->entityManager->flush();
     }
@@ -86,12 +73,16 @@ class TransactionHandler
         foreach ($requests as $request){
             $quantity = 0;
         
-        foreach ($ListeResource as $key => $resource) {
-            if($resource['tokenId'] == $request->getResourceTokenID()){
-                $quantity = $resource['balance'];
+            foreach ($ListeResource as $key => $resource) {
+                if($resource['tokenId'] == $request->getResourceTokenID()){
+                    $quantity = $resource['balance'];
+                }
             }
-        }
-        $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
+
+            $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
+            sleep(5);
+            $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
+            sleep(5);
         $request->setState('Validé');
         $this->entityManager->persist($request);
         }
@@ -99,8 +90,24 @@ class TransactionHandler
     }
 
     /**
+    
      * @throws Exception
      */
+    public function refuseTransaction(int $id, UserInterface $user) : void
+    {
+        $request = $this->requestRepository->find($id);
+        if (!$request || $request->getInitialOwner() != $user || $request->getState() != 'En attente'){
+            throw new Exception('Erreur lors de la transaction');
+        }
+        $request->setState('Refusé');
+        $this->entityManager->persist($request);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @throws Exception
+     */
+
     public function askOwnership( UserInterface $receiverID, int $tokenID ) : void
     {
         $MetaDataTokenID = $this->blockChainService->getMetaDataFromTokenId($tokenID);
