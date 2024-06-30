@@ -58,10 +58,6 @@
             <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Pays de création : {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
-            <li class="list-group-item">Lieu de départ du trajet : {{ resource.gpsStart }}</li>
-            <li class="list-group-item">Lieu d'arrivé du trajet : {{ resource.gpsEnd }}</li>
-            <li class="list-group-item">Température de conservation départ du trajet : {{ resource.temperatureStart }}</li>
-            <li class="list-group-item">Température de conservation arrivé du trajet : {{ resource.temperatureEnd }}</li>
             <li class="list-group-item">Ressources utilisées (NFT) :
             {% for parentResource, value in resource.listOfIngredients %}
                 <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>

@@ -71,7 +71,7 @@ class SearchController extends AbstractController
                 $resources = $this->blockChainService->getResourceFromTokenIDMeat($id);
                 break;
             case "Product":
-                $resources = $this->blockChainService->getResourceFromTokenIDProduct($id);
+                $resources = $this->blockChainService->getResourceFromTokenIDRecipe($id);
                 break;
             default:
                 $this->addFlash('error', 'Ressource non reconnue');

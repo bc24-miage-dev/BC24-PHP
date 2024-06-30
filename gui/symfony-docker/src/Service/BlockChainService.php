@@ -501,6 +501,7 @@ class BlockChainService
             "resourceName" => $data["resource_name"],
             "resourceType" => $data["resource_type"], 
             "isContaminated" => $stringDataPath["isContaminated"],
+            "recipeDate" => $stringDataPath["recipeDate"],
             "manufacturingPlace" => $stringDataPath["manufacturingPlace"],
             "manufactureingCountry" => $stringDataPath["manufactureingCountry"],
             "approvalNumberManufacturer" => $stringDataPath["approvalNumberManufacturer"],
