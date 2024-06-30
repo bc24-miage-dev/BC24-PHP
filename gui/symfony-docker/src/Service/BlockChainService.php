@@ -583,12 +583,11 @@ class BlockChainService
         return $returnData;
     }
 
-    public function replaceMetaDataTransport($walletAddress,int $tokenId): array
+    public function replaceMetaDataTransport($walletAddress,int $tokenId,String $typeMovement): array
     {
         $response = $this->getMetaDataFromTokenId($tokenId);
-        $roleReceiver = $this->getRole($walletAddress);
 
-        if($roleReceiver["role"] == "TRANSPORTER"){
+        if($typeMovement == "start"){
             $metadata["transportDate1"] = new \DateTime('now', new \DateTimeZone('Europe/Paris'));
             // sleep(5);
             // $metadata["transportDate2"] = json_decode(json_encode(new \DateTime('now', new \DateTimeZone('Europe/Paris')),true),true);

@@ -186,7 +186,7 @@ class TransporteurController extends AbstractController
             }
 
             foreach ($resourcesTransported as $resource) {
-                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
+                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata,"start");
                 sleep(5);
                 $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(), $request->getResourceTokenID());
                 sleep(5);
@@ -217,7 +217,7 @@ class TransporteurController extends AbstractController
                 throw new Exception('Erreur lors de la transaction');
             }
             foreach ($resourcesTransported as $resource) {
-                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
+                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata, "end");
                 sleep(5);
                 $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(), $request->getResourceTokenID());
                 sleep(5);
