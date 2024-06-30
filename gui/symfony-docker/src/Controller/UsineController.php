@@ -252,11 +252,6 @@ class UsineController extends AbstractController
                                                                         $morceaux);
                 $mintResource = json_decode($mintResource, true);
                 // dd($mintResource);
-                foreach ($morceaux as $key => $morceau) {
-                    sleep(5);
-                    $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $morceau,
-                        $this->blockChainService->metadataTemplateMeat($template));
-                }
 
             } catch (\Exception $e) {
                 $this->addFlash('error', "Vérifiez votre stock et le NFT" );
