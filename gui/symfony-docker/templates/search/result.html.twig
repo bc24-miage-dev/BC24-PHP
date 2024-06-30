@@ -54,7 +54,9 @@
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
             <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }}</li>
             <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
+            {% if resource.demiCarcassDate != null %}
             <li class="list-group-item">Date d'utilisation : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
+            {% endif %}
             <li class="list-group-item">Pays de création: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
     {% elseif resource.resourceType == 'Demi Carcass' %}
@@ -67,8 +69,12 @@
             <li class="list-group-item">Date de création : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Pays de création: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            {% if resource.meatDate != null %}
             <li class="list-group-item">Date de d'utilisation : {{ resource.meatDate.date|date('d/m/Y') }} , {{ resource.meatDate.date|date('H:i:s') }}</li>
+            {% endif %}
+            {% if resource.travelTime != null %}
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
+            {% endif %}
             <li class="list-group-item">Lieu de départ : {{ resource.gpsStart }}</li>
             <li class="list-group-item">Lieu d'arrivé : {{ resource.gpsEnd }}</li>
             <li class="list-group-item">Température de conservation départ : {{ resource.temperatureStart }}</li>
