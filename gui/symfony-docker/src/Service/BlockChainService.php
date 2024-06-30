@@ -260,7 +260,7 @@ class BlockChainService
 
     public function createWalletAddress(): String
     {
-        $response = $this->httpClient->request('GET', $this->baseURL."wallet/static");
+        $response = $this->httpClient->request('GET', $this->baseURL."wallet/create");
         $data = json_decode($response->getContent(), true);
         return $data["wallet_address"];
     }
