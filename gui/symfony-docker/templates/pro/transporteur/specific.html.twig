@@ -40,7 +40,7 @@
             <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }}</li>
             <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
-            <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
+            <li class="list-group-item">Pays de coupe: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
         
         <br>
@@ -52,7 +52,7 @@
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
             <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }} </li>
             <li class="list-group-item">Date découpe : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
-            <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
+            <li class="list-group-item">Pays de découpe: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
         
 
@@ -66,7 +66,7 @@
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
             <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
             <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
-            <li class="list-group-item">Pay de découpe : {{ resource.manufactureingCountry }}</li>
+            <li class="list-group-item">Pays de découpe : {{ resource.manufactureingCountry }}</li>
         
     {% else %}
     <h1>Informations sur votre produit :</h1>
@@ -76,13 +76,13 @@
             <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
             <li class="list-group-item">Adresse de découpe : {{ resource.manufacturingPlace }}</li>
             <li class="list-group-item">Numéro d'approbation de l'usine: {{ resource.approvalNumberManufacturer }}</li>
-            <li class="list-group-item">Pay de découpe : {{ resource.manufactureingCountry }}</li>
+            <li class="list-group-item">Pays de découpe : {{ resource.manufactureingCountry }}</li>
     {% endif %}
     <li class="list-group-item">Lieu de départ du transport: {{ resource.gpsStart }}</li>
     <li class="list-group-item">Lieu d'arrivé du transport: {{ resource.gpsEnd }}</li>
     <li class="list-group-item">Température de conservation départ du transport: {{ resource.temperatureStart }}</li>
     <li class="list-group-item">Température de conservation arrivé du transport: {{ resource.temperatureEnd }}</li>
-    <li class="list-group-item">Ressources utilisées (NFT) :
+    <li class="list-group-item">Ressources utilisées : (NFT) :
     {% for parentResource, value in resource.listOfIngredients %}
         <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
     {% endfor %}

@@ -243,8 +243,6 @@ class UsineController extends AbstractController
             ];
 
             try {
-                
-
                 $mintResource = $this->blockChainService->mintResource($this->getUser()->getWalletAddress(),
                                                                         $id,
                                                                         1, 
