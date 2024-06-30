@@ -54,7 +54,7 @@ class TransactionHandler
 
         $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
 
-        $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
+        // $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
         $request->setState('Validé');
         $this->entityManager->persist($request);
         $this->entityManager->flush();
@@ -81,8 +81,8 @@ class TransactionHandler
 
             $this->blockChainService->transferResource($request->getResourceTokenID(),$quantity,$request->getInitialOwner()->getWalletAddress(), $request->getRequester()->getWalletAddress());
             sleep(5);
-            $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
-            sleep(5);
+            // $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(),$request->getResourceTokenID());
+            // sleep(5);
         $request->setState('Validé');
         $this->entityManager->persist($request);
         }
