@@ -244,26 +244,26 @@ class UsineController extends AbstractController
 
             try {
                 $mintResource = $this->blockChainService->mintResource($this->getUser()->getWalletAddress(),
-                                                                        $id,
-                                                                        1, 
-                                                                        $this->blockChainService->metadataTemplateRecipe($template),
-                                                                        $morceaux);
+                    $id,
+                    1,
+                    $this->blockChainService->metadataTemplateRecipe($template),
+                    $morceaux);
                 $mintResource = json_decode($mintResource, true);
                 // dd($mintResource);
+                $returnID = [$mintResource["tokenId"]];
+                $returnName = [$mintResource["ressourceName"]];
+                $this->addFlash('success', 'Recette bien appliquée, vous avez crée : ' . $mintResource["ressourceName"] . ' ! NFT : ' . $mintResource["tokenId"]);
+
+                return $this->render('user/WriteOnNFC.html.twig', [
+                    'id' => $returnID,
+                    'name' => $returnName,
+                    'resourceType' => "Product",
+                ]);
 
             } catch (\Exception $e) {
-                $this->addFlash('error', "Vérifiez votre stock et le NFT" );
+                $this->addFlash('error', "Vérifiez votre stock et le NFT utilisé");
                 return $this->redirectToRoute('app_usine_recette', ['id' => $id]);
             }
-            $returnID = [$mintResource["tokenId"]];
-            $returnName = [$mintResource["ressourceName"]];
-            $this->addFlash('success', 'Recette bien appliquée, vous avez crée : ' . $mintResource["ressourceName"] . ' ! NFT : ' . $mintResource["tokenId"]);
-
-            return $this->render('user/WriteOnNFC.html.twig', [
-                'id' => $returnID,
-                'name' => $returnName,
-                'resourceType' => "Product",
-            ]);
         }
         return $this->render('pro/usine/appliRecette.html.twig',
             ['ingredients' => $ingredients, 'product' => $recipeTitle]);
