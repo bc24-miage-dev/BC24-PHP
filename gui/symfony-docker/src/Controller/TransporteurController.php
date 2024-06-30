@@ -181,7 +181,6 @@ class TransporteurController extends AbstractController
                 "temperatureStart" => $readerData["data"]["temperature"],
             ];
             $requests = $this->requestRepository->findBy(['initialOwner' => $user, 'state' => 'En attente']);
-            $this->blockChainService->replaceMetaDataTransport($request->getRequester()->getWalletAddress(), $request->getResourceTokenID());
             foreach ($resourcesTransported as $resource) {
                 $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
                 sleep(5);
