@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.scanner-button').forEach(button => {
+    document.querySelectorAll('.scanner-button-manufacturer').forEach(button => {
         button.addEventListener('click', function() {
+
+            var parentDiv = button.closest('.input-div'); //Trouve la div parente de ce bouton
             // Show the loader modal
             var loaderModal = document.getElementById('loaderModal');
             loaderModal.style.display = 'flex';
@@ -19,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Manipuler les données JSON récupérées
                     console.log('Scanner data:', data.data);
                     // Vérifiez le type et la valeur du champ de saisie avant de le définir
-                    const searchInput = document.querySelector('.search-input');
+                    const searchInput = parentDiv.querySelector('.search-input');
                     console.log('Type of searchInput:', searchInput.type);
                     console.log('Current value of searchInput:', searchInput.value);
                     console.log('Setting searchInput value to:', data.data.NFT_tokenID);
@@ -42,5 +44,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-

@@ -9,7 +9,7 @@
             <li class="list-group-item">Nom : {{ animal.resourceName }}</li>
             <li class="list-group-item">Genre : {{ animal.genre }}</li>
             <li class="list-group-item">Lieu de création : {{ animal.address }}</li>
-            <li class="list-group-item">Date de naissance : {{ animal.birthDate|date('d/m/Y') }} , {{ animal.birthDate|date('H:i:s') }}</li>
+            <li class="list-group-item">Date de naissance : {{ animal.birthDate.date|date('d/m/Y') }} , {{ animal.birthDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Nutrition : {{ animal.nutrition }}</li>
             <li class="list-group-item">Vaccin : <br>
             {# {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li> #}

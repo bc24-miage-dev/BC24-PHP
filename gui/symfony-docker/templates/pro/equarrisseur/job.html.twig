@@ -11,17 +11,15 @@
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
             <li class="list-group-item">Genre : {{ resource.genre }}</li>
             <li class="list-group-item">Lieu de création : {{ resource.address }}</li>
-            <li class="list-group-item">Date de naissance : {{ resource.birthDate|date('d/m/Y') }} , {{ resource.birthDate|date('H:i:s') }}</li>
+            <li class="list-group-item">Date de naissance : {{ resource.birthDate.date|date('d/m/Y') }} , {{ resource.birthDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Nutrition : {{ resource.nutrition }}</li>
             <li class="list-group-item">Vaccin : <br>
-            {# {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li> #}
             {% for key, value in resource.vaccin %}
                 {{ key }} : {{ value.date|date('d/m/Y') }} , {{ value.date|date('H:i:s') }}
                 <br>
             {% endfor %}
             </li>
             <li class="list-group-item">Maladie : <br>
-            {# {{ resource.date|date('d/m/Y') }}, {{ resource.date|date('H:i:s') }}</li> #}
             {% for key, value in resource.disease %}
                 {{ key }} : {{ value.date|date('d/m/Y') }} , {{ value.date|date('H:i:s') }}
                 <br>
@@ -30,6 +28,17 @@
             <li class="list-group-item">Poids en grammes : {{ resource.weight }}</li>
             <li class="list-group-item">Numéro d'approbation de ferme: {{ resource.approvalNumberBreeder }}</li>
             <li class="list-group-item">Temps de trajet : {{ resource.travelTime }}</li>
+            <li class="list-group-item">Lieu de départ : {{ resource.gpsStart }}</li>
+            <li class="list-group-item">Lieu d'arrivé : {{ resource.gpsEnd }}</li>
+            <li class="list-group-item">Température de conservation départ : {{ resource.temperatureStart }}</li>
+            <li class="list-group-item">Température de conservation arrivé : {{ resource.temperatureEnd }}</li>
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
+            
+
         </ul>
         <br>
         {% if newResourceID != -1 %}
@@ -47,9 +56,17 @@
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
             <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }}</li>
             <li class="list-group-item">Date de création : {{ resource.carcassDate.date|date('d/m/Y') }} , {{ resource.carcassDate.date|date('H:i:s') }}</li>
-            <li class="list-group-item">Temps de transport : {{ resource.travelTime|date('H:i:s') }}</li>
             <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            <li class="list-group-item">Lieu de départ : {{ resource.gpsStart }}</li>
+            <li class="list-group-item">Lieu d'arrivé : {{ resource.gpsEnd }}</li>
+            <li class="list-group-item">Température de conservation départ : {{ resource.temperatureStart }}</li>
+            <li class="list-group-item">Température de conservation arrivé : {{ resource.temperatureEnd }}</li>
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
         </ul>
         <br>
         <a href="{{ path('app_equarrisseur_equarrir', {"newResourceID" : newResourceID , 'tokenIDAnimal' : resource.tokenID}) }}">
@@ -61,10 +78,19 @@
         <ul class="list-group">
             <li class="list-group-item">NFT : {{ resource.tokenID }}</li>
             <li class="list-group-item">Nom : {{ resource.resourceName }}</li>
-            <li class="list-group-item">Adresse : {{ resource.address }} </li>
+            <li class="list-group-item">Adresse : {{ resource.slaughteringPlace }} </li>
             <li class="list-group-item">Date découpe : {{ resource.demiCarcassDate.date|date('d/m/Y') }} , {{ resource.demiCarcassDate.date|date('H:i:s') }}</li>
             <li class="list-group-item">Pay de coupe: {{ resource.slaughtererCountry }}</li>
             <li class="list-group-item">Numéro d'approbation de l'équarrisseur: {{ resource.approvalNumberSlaughterer }}</li>
+            <li class="list-group-item">Lieu de départ : {{ resource.gpsStart }}</li>
+            <li class="list-group-item">Lieu d'arrivé : {{ resource.gpsEnd }}</li>
+            <li class="list-group-item">Température de conservation départ : {{ resource.temperatureStart }}</li>
+            <li class="list-group-item">Température de conservation arrivé : {{ resource.temperatureEnd }}</li>
+            <li class="list-group-item">Liste des ingrédients (NFT) :
+            {% for parentResource, value in resource.listOfIngredients %}
+                <a href="{{ path('app_search_result', {'id' : value})}}" class="card-link"> {{ value }}</a>
+            {% endfor %}
+            </li>
         </ul>
 
     {% endif %}

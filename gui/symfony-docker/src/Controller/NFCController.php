@@ -43,10 +43,12 @@ class NFCController extends AbstractController
         return $this->redirectToRoute('app_nfc_write', ['id' => $test]);
     }
 
-    #[Route('/NFC/{id}', name: 'app_nfc_readjs')]
-    public function testNFCjs($id): response
+    #[Route('/NFC/test3', name: 'app_nfc_readjs')]
+    public function testNFCjs(): response
     {
-        $this->hardwareService->write($id);
+        $test = $this->hardwareService->startReader();
+        $test = json_decode($test->getContent(), true);
+        dd($test);
         return $this->render("/static/info.html.twig");
     }
 }

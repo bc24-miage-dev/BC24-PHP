@@ -147,10 +147,12 @@ class AdminController extends AbstractController
 
     #[Route('/userEdit/{id}/{role}', name: 'app_admin_userEdit')]
     public function userEdit(UserRepository $userRepo,
-                             $id, $role): RedirectResponse
+                             $id, $role,RoleConversionWithBlockChainHandler $roleConversionWithBlockChainHandler): RedirectResponse
     {
         $user = $userRepo->find($id);
         $user->setSpecificRole("$role");
+        $role = $roleConversionWithBlockChainHandler->convertRoleToBlockchainRole($role);
+        $this->blockChainService->assignRole($user->getWalletAddress(), $role);
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
