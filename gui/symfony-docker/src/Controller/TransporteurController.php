@@ -2,20 +2,19 @@
 
 namespace App\Controller;
 
+use App\Form\ResourceOwnerChangerType;
 use App\Handlers\ProHandler;
 use App\Handlers\ResourcesListHandler;
 use App\Handlers\TransactionHandler;
 use App\Repository\OwnershipAcquisitionRequestRepository;
 use App\Repository\ResourceRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use App\Form\ResourceOwnerChangerType;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use App\Service\BlockChainService;
 use App\Service\HardwareService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/pro/transporteur')]
 class TransporteurController extends AbstractController
@@ -27,17 +26,14 @@ class TransporteurController extends AbstractController
     private HardwareService $hardwareService;
 
     public function __construct(TransactionHandler $transactionHandler,
-                                ProHandler $proHandler,
-                                BlockChainService $blockChainService,
-                                HardwareService $hardwareService)
-    {
+        ProHandler $proHandler,
+        BlockChainService $blockChainService,
+        HardwareService $hardwareService) {
         $this->transactionHandler = $transactionHandler;
         $this->proHandler = $proHandler;
         $this->blockChainService = $blockChainService;
         $this->hardwareService = $hardwareService;
     }
-
-    
 
     #[Route('/', name: 'app_transporteur_index')]
     public function index(): Response
@@ -45,11 +41,9 @@ class TransporteurController extends AbstractController
         return $this->render('pro/transporteur/index.html.twig');
     }
 
-
     #[Route('/acquisition', name: 'app_transporteur_acquire')]
     public function acquisition(Request $request,
-                                OwnershipAcquisitionRequestRepository $ownershipRepo): Response
-    {
+        OwnershipAcquisitionRequestRepository $ownershipRepo): Response {
         $form = $this->createForm(ResourceOwnerChangerType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -65,15 +59,13 @@ class TransporteurController extends AbstractController
         $requests = $ownershipRepo->findBy(['requester' => $this->getUser()], ['requestDate' => 'DESC'], limit: 30);
         return $this->render('pro/transporteur/acquire.html.twig', [
             'form' => $form->createView(),
-            'requests' => $requests
+            'requests' => $requests,
         ]);
     }
 
-
     #[Route('/list', name: 'app_transporteur_list')]
     public function list(ResourcesListHandler $listHandler,
-                         Request $request) : Response
-    {
+        Request $request): Response {
         if ($request->isMethod('POST')) {
             $resources = $this->blockChainService->getRessourceFromTokenId($request->request->get('NFC'));
             $category = $resources["resourceType"];
@@ -81,7 +73,7 @@ class TransporteurController extends AbstractController
                 $this->addFlash('error', 'Aucune ressource trouvée');
                 return $this->redirectToRoute('app_transporteur_list');
             }
-            if($resources['current_owner'] != $this->getUser()->getWalletAddress()){
+            if ($resources['current_owner'] != $this->getUser()->getWalletAddress()) {
                 $this->addFlash('error', 'Vous n\'êtes pas le propriétaire de cette ressource');
                 return $this->redirectToRoute('app_transporteur_list');
             }
@@ -94,12 +86,10 @@ class TransporteurController extends AbstractController
         );
     }
 
-
     #[Route('/specific/{id}', name: 'app_transporteur_specific')]
     public function specific(ResourceRepository $resourceRepository,
-                             $id): Response
-    {
-        $resource =$this->blockChainService->getRessourceFromTokenId($id);
+        $id): Response {
+        $resource = $this->blockChainService->getRessourceFromTokenId($id);
 
         switch ($resource["resourceType"]) {
             case 'Animal':
@@ -131,13 +121,12 @@ class TransporteurController extends AbstractController
     #[Route('/transaction', name: 'app_transporteur_transferList')]
     public function transferList(OwnershipAcquisitionRequestRepository $requestRepository): Response
     {
-        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser() ,'state' => 'En attente']);
+        $requests = $requestRepository->findBy(['initialOwner' => $this->getUser(), 'state' => 'En attente']);
         $pastTransactions = $requestRepository->findPastRequests($this->getUser());
         return $this->render('pro/transporteur/transferList.html.twig',
             ['requests' => $requests, 'pastTransactions' => $pastTransactions]
         );
     }
-
 
     #[Route('/transaction/{id}', name: 'app_transporteur_transfer', requirements: ['id' => '\d+'])]
     public function transfer($id): RedirectResponse
@@ -145,14 +134,12 @@ class TransporteurController extends AbstractController
         try {
             $this->transactionHandler->acceptTransaction($id, $this->getUser());
             $this->addFlash('success', 'Transaction effectuée');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->addFlash('error', $e->getMessage());
         } finally {
             return $this->redirectToRoute('app_transporteur_transferList');
         }
     }
-
 
     #[Route('/transactionRefused/{id}', name: 'app_transporteur_transferRefused', requirements: ['id' => '\d+'])]
     public function transferRefused($id): RedirectResponse
@@ -167,15 +154,13 @@ class TransporteurController extends AbstractController
         }
     }
 
-
-    #[Route('/transaction/all' , name: 'app_transporteur_transferAll')]
+    #[Route('/transaction/all', name: 'app_transporteur_transferAll')]
     public function transferAll(): RedirectResponse
     {
         try {
             $this->transactionHandler->acceptAllTransactions($this->getUser());
             $this->addFlash('success', 'Toutes les transactions ont été effectuées');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->addFlash('error', $e->getMessage());
         } finally {
             return $this->redirectToRoute('app_transporteur_transferList');
@@ -187,22 +172,23 @@ class TransporteurController extends AbstractController
     {
         try {
             $readerData = $this->hardwareService->startReader();
-        $readerData = json_decode($readerData->getContent() , true);
-        //dd($readerData);
-        $resourcesTransported = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
-        //dd($resourcesTransported);
-        $arrayAddMetadata = [
-            "gpsStart" => $readerData["data"]["gps"],
-            "temperatureStart" => $readerData["data"]["temperature"],
-        ];
-        foreach ($resourcesTransported as $resource) {
-            $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
-            sleep(5);
-        }
-        $this->addFlash('success', 'Lecture et enregistrement bien effectué');
+            $readerData = json_decode($readerData->getContent(), true);
+            //dd($readerData);
+            $resourcesTransported = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
+            //dd($resourcesTransported);
+            $arrayAddMetadata = [
+                "gpsStart" => $readerData["data"]["gps"],
+                "temperatureStart" => $readerData["data"]["temperature"],
+            ];
+            $requests = $this->requestRepository->findBy(['initialOwner' => $user, 'state' => 'En attente']);
+            foreach ($resourcesTransported as $resource) {
+                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
+                sleep(5);
+            }
+            $this->addFlash('success', 'Le transport à démaré');
 
-        } catch (Exeption $th) {
-            $this->addFlash('error', 'Erreur lors de la lecture du lecteur');
+        } catch (Exception $th) {
+            $this->addFlash('error', 'Erreur lors du départ');
         }
         return $this->redirectToRoute('app_transporteur_list');
     }
@@ -212,22 +198,22 @@ class TransporteurController extends AbstractController
     {
         try {
             $readerData = $this->hardwareService->startReader();
-        $readerData = json_decode($readerData->getContent() , true);
-        //dd($readerData);
-        $resourcesTransported = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
-        //dd($resourcesTransported);
-        $arrayAddMetadata = [
-            "gpsEnd" => $readerData["data"]["gps"],
-            "temperatureEnd" => $readerData["data"]["temperature"],
-        ];
-        foreach ($resourcesTransported as $resource) {
-            $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
-            sleep(5);
-        }
-        $this->addFlash('success', 'Lecture et enregistrement bien effectué');
+            $readerData = json_decode($readerData->getContent(), true);
 
-        } catch (Exeption $th) {
-            $this->addFlash('error', 'Erreur lors de la lecture du lecteur');
+            $resourcesTransported = $this->blockChainService->getAllRessourceFromWalletAddress($this->getUser()->getWalletAddress());
+            //dd($resourcesTransported);
+            $arrayAddMetadata = [
+                "gpsEnd" => $readerData["data"]["gps"],
+                "temperatureEnd" => $readerData["data"]["temperature"],
+            ];
+            foreach ($resourcesTransported as $resource) {
+                $this->blockChainService->replaceMetaData($this->getUser()->getWalletAddress(), $resource["tokenId"], $arrayAddMetadata);
+                sleep(5);
+            }
+            $this->addFlash('success', 'Le transport s\'est terminé');
+
+        } catch (Exception $th) {
+            $this->addFlash('error', 'Erreur lors de l\'arrivée');
         }
         return $this->redirectToRoute('app_transporteur_list');
     }
