@@ -233,7 +233,6 @@ class UsineController extends AbstractController
         $ingredients = $this->blockChainService->getResourceListInformation($recipe["needed_resources"]);
         // dd($ingredients);
         $recipeTitle = $recipe["resource_name"];
-
         if ($request->isMethod('POST')) {
             $morceaux = $request->request->all()['morceaux'];
             $template = [
